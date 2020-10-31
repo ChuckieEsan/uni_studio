@@ -4,7 +4,7 @@ from flask_bootstrap import Bootstrap#for flask-file-uploader | fileservice
 from .test import tests
 from .fileservice.app import app as fileserviceapp
 from .vote import vote as voteapp
-from .postcard.app import postcard as postcardapp
+from .api import postcardapp
 from .utils.dir_helper import join_upload_dir
 import redis
 #r = redis.Redis(host='localhost',port=6379,decode_responses=True,password='Bit_redis_123')

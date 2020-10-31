@@ -1,0 +1,1 @@
+from .postcard.app import postcard as postcardapp
