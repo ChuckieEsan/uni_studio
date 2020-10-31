@@ -1,25 +1,23 @@
 # coding: utf-8
 from __future__ import division
-from flask import Flask,request,render_template,redirect,url_for,jsonify,make_response,send_file,session,Response
-import flask_sqlalchemy
-from flask_sqlalchemy import SQLAlchemy
-import pymysql
+from flask import Flask,request,render_template,redirect,url_for,jsonify,make_response,send_file,session,Response,Blueprint
 import datetime
 import time,os,copy,requests,json,hashlib
 from shutil import copyfile
 from PIL import Image
 from requests_toolbelt import MultipartEncoder
+from studio.models import db
+from studio.models import PostcardCards as Cards
+from studio.models import PostcardRoles as Roles
+from studio.models import PostcardTemplates as Templates
+from studio.models import PostcardUsers as Users
 
 
-app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:***@127.0.0.1:3306/postcard?charset=utf8mb4"
-app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY']=
-db = SQLAlchemy(app)
+
+postcard = Blueprint('postcard',__name__,template_folder='templates',url_prefix='/postcard')
 sizes = ['small','large']
-APPID = 
-APPSECRET = 
+APPID = '*'
+APPSECRET = '*'
 
 def md5(arg):
     m = hashlib.md5()
@@ -37,83 +35,8 @@ def process_sqlalchemy_arr(arr):
         item.pop('_sa_instance_state')
         result.append(item)
     return result
-class Users(db.Model):
-    __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
-    wxid = db.Column(db.String(65), nullable=True)
-    wx_name = db.Column(db.String(100),nullable=True)
-    last_ip = db.Column(db.String(100),nullable=False)
-    log_time = db.Column(db.Integer,nullable=False)
-    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
-    cards_saved = db.Column(db.Text,nullable=True)
-    avt_url = db.Column(db.String(200),nullable=True)
-    def __init__(self,wxid,last_ip,role_id=2,wx_name=None,cards_saved='[]',avt_url=''):
-        self.wxid = wxid
-        self.wx_name = wx_name
-        self.last_ip = last_ip
-        self.log_time = int(time.time())
-        self.role_id = role_id
-        self.cards_saved = cards_saved
-        self.avt_url = avt_url
 
-class Cards(db.Model):
-    __tablename__ = 'cards'
-    id = db.Column(db.Integer,primary_key=True)
-    wx_openid = db.Column(db.String(100))
-    create_time = db.Column(db.Integer,nullable=False)
-    title = db.Column(db.Text,nullable=True)
-    description = db.Column(db.Text,nullable=True)
-    content = db.Column(db.Text,nullable=True)
-    with_audio = db.Column(db.Integer,nullable=True)#0是采用自带模板，非0是模板编号
-    with_img = db.Column(db.Integer,nullable=True)#0是采用自带模板，非0是模板编号
-    dir_name = db.Column(db.String(33),nullable=True)
-    crop = db.Column(db.Text,nullable=True)
-    display = db.Column(db.Boolean,nullable=False)
-    likes = db.Column(db.Integer,nullable=True)
-    liked_by = db.Column(db.Text,nullable=True)
-    def __init__(self,wx_openid,title,description,content,crop='',with_audio=0,with_img=0,display=False,dir_name='',likes=0,liked_by='[]'):
-        self.wx_openid = wx_openid
-        self.title = title
-        self.description = description
-        self.content = content
-        self.crop = crop
-        self.with_audio = with_audio
-        self.with_img = with_img
-        self.display = display
-        self.create_time = int(time.time())
-        self.dir_name = dir_name
-        self.likes=likes
-        self.liked_by=liked_by
-
-class Templates(db.Model):
-    __tablename__ = 'templates'
-    id = db.Column(db.Integer,primary_key=True)
-    upload_user = db.Column(db.Integer,db.ForeignKey('users.id'))
-    create_time = db.Column(db.Integer,nullable=False)
-    title = db.Column(db.Text,nullable=True)
-    description = db.Column(db.Text,nullable=True)
-    with_audio = db.Column(db.Boolean,nullable=True)
-    def __init__(self,upload_user,create_time,title,description,with_audio):
-        self.upload_user = upload_user
-        self.create_time = int(time.time())
-        self.title = title
-        self.description = description
-        self.with_audio = with_audio
-
-class Roles(db.Model):
-    __tablename__ = 'roles'
-    id = db.Column(db.Integer,primary_key=True)
-    creator = db.Column(db.Integer,nullable=False)
-    create_time = db.Column(db.Integer,nullable=False)
-    name = db.Column(db.Text,nullable=True)
-    description = db.Column(db.Text,nullable=True)
-    def __init__(self,creator,name,description):
-        self.name = name
-        self.creator = creator
-        self.description = description
-        self.create_time = int(time.time())
-
-@app.route('/postcard/upload',methods=['POST','GET'])
+@postcard.route('/upload',methods=['POST','GET'])
 def uploader():
     msg = {'success':0,'exist':0,'data':'unknown error','errorCode':0}
     wxid = request.headers.get('openid')
@@ -144,7 +67,7 @@ def uploader():
             msg['data'] = repr(e)
     return jsonify(msg)
 
-@app.route('/postcard/<op_type>/<id>',methods=['GET','POST'])
+@postcard.route('/<op_type>/<id>',methods=['GET','POST'])
 def resource_handler(op_type,id):
     if request.method=='GET':
         if op_type=='image':
@@ -203,7 +126,7 @@ def resource_handler(op_type,id):
     else:
         return do_return(500,'not ready')
 
-@app.route('/postcard/card',methods=['GET','POST','PUT','DELETE'])
+@postcard.route('/card',methods=['GET','POST','PUT','DELETE'])
 def card_handler():
     msg = {'success':0,'data':{},'errorCode':0}
     if request.method=='POST':
@@ -352,7 +275,7 @@ def card_handler():
             msg['data']='unauthorized';msg['errorCode']=25
     return jsonify(msg)
 
-@app.route('/postcard/code',methods=['GET','POST'])
+@postcard.route('/code',methods=['GET','POST'])
 def pcode():
     msg = {'success':0,'data':{},'errorCode':0,'new':0}
     if request.method=='GET':
@@ -427,7 +350,7 @@ def pcode():
         msg['data'] = repr(e);msg['errorCode']=7
     return jsonify(msg)
 
-@app.route('/postcard/public',methods=['GET'])
+@postcard.route('/public',methods=['GET'])
 def public_handler():
     msg = {'success':0,'data':{},'errorCode':0}
     c = []
@@ -463,7 +386,7 @@ def public_handler():
     msg['data'] = c;msg['success']=1;msg['logged_in']=this_visitor_id!=None
     return jsonify(msg)
 
-@app.route('/postcard/user',methods=['GET','POST','PUT','DELETE'])
+@postcard.route('/user',methods=['GET','POST','PUT','DELETE'])
 def user_handler():
     msg = {'success':0,'data':{},'errorCode':0}
     if request.headers.get('openid') and Users.query.filter(Users.wxid==request.headers.get('openid')).first():
@@ -521,7 +444,7 @@ def user_handler():
     else:
         return do_return(403,'unauthorized')  
 
-@app.route('/postcard/templates',methods=['GET','POST'])#拿list
+@postcard.route('/templates',methods=['GET','POST'])#拿list
 def template_handler():
     msg = {'success':0,'data':{},'errorCode':0}
     if request.method=='GET':
@@ -532,11 +455,10 @@ def template_handler():
         return do_return(500,'1')
     return jsonify(msg)
     
-@app.route('/postcard/home',methods=['GET','POST'])
+@postcard.route('/home',methods=['GET','POST'])
 def homepage():
     return render_template('upload.html')
         
 if __name__ == '__main__':
-    #db.drop_all()
-    db.create_all()
-    app.run(host='0.0.0.0', debug=True ,port=6060)   
+    #a#pp.run(host='0.0.0.0', debug=True ,port=6060)   
+    pass
