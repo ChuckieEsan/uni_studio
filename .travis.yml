@@ -12,4 +12,4 @@ script:
 # unit test
 - python -m pytest -v
 # linting test
-- flake
+- flake8
