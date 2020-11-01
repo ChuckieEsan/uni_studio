@@ -1,5 +1,5 @@
 # uni_studio
-
+[![Build Status](https://travis-ci.org/dutbit/uni_studio.svg?branch=main)](https://travis-ci.org/dutbit/uni_studio)  
 A web based set of tools for operations of studios in universities.
 
 - User service  
