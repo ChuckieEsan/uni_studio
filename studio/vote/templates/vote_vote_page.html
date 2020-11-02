@@ -39,7 +39,7 @@
             {% if c.image %}
             <img src="{{c.image}}"/>
             {% endif %}
-            <input type="checkbox" name="candidates" value="{{v.id}}" required/>
+            <input type="checkbox" name="candidates" value="{{c.id}}" required/>
             {% endfor %}
             <br>
             <input type="submit">
