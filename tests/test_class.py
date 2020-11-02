@@ -14,3 +14,13 @@ class TestThis(unittest.TestCase):
     def test_page(self):
         res = self.app.get('/',follow_redirects=True)
         self.assertEqual(res.status_code,200)
+    
+    def test_vote_page(self):
+        res = self.app.get('/vote/populate',follow_redirects=True)
+        self.assertEqual(res.status_code,200)
+        res = self.app.get('/vote/populate/1',follow_redirects=True)
+        self.assertEqual(res.status_code,200)
+        res = self.app.get('/vote/1')
+        self.assertEqual(res.status_code,200)
+
+    
