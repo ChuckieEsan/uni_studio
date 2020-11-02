@@ -20,7 +20,6 @@ def vote_page(vote_id):
         'vote_vote_page.html',
         candidate_all=candidate_all,
         vote_info=vote_info,
-        admin=False
     )
 
 @vote.route('/<int:vote_id>',methods=["POST"])

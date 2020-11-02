@@ -30,12 +30,15 @@
         </div>
         <div id="root"></div>
         <form action="{{url_for('vote.vote_handler',vote_id=vote_info.id)}}" method="POST">
-            {% for v in candidate_all %}
-            <h3>{{v.title}}</h3>
-            <h4>{{v.subtitle}}</h4>
-            <p>{{v.description}}</p>
-            <p>{{v.votes}}</p>
-            <p>{{v.action_at}}</p>
+            {% for c in candidate_all %}
+            <h3>{{c.title}}</h3>
+            <h4>{{c.subtitle}}</h4>
+            <p>{{c.description}}</p>
+            <p>{{c.votes}}</p>
+            <p>{{c.action_at}}</p>
+            {% if c.image %}
+            <img src="{{c.image}}"/>
+            {% endif %}
             <input type="checkbox" name="candidates" value="{{v.id}}" required/>
             {% endfor %}
             <br>
