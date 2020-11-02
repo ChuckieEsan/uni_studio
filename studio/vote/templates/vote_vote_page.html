@@ -45,15 +45,6 @@
             <input type="submit">
         </form>
         <hr>
-        {% if admin %}
-        <form action="{{url_for('vote.candidate_add',vote_id=vote_info.id)}}" method="POST">
-            <input type="text" placeholder="title" name="title">
-            <input type="text" placeholder="subtitle" name="subtitle">
-            <input type="text" placeholder="description" name="description">
-            <input type="submit">submit</input>
-        </form>
-        
-        {% endif %}
         <script src="" async defer></script>
     </body>
 </html>
