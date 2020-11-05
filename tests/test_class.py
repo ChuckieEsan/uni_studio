@@ -11,9 +11,6 @@ class TestThis(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_page(self):
-        res = self.app.get('/',follow_redirects=True)
-        self.assertEqual(res.status_code,200)
     
     def test_vote_page(self):
         res = self.app.get('/vote/populate',follow_redirects=True)
