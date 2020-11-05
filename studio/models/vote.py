@@ -43,6 +43,7 @@ class VoteInfo(TimestampMixin,db.Model):
     vote_max = db.Column(db.Integer,default=999,nullable=False)
     admin = db.Column(db.Text,nullable=False)
     shuffle = db.Column(db.Boolean,default=False,nullable=False)
+    is_poll = db.Column(db.Boolean,default=False,nullable=False)
 
     def __init__(self,*args,**kwargs):
         super(VoteInfo, self).__init__(**kwargs)
