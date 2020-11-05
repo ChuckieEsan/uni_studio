@@ -5,6 +5,7 @@ from .test import tests
 from .fileservice.app import app as fileserviceapp
 from .vote import vote as voteapp
 from .api import postcardapp
+from .issues import issues as issuesapp
 from .utils.dir_helper import join_upload_dir
 import redis
 #r = redis.Redis(host='localhost',port=6379,decode_responses=True,password='Bit_redis_123')
@@ -25,6 +26,7 @@ def create_app():
         app.register_blueprint(fileserviceapp)
         app.register_blueprint(voteapp)
         app.register_blueprint(postcardapp)
+        app.register_blueprint(issuesapp)
         app.config['SECRET_KEY'] = 'hard to guess string'
         app.config['FILESERVICE_UPLOAD_FOLDER'] = join_upload_dir('data/')
         app.config['FILESERVICE_THUMBNAIL_FOLDER'] = join_upload_dir('data/thumbnail/')
