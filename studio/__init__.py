@@ -27,7 +27,8 @@ def create_app():
         app.register_blueprint(voteapp)
         app.register_blueprint(postcardapp)
         app.register_blueprint(issuesapp)
-        app.config['SECRET_KEY'] = 'hard to guess string'
+        #app.config['SERVER_NAME'] = 'dutbit.com'
+        app.config['SECRET_KEY'] = 'Do not go gentle into that good night'
         app.config['FILESERVICE_UPLOAD_FOLDER'] = join_upload_dir('data/')
         app.config['FILESERVICE_THUMBNAIL_FOLDER'] = join_upload_dir('data/thumbnail/')
         app.config['FILESERVICE_MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024

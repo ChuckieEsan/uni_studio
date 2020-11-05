@@ -20,7 +20,7 @@ from .libs.upload_file import uploadfile
 
 #app = Flask(__name__)
 
-app = Blueprint("fileservice",__name__,template_folder='templates')
+app = Blueprint("fileservice",__name__,template_folder='templates',subdomain='files')
 
 # current_app.config['SECRET_KEY'] = 'hard to guess string'
 # current_app.config['UPLOAD_FOLDER'] = 'data/'

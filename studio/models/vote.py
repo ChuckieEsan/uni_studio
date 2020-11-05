@@ -17,8 +17,8 @@ class VoteCandidates(TimestampMixin,db.Model):
     __tablename__ = "vote_candidates"
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255),nullable=False)
-    subtitle = db.Column(db.String(255),nullable=True)
-    description = db.Column(db.String(255),nullable=True)
+    subtitle = db.Column(db.Text,nullable=True)
+    description = db.Column(db.Text,nullable=True)
     action_at = db.Column(db.DateTime(True), default=db.func.now(), nullable=True)
     votes = db.Column(db.Integer,default=0,nullable=False)
     vote_id = db.Column(db.Integer,nullable=False)
@@ -33,8 +33,8 @@ class VoteInfo(TimestampMixin,db.Model):
     __tablename__ = "vote_info"
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255),nullable=False)
-    subtitle = db.Column(db.String(255),default='',nullable=True)
-    description = db.Column(db.String(255),default='',nullable=True)
+    subtitle = db.Column(db.Text,default='',nullable=True)
+    description = db.Column(db.Text,default='',nullable=True)
     image = db.Column(db.Text,nullable=True)
     disabled = db.Column(db.Boolean, default=False, nullable=False)
     start_at = db.Column(db.DateTime(True), default=db.func.now(), nullable=True)

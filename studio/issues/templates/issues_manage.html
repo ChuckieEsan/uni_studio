@@ -1,6 +1,6 @@
-
 <!DOCTYPE html>
 <html lang="zh-cn">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,26 +10,12 @@
     <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css" />
     <!--<script src="https://static.runoob.com/assets/jquery-validation-1.14.0/lib/jquery.js"></script>-->
 </head>
-<body>
-<?php 
 
-//ini_set("display_errors", "On"); 
-//error_reporting(E_ALL | E_STRICT);
-include('/usr/share/nginx/html/global-session.php');
-$user_info = r_session_get(array('site'));
-if(isset($user_info['site'])){
-    if(isset(json_decode($user_info['site'])->super_admin)){
-    } elseif(isset(json_decode($user_info['site'])->vol_time_admin)){
-        $vol_time_admin = 1;
-    }
-} else {
-    die('File not found.');
-}
-?>
+<body>
     <div class="container">
-    <span><?php if(isset($vol_time_admin)){echo '志愿时长查询管理员';}?></span>
-    <a style="float:right;margin-top:10px" href="{{url_for('issues.root')}}">上报页面</a>
-    <table id="data-table" class="table" style="margin-top:50px">
+        <span>{{role}}</span>
+        <a style="float:right;margin-top:10px" href="{{url_for('issues.root')}}">上报页面</a>
+        <table id="data-table" class="table" style="margin-top:50px">
             <thead>
                 <tr>
                     <td>url</td>
@@ -40,31 +26,16 @@ if(isset($user_info['site'])){
                 </tr>
             </thead>
             <tbody id="table-con">
-             <?php
-             //ini_set("display_errors", "On");//打开错误提示
-//ini_set("error_reporting",E_ALL); 
-
-ini_set('date.timezone', 'Asia/Shanghai');
-                
-                $conn = new mysqli('localhost','root','Bit_root_123','user_issues');
-                if ($conn->connect_error) {
-                    die("连接失败: " . $conn->connect_error);
-                }
-                if(isset($vol_time_admin)){
-                    $sql = "select * from issues where url = 'https://www.dutbit.com/vol_time/' and status = 'pending' order by created_at desc";
-                } else {
-                    $sql = "select * from issues where status = 'pending' order by created_at desc";
-                }
-                $result = $conn->query($sql);
-                if ($result->num_rows > 0) {
-                    // 输出数据 
-                    while($row = $result->fetch_assoc()) {
-                        echo "<tr>" . "<td>".$row["url"]."</td>". "<td>".$row["contact"]."</td>"."<td>".$row["content"]."</td>"."<td>".date('Y-m-d H:i:s',$row["created_at"])."</td>"."<td>".$row["ip"]."</td>";
-                        
-                    }
-                }
-             ?>   
-            </tbody> 
+                {% for i in issues %}
+                <tr>
+                    <td>{{i.url}}</td>
+                    <td>{{i.contact}}</td>
+                    <td>{{i.content}}</td>
+                    <td>{{i.created_at}}</td>
+                    <td>{{i.ip}}</td>"
+                </tr>
+                {% endfor %}
+            </tbody>
         </table>
-</div>
+    </div>
 </body>
