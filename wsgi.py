@@ -1,6 +1,6 @@
 import os
 
-from stuido import create_app
+from studio import create_app
 
 app = create_app()
 
