@@ -18,6 +18,7 @@ def create_app():
         from studio.models import db
     
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dev.db'
+        app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         db.init_app(app)
         #db.drop_all()
         db.create_all()

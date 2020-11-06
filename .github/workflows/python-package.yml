@@ -5,9 +5,9 @@ name: Python package
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main,dev ]
   pull_request:
-    branches: [ main ]
+    branches: [ main,dev ]
 
 jobs:
   build:
@@ -38,3 +38,12 @@ jobs:
       run: |
         # does nothing, this is TODO!
         pytest
+    - name: Push to master
+      run: |
+        git config --global user.name 'NL'
+        git config --global user.email 'tzy15368@users.noreply.github.com'
+        git fetch
+        git checkout main
+        git pull origin main --allow-unrelated-histories
+        git merge dev -X theirs --allow-unrelated-histories
+        git push origin main
