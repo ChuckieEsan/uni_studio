@@ -17,12 +17,14 @@ def create_app():
 
         from studio.models import db
     
+        app.config['CURRENT_MODE'] = 'DEV'
+
+
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dev.db'
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         db.init_app(app)
         #db.drop_all()
         db.create_all()
-
         app.register_blueprint(tests)
         app.register_blueprint(fileserviceapp)
         app.register_blueprint(voteapp)
