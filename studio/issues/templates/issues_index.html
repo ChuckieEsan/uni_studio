@@ -47,30 +47,7 @@
         <div class="modal-footer">
             <span style="font-size:20px;color:#B7472A">
             <strong>
-                    <?php
-                        if($_SERVER['REQUEST_METHOD']==='POST'){
-                            $conn = new mysqli('localhost','root','Bit_root_123','user_issues');
-                            if ($conn->connect_error) {
-                                die("连接失败: " . $conn->connect_error);
-                            }
-                            $stmt = $conn->prepare("INSERT INTO issues (url,contact,content,created_at,ip) values (?,?,?,?,?)"); 
-                            $stmt->bind_param("sssis",$url,$contact,$content,$created_at,$ip);
-                            $url = $_POST['source'];
-                            $contact = $_POST['contact'];
-                            $content = $_POST['content'];
-                            $created_at = time();
-                            $ip = $_SERVER['REMOTE_ADDR'];
-                            $r = $stmt->execute();
-                            //print_r($_POST);
-                            if($r=='1'){
-                                echo '提交成功，感谢您的反馈';
-                            } else {
-                                echo $r.'提交失败';
-                            }
-                            $stmt->close();
-                            $conn->close();
-                        } 
-                    ?>
+                {% get_flashed_messages() %}
                     &nbsp;&nbsp;
             </strong>
             </span>
