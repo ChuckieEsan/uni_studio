@@ -1,6 +1,7 @@
 import os
-from flask import Flask,Request
-from flask_bootstrap import Bootstrap#for flask-file-uploader | fileservice
+import socket
+from flask import Flask, Request
+from flask_bootstrap import Bootstrap  # for flask-file-uploader | fileservice
 from .test import tests
 from .fileservice.app import app as fileserviceapp
 from .vote import vote as voteapp
@@ -9,6 +10,9 @@ from .issues import issues as issuesapp
 from .utils.dir_helper import join_upload_dir
 import redis
 #r = redis.Redis(host='localhost',port=6379,decode_responses=True,password='Bit_redis_123')
+hostname = socket.gethostname()
+ip = socket.gethostbyname(hostname)
+
 
 def create_app():
     app = Flask(__name__)
@@ -16,14 +20,22 @@ def create_app():
         Bootstrap(app)
 
         from studio.models import db
-    
-        app.config['CURRENT_MODE'] = 'DEV'
 
+        if ip == '172.31.240.127':  # is dutbit.com
+            print('------ starting service in production ------')
+            app.config['SERVER_NAME'] = 'dutbit.com'
+            app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
+            if 'mysql+pymysql' not in app.config['SQLALCHEMY_DATABASE_URI']:
+                raise EnvironmentError("No db connection uri provided")
+                exit(-1)
+        else:
+            print('------ starting service in development ------')
+            app.config['SERVER_NAME'] = '127.0.0.1:5000'
+            app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dev.db'
 
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dev.db'
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         db.init_app(app)
-        #db.drop_all()
+        # db.drop_all()
         db.create_all()
         app.register_blueprint(tests)
         app.register_blueprint(fileserviceapp)
