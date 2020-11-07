@@ -5,4 +5,4 @@ parser.add_argument("--port",help="Port for debug server to listen on",default=5
 args = parser.parse_args()
 app = create_app()
 
-app.run(debug=True,host='0.0.0.0',port=args.port)
+app.run(debug=True,host='127.0.0.1',port=args.port)

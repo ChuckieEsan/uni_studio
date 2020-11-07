@@ -13,6 +13,16 @@ import redis
 hostname = socket.gethostname()
 ip = socket.gethostbyname(hostname)
 
+subdomains = {
+    'DEVELOPMENT':{
+        'www':'',
+        'files':'',
+    },
+    'PRODUCTION':{
+        'www':'www',
+        'files':'files',
+    }
+}
 
 def create_app():
     app = Flask(__name__)
@@ -23,15 +33,19 @@ def create_app():
 
         if ip == '172.31.240.127':  # is dutbit.com
             print('------ starting service in production ------')
+            app.config['DEBUG'] = True
             app.config['SERVER_NAME'] = 'dutbit.com'
             app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
+            app.config['SUBDOMAINS'] = subdomains['PRODUCTION']
             if 'mysql+pymysql' not in app.config['SQLALCHEMY_DATABASE_URI']:
                 raise EnvironmentError("No db connection uri provided")
                 exit(-1)
         else:
             print('------ starting service in development ------')
+            app.config['DEBUG'] = False
             app.config['SERVER_NAME'] = '127.0.0.1:5000'
             app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dev.db'
+            app.config['SUBDOMAINS'] = subdomains['DEVELOPMENT']
 
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         db.init_app(app)
@@ -39,9 +53,9 @@ def create_app():
         db.create_all()
         app.register_blueprint(tests)
         app.register_blueprint(fileserviceapp)
-        app.register_blueprint(voteapp)
+        app.register_blueprint(voteapp,url_prefix='/vote',subdomain=app.config['SUBDOMAINS']['www'])
         app.register_blueprint(postcardapp)
-        app.register_blueprint(issuesapp)
+        app.register_blueprint(issuesapp,url_prefix="/issues",subdomain=app.config['SUBDOMAINS']['www'])
         #app.config['SERVER_NAME'] = 'dutbit.com'
         app.config['SECRET_KEY'] = 'Do not go gentle into that good night'
         app.config['FILESERVICE_UPLOAD_FOLDER'] = join_upload_dir('data/')
