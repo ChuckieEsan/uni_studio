@@ -8,6 +8,7 @@
     <title>反馈管理</title>
     <link rel="shortcut icon" href="/vol_time/static/favicon.ico" />
     <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.15.3/dist/bootstrap-table.min.css">
 </head>
 
 <body>
@@ -35,8 +36,8 @@
                             </span>
                             <br>
                             {% endfor %}
-                        </div>  
-                        
+                        </div>
+
                         <input type="text" placeholder="类别名称" required name="name">
                         <input type="text" placeholder="类别值" required name="value">
                     </div>
@@ -48,60 +49,43 @@
             </div>
         </div>
     </div>
-    <div class="container">
+    <div id="toolbar">
+        
         <span>{{role}}</span>
         <a style="float:right;margin-top:10px" href="{{url_for('issues.root')}}">上报页面</a>
-        <table id="data-table" class="table" style="margin-top:50px">
-            <thead>
-                <tr>
-                    <td>url</td>
-                    <td>联系方式</td>
-                    <td>内容</td>
-                    <td>上报时间</td>
-                    <td>ip</td>
-                </tr>
-            </thead>
-            <tbody id="table-con">
-                {% for i in issues %}
-                <tr>
-                    <td>{{i.url}}</td>
-                    <td>{{i.contact}}</td>
-                    <td>{{i.content}}</td>
-                    <td>{{i.created_at}}</td>
-                    <td>{{i.ip}}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
     </div>
-    <nav aria-label="Page navigation" class="navbar-fixed-bottom">
-        <div class="container">
-            <ul class="pagination">
-                <li>
-                    <a href="#" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                    </a>
-                </li>
-                {% for p in pages %}
-                <li>
-                    <a href="{{url_for('issues.manage',page_id=p)}}">{{p}}</a>
-                </li>
-                {% endfor %}
-                <li>
-                    <a href="#" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                    </a>
-                </li>
-            </ul>
-            <button class="btn btn-default" data-toggle="modal" data-target="#myModal"
-                style="position: fixed;bottom:20%;right:16%;z-index: 1;">
-                <img src="/static/img/edit.png" width="30px" height="30px" />
-            </button>
-        </div>
-    </nav>
-
+    <table 
+    id="table" 
+    data-locale="zh-CN"
+    data-toolbar="#toolbar"
+    data-toggle="table" 
+    data-url="{{url_for('issues.get_issues',page_id=1)}}"
+    data-search="true"
+    data-show-columns="true"
+    data-show-export="true"
+    data-show-pagination-switch="true"
+    data-pagination="true"
+    data-show-pagination-switch="true"
+    data-page-list="[15, 25, 50, 100, all]">
+        <thead>
+            <tr>
+                <th data-field="url">来源页面</th>
+                <th data-field="type">类型</th>
+                <th data-field="contact">联系方式</th>
+                <th data-field="created_at">提交时间</th>
+                <th data-field="content">内容</th>
+                <th data-field="ip">ip</th>
+            </tr>
+        </thead>
+    </table>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-table@1.15.3/dist/bootstrap-table.min.js"></script>
+
+    <script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-table@1.18.0/dist/bootstrap-table.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-table@1.18.0/dist/bootstrap-table-locale-all.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-table@1.18.0/dist/extensions/export/bootstrap-table-export.min.js"></script>
     <script>
 
     </script>

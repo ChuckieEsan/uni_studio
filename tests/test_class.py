@@ -22,5 +22,8 @@ class TestThis(unittest.TestCase):
     def test_issues_page(self):
         res = self.app.get('/issues/')
         self.assertEqual(res.status_code,200)    
+    def test_issues_admin(self):
+        res = self.app.get('/issues/manage/')
+        self.assertEqual(res.status_code,200)  
 
     
