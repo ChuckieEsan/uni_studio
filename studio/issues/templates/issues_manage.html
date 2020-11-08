@@ -8,10 +8,46 @@
     <title>反馈管理</title>
     <link rel="shortcut icon" href="/vol_time/static/favicon.ico" />
     <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css" />
-    <!--<script src="https://static.runoob.com/assets/jquery-validation-1.14.0/lib/jquery.js"></script>-->
 </head>
 
 <body>
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">反馈类别编辑</h4>
+                </div>
+                <form action="{{url_for('issues.types')}}" method="POST" name="newVoteForm">
+                    <div class="modal-body">
+                        <div id="issuetypes">
+                            {% if not issuetypes %}
+                            NO ISSUE TYPES
+                            {% endif %}
+                            {% for t in issuetypes %}
+                            <label>类别名称</label>
+                            <span>
+                                {{t.typename}}
+                            </span>
+                            <label>类别值</label>
+                            <span>
+                                {{t.typevalue}}
+                            </span>
+                            <br>
+                            {% endfor %}
+                        </div>  
+                        
+                        <input type="text" placeholder="类别名称" required name="name">
+                        <input type="text" placeholder="类别值" required name="value">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <input type="submit" value="Submit" class="btn btn-primary" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
     <div class="container">
         <span>{{role}}</span>
         <a style="float:right;margin-top:10px" href="{{url_for('issues.root')}}">上报页面</a>
@@ -38,4 +74,35 @@
             </tbody>
         </table>
     </div>
+    <nav aria-label="Page navigation" class="navbar-fixed-bottom">
+        <div class="container">
+            <ul class="pagination">
+                <li>
+                    <a href="#" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                {% for p in pages %}
+                <li>
+                    <a href="{{url_for('issues.manage',page_id=p)}}">{{p}}</a>
+                </li>
+                {% endfor %}
+                <li>
+                    <a href="#" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+            <button class="btn btn-default" data-toggle="modal" data-target="#myModal"
+                style="position: fixed;bottom:20%;right:16%;z-index: 1;">
+                <img src="/static/img/edit.png" width="30px" height="30px" />
+            </button>
+        </div>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+    <script>
+
+    </script>
 </body>
