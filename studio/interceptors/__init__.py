@@ -28,6 +28,7 @@ def roles_required(roles:list):
         @wraps(func)
         def func_wrapper(*args,**kwargs):
             sessionid = request.cookies.get('SESSIONID')
+            print(current_app.config['DEBUG'])
             if current_app.config['DEBUG']:
                 g.role = ['super_admin']
                 if request.values.get('role') is not None:
