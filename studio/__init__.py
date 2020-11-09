@@ -1,3 +1,10 @@
+import redis
+try:
+    r = redis.Redis(host='localhost',port=6379,decode_responses=True,password='Bit_redis_123')
+except Exception as e:
+    print(e)
+    r = None
+    
 import os
 import socket
 from flask import Flask, Request
@@ -8,8 +15,8 @@ from .vote import vote as voteapp
 from .api import postcardapp
 from .issues import issues as issuesapp
 from .utils.dir_helper import join_upload_dir
-import redis
-#r = redis.Redis(host='localhost',port=6379,decode_responses=True,password='Bit_redis_123')
+
+
 hostname = socket.gethostname()
 ip = socket.gethostbyname(hostname)
 
