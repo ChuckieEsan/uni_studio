@@ -1,5 +1,5 @@
 import redis
-r = redis.Redis(host='localhost',port=6379,decode_responses=True,password='Bit_redis_123')
+r = redis.Redis(host='localhost',port=6379,decode_responses=True,password='Bit_redis_123', socket_timeout=0.5)
 try:
     r.ping()
 except Exception as e:
@@ -60,7 +60,8 @@ def create_app():
         # db.drop_all()
         db.create_all()
         app.register_blueprint(tests)
-        app.register_blueprint(fileserviceapp)
+        app.register_blueprint(fileserviceapp,url_prefix='/fileservice',subdomain=app.config['SUBDOMAINS']['www'])
+        app.register_blueprint(fileserviceapp,url_prefix='',subdomain=app.config['SUBDOMAINS']['files'])
         app.register_blueprint(voteapp,url_prefix='/vote',subdomain=app.config['SUBDOMAINS']['www'])
         app.register_blueprint(postcardapp)
         app.register_blueprint(issuesapp,url_prefix="/issues",subdomain=app.config['SUBDOMAINS']['www'])
