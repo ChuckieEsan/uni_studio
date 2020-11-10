@@ -17,8 +17,8 @@ from werkzeug.utils import secure_filename
 
 from studio.interceptors import session_required
 from .libs.upload_file import uploadfile
-
-
+ 
+ 
 #app = Flask(__name__)
 
 app = Blueprint("fileservice",__name__,template_folder='templates',static_folder='static')
@@ -30,7 +30,7 @@ app = Blueprint("fileservice",__name__,template_folder='templates',static_folder
 
 ALLOWED_EXTENSIONS = set(['txt', 'gif', 'png', 'jpg', 'jpeg', 'bmp', 'rar', 'zip', '7zip', 'doc', 'docx'])
 IGNORED_FILES = set(['.gitignore'])
-
+ 
 #bootstrap = Bootstrap(current_app)
 
 
