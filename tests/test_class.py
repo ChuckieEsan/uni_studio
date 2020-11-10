@@ -26,4 +26,8 @@ class TestThis(unittest.TestCase):
         res = self.app.get('/issues/manage/')
         self.assertEqual(res.status_code,200)  
 
-    
+    def test_fileservice(self):
+        res = self.app.get('/fileservice/')
+        self.assertEqual(res.status_code,200)
+        res = self.app.get('/fileservice/upload')
+        self.assertEqual(res.status_code,200)
