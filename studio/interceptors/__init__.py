@@ -12,6 +12,8 @@ def ho(id):
     return 'bruhalsdfa'+id
 
 #this is intended to be read-only
+
+# for flexibility, DO NOT do direct redis operations out of this interceptor module!!!
 """
 def session_required(func):
     @wraps(func)
@@ -22,14 +24,14 @@ def session_required(func):
             return func(*args,**kwargs)
         sessionid = request.cookies.get('SESSIONID')
         if sessionid is None or len(sessionid)!=32:
-            return redirect("/userservice/index.html?authrequired")
+            return redirect("/userservice/index.html?target={}".format(request.referrer))
         if r.exists(sessionid):
             g.sessionid = sessionid
             user_info = r.hmget(sessionid,'_id')
             g._id = user_info[0]
             return func(*args,**kwargs)
         else:
-            return redirect("/userservice/index.html?authrequired")
+            return redirect("/userservice/index.html?target={}".format(request.referrer))
     return func_wrapper
 
 
@@ -49,8 +51,8 @@ def roles_required(roles:list):
                 print('debug mode, ignoring requirements, role is now',g.role)
                 return func(*args,**kwargs) 
             try:
-                user_info = r.hmget(sessionid,'site')
-                role_info = json.loads(user_info)[0]
+                user_info = r.hmget(sessionid,'site','_id')
+                role_info = json.loads(user_info[0])
                 role_intersection = set(roles)&set(role_info.keys())
                 if not role_intersection:
                     raise ValueError
@@ -58,10 +60,10 @@ def roles_required(roles:list):
                 g._id = user_info[1]
             except redis.DataError:#no sessionid
                 #print('no sessionid')
-                return redirect('/userservice/index.html#1')
+                return redirect('/userservice/index.html?target={}#1'.format(request.referrer))
             except TypeError:#hmget returned none, no valid userservice session.
                 #print('no valid session')
-                return redirect('/userservice/index.html#2')
+                return redirect('/userservice/index.html?target={}#2'.format(request.referrer))
             except ValueError:
                 #print('no valid role')
                 return abort(404)
