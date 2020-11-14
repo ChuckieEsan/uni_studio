@@ -51,17 +51,17 @@ def roles_required(roles:list):
                 print('debug mode, ignoring requirements, role is now',g.role)
                 return func(*args,**kwargs) 
             try:
-                role_info = r.hgetall(g._id)
+                role_info = r.hgetall("userservice:rolemap:"+g._id)
                 role_intersection = set(roles)&set(role_info.keys())
                 if not role_intersection:
                     raise ValueError
                 g.role = role_intersection
             except redis.DataError:#no sessionid
                 #print('no sessionid')
-                return redirect('/userservice/index.html?target={}#1'.format(request.referrer))
+                return redirect('/userservice/index.html?target={}#1'.format(request.path))
             except TypeError:#hmget returned none, no valid userservice session.
                 #print('no valid session')
-                return redirect('/userservice/index.html?target={}#2'.format(request.referrer))
+                return redirect('/userservice/index.html?target={}#2'.format(request.path))
             except ValueError:
                 #print('no valid role')
                 return abort(404)
