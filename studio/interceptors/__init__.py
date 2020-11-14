@@ -25,10 +25,10 @@ def session_required(func):
         sessionid = request.cookies.get('SESSIONID')
         if sessionid is None or len(sessionid)!=32:
             return redirect("/userservice/index.html?target={}".format(request.referrer))
-        if r.exists(sessionid):
+        _id = r.get(sessionid)
+        if _id is not None:
             g.sessionid = sessionid
-            user_info = r.hmget(sessionid,'_id')
-            g._id = user_info[0]
+            g._id = _id
             return func(*args,**kwargs)
         else:
             return redirect("/userservice/index.html?target={}".format(request.referrer))
@@ -51,13 +51,11 @@ def roles_required(roles:list):
                 print('debug mode, ignoring requirements, role is now',g.role)
                 return func(*args,**kwargs) 
             try:
-                user_info = r.hmget(sessionid,'site','_id')
-                role_info = json.loads(user_info[0])
+                role_info = r.hgetall(g._id)
                 role_intersection = set(roles)&set(role_info.keys())
                 if not role_intersection:
                     raise ValueError
                 g.role = role_intersection
-                g._id = user_info[1]
             except redis.DataError:#no sessionid
                 #print('no sessionid')
                 return redirect('/userservice/index.html?target={}#1'.format(request.referrer))
