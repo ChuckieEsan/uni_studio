@@ -6,7 +6,7 @@
 # This work based on jQuery-File-Upload which can be found at https://github.com/blueimp/jQuery-File-Upload/
 
 import os
-import PIL
+import PIL,re
 from PIL import Image
 import simplejson
 import traceback
