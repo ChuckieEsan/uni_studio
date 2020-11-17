@@ -83,11 +83,15 @@ def create_thumbnail(image):
 @app.route("/upload", methods=['GET', 'POST'])
 @session_required
 def upload():
+    def filename_filter(s):
+        return re.sub('[\/:*?"<>|]','-',s)
     if request.method == 'POST':
         files = request.files['file']
 
         if files:
-            filename = secure_filename(files.filename)
+            
+            #filename = secure_filename(files.filename)
+            filename = filename_filter(files.filename)
             filename = gen_file_name(filename)
             mime_type = files.content_type
 
