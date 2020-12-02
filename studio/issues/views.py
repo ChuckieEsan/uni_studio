@@ -23,9 +23,12 @@ def root():
             user_id=None
         )
         print('type:',request.form.get('type'))
+        print('1:{}'.format(_i.id))
         db.session.add(_i)
+        print('2:{}'.format(_i.id))
         try:
             db.session.commit()
+            print('3:{}'.format(_i.id))
             flash('提交成功，感谢您的反馈')
         except Exception as e:
             print(e)
