@@ -11,7 +11,7 @@ from PIL import Image
 import simplejson
 import traceback
 
-from flask import Flask, request, render_template, redirect, url_for, send_from_directory,g,current_app
+from flask import Flask, request, render_template, redirect, url_for, send_from_directory,g,current_app,Blueprint
 from flask_bootstrap import Bootstrap
 from werkzeug.utils import secure_filename
 from studio.interceptors import roles_required
