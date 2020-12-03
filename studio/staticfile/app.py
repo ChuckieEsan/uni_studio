@@ -148,7 +148,7 @@ def get_file(filename):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    return render_template('staticfileservice_index.html')
+    return render_template('fileservice_index.html')
 
 
 if __name__ == '__main__':
