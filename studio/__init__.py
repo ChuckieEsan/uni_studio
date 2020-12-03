@@ -15,6 +15,7 @@ from .fileservice.app import app as fileserviceapp
 from .vote import vote as voteapp
 from .api import postcardapp
 from .issues import issues as issuesapp
+from .staticfile import app as staticfileapp
 from .utils.dir_helper import join_upload_dir
 
 
@@ -62,6 +63,7 @@ def create_app():
         app.register_blueprint(tests)
         app.register_blueprint(fileserviceapp,url_prefix='/fileservice',subdomain=app.config['SUBDOMAINS']['www'])
         app.register_blueprint(fileserviceapp,url_prefix='',subdomain=app.config['SUBDOMAINS']['files'])
+        app.register_blueprint(staticfileapp,url_prefix='/staticfile',subdomain='www')
         app.register_blueprint(voteapp,url_prefix='/vote',subdomain=app.config['SUBDOMAINS']['www'])
         app.register_blueprint(postcardapp)
         app.register_blueprint(issuesapp,url_prefix="/issues",subdomain=app.config['SUBDOMAINS']['www'])
