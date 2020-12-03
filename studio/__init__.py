@@ -15,7 +15,7 @@ from .fileservice.app import app as fileserviceapp
 from .vote import vote as voteapp
 from .api import postcardapp
 from .issues import issues as issuesapp
-from .staticfileservice.app import app as staticfileserviceapp
+from .staticfile.app import app as staticfileapp
 from .utils.dir_helper import join_upload_dir
 
 
@@ -43,11 +43,9 @@ def create_app():
         if ip == '172.31.240.127':  # is dutbit.com
             print('------ starting service in production ------')
             app.config['DEBUG'] = False
-            app.config['SERVER_NAME'] = subdomains['PRODUCTION']['www']+'dutbit.com'
+            app.config['SERVER_NAME'] = 'dutbit.com'
             app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
             app.config['SUBDOMAINS'] = subdomains['PRODUCTION']
-            app.config['STATICFILESERVICE_UPLOAD_FOLDER'] = '/usr/share/nginx/html'
-            app.config['STATICFILESERVICE_THUMBNAIL_FOLDER'] = '/usr/share/nginx/html/img/thumbnails'
             if 'mysql+pymysql' not in app.config['SQLALCHEMY_DATABASE_URI']:
                 raise EnvironmentError("No db connection uri provided")
                 exit(-1)
@@ -57,8 +55,6 @@ def create_app():
             app.config['SERVER_NAME'] = '127.0.0.1:5000'
             app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dev.db'
             app.config['SUBDOMAINS'] = subdomains['DEVELOPMENT']
-            app.config['STATICFILESERVICE_UPLOAD_FOLDER'] = join_upload_dir('staticdata/')
-            app.config['STATICFILESERVICE_THUMBNAIL_FOLDER'] = join_upload_dir('staticdata/thumbnail/')
 
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         db.init_app(app)
@@ -67,7 +63,7 @@ def create_app():
         app.register_blueprint(tests)
         app.register_blueprint(fileserviceapp,url_prefix='/fileservice',subdomain=app.config['SUBDOMAINS']['www'])
         app.register_blueprint(fileserviceapp,url_prefix='',subdomain=app.config['SUBDOMAINS']['files'])
-        app.register_blueprint(staticfileserviceapp,url_prefix='/staticfile',subdomain=app.config['SUBDOMAINS']['www'])
+        app.register_blueprint(staticfileapp,url_prefix='/staticfile',subdomain='www')
         app.register_blueprint(voteapp,url_prefix='/vote',subdomain=app.config['SUBDOMAINS']['www'])
         app.register_blueprint(postcardapp)
         app.register_blueprint(issuesapp,url_prefix="/issues",subdomain=app.config['SUBDOMAINS']['www'])
