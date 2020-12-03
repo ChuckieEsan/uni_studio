@@ -26,7 +26,7 @@ UPLOAD_FOLDER = '/usr/share/nginx/html/static'
 THUMBNAIL_FOLDER = '/usr/share/nginx/html/static/img/thumbnails'
 #bootstrap = Bootstrap(app)
 @app.before_request
-@session_required
+@session_required('/staticfile')
 @roles_required(['super_admin'])
 def befreq():
     pass
