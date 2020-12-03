@@ -23,7 +23,7 @@ app = Blueprint("staticfile",__name__,template_folder='templates',static_folder=
 ALLOWED_EXTENSIONS = set(['txt', 'gif', 'png', 'jpg', 'jpeg', 'bmp', 'rar', 'zip', '7zip', 'doc', 'docx'])
 IGNORED_FILES = set(['.gitignore'])
 UPLOAD_FOLDER = '/usr/share/nginx/html/static'
-THUMBNAIL_FOLDER = '/usr/share/nginx/html/static/img/thumbnail'
+THUMBNAIL_FOLDER = '/usr/share/nginx/html/static/img/thumbnails'
 #bootstrap = Bootstrap(app)
 @app.before_request
 @session_required
