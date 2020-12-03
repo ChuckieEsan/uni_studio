@@ -16,7 +16,7 @@ def ho(id):
 # for flexibility, DO NOT do direct redis operations out of this interceptor module!!!
 """
 def session_required(target:str=None):
-    def check_session(func):
+    def _check_session(func):
         @wraps(func)
         def func_wrapper(*args,**kwargs):
             redirect_target = '/userservice/index.html' if target is None else "/userservice/index.html?target={}".format(target)
@@ -35,7 +35,7 @@ def session_required(target:str=None):
             else:
                 return redirect(redirect_target)
         return func_wrapper
-    return check_session
+    return _check_session
 
 
 def roles_required(roles:list):
