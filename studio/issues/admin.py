@@ -4,7 +4,7 @@ from studio.models import db, IssuesIssues, IssueTypes
 from studio.interceptors import roles_required,session_required
 
 @issues.route('/data/<int:page_id>')
-@session_required
+@session_required('/issues')
 @roles_required(['vol_time_admin','super_admin'])
 def get_issues(page_id=1):
     role = '志愿时长查询管理员'
@@ -24,7 +24,7 @@ def get_issues(page_id=1):
     return jsonify(a) 
     #return jsonify(issues)
 @issues.route('/manage/')
-@session_required
+@session_required('/issues')
 @roles_required(['vol_time_admin','super_admin'])
 def manage_home():
     role = g.role
@@ -40,7 +40,7 @@ def manage_home():
     )
 
 @issues.route('/manage/types', methods=['POST'])
-@session_required
+@session_required('/issues')
 @roles_required(['super_admin'])
 def types():
     _t = IssueTypes(
