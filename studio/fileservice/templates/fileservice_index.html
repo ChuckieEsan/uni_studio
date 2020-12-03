@@ -164,7 +164,7 @@
 {% block scripts %}
 <script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
 <!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
-<script src="static/js/vendor/jquery.ui.widget.js"></script>
+<script src="{{ url_for('fileservice.static', filename='js/vendor/jquery.ui.widget.js')}}"></script>
 <!-- The Templates plugin is included to render the upload/download listings -->
 <script src="https://blueimp.github.io/JavaScript-Templates/js/tmpl.min.js"></script>
 <!-- The Load Image plugin is included for the preview images and image resizing functionality -->
