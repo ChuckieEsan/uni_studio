@@ -15,7 +15,7 @@ from .fileservice.app import app as fileserviceapp
 from .vote import vote as voteapp
 from .api import postcardapp
 from .issues import issues as issuesapp
-from .staticfile import app as staticfileapp
+from .staticfile.app import app as staticfileapp
 from .utils.dir_helper import join_upload_dir
 
 
