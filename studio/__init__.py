@@ -43,7 +43,7 @@ def create_app():
         if ip == '172.31.240.127':  # is dutbit.com
             print('------ starting service in production ------')
             app.config['DEBUG'] = False
-            app.config['SERVER_NAME'] = subdomains['PRODUCTION']+'dutbit.com'
+            app.config['SERVER_NAME'] = subdomains['PRODUCTION']['www']+'dutbit.com'
             app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
             app.config['SUBDOMAINS'] = subdomains['PRODUCTION']
             app.config['STATICFILESERVICE_UPLOAD_FOLDER'] = '/usr/share/nginx/html'
