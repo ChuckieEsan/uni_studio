@@ -35,7 +35,7 @@ def session_required(func):
     return func_wrapper
 
 
-def roles_required(roles:list):
+def roles_required(roles:list,redirect=None):
     def check_roles(func):
         @wraps(func)
         def func_wrapper(*args,**kwargs):
