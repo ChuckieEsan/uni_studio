@@ -18,7 +18,7 @@ from studio.interceptors import roles_required
 from .libs.upload_file import uploadfile
 
 
-app = Blueprint("staticfileservice",__name__,template_folder='templates')
+app = Blueprint("staticfileservice",__name__,template_folder='templates',static_folder='static')
 
 ALLOWED_EXTENSIONS = set(['txt', 'gif', 'png', 'jpg', 'jpeg', 'bmp', 'rar', 'zip', '7zip', 'doc', 'docx'])
 IGNORED_FILES = set(['.gitignore'])
