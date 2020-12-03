@@ -15,24 +15,27 @@ def ho(id):
 
 # for flexibility, DO NOT do direct redis operations out of this interceptor module!!!
 """
-def session_required(func):
-    @wraps(func)
-    def func_wrapper(*args,**kwargs):
-        if current_app.config['DEBUG']:
-            g.sessionid = 'abcdefgh'*4
-            g._id = '_id-test123'
-            return func(*args,**kwargs)
-        sessionid = request.cookies.get('SESSIONID')
-        if sessionid is None or len(sessionid)!=32:
-            return redirect("/userservice/index.html?target={}".format(request.referrer))
-        _id = r.get(sessionid)
-        if _id is not None:
-            g.sessionid = sessionid
-            g._id = _id
-            return func(*args,**kwargs)
-        else:
-            return redirect("/userservice/index.html?target={}".format(request.referrer))
-    return func_wrapper
+def session_required(target:str=None):
+    def check_session(func):
+        @wraps(func)
+        def func_wrapper(*args,**kwargs):
+            redirect_target = '/userservice/index.html' if target is None else "/userservice/index.html?target={}".format(target)
+            if current_app.config['DEBUG']:
+                g.sessionid = 'abcdefgh'*4
+                g._id = '_id-test123'
+                return func(*args,**kwargs)
+            sessionid = request.cookies.get('SESSIONID')
+            if sessionid is None or len(sessionid)!=32:
+                return redirect(redirect_target)
+            _id = r.get(sessionid)
+            if _id is not None:
+                g.sessionid = sessionid
+                g._id = _id
+                return func(*args,**kwargs)
+            else:
+                return redirect(redirect_target)
+        return func_wrapper
+    return check_session
 
 
 def roles_required(roles:list):
