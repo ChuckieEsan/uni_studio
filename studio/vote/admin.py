@@ -1,10 +1,13 @@
 from studio.vote import vote
 from studio.utils.time_helper import timestamp_to_datetime
+from studio.utils.hash_helper import md5
 from studio.models import VoteInfo,VoteCandidates,VoteVotes,db
-from flask import url_for,redirect,render_template,request
+from flask import url_for,redirect,abort,render_template,request
 from faker import Faker
+import time
+import os
 f=Faker(locale='zh_CN')
-@vote.route('/admin/votes',methods=["GET"])
+@vote.route('/admin/votes',methods=["GET"])#投票管理大厅，能看所有投票
 def admin_votes_show():
     voteinfo_all = VoteInfo.query.filter().all()
     return render_template(
@@ -12,7 +15,7 @@ def admin_votes_show():
         info_list=voteinfo_all
         )
 
-@vote.route('/admin/votes',methods=["POST"])#add a vote
+@vote.route('/admin/votes',methods=["POST"])#新建投票接口
 def admin_votes_add():
     #new_vote = request.get_json()
     new_vote = request.form
@@ -48,11 +51,26 @@ def admin_vote_page(vote_id):
 @vote.route('/admin/votes/<int:vote_id>/candidates',methods=["POST"])
 def candidate_add(vote_id):
     new_candidate = request.form
+    print(request.form)
+    _file = request.files.get('image')
+    file_suffix = _file.filename.split('.')[-1]
+    if file_suffix not in ['png','PNG','jpg','JPG','JPEG','jpeg','mp3']:
+        return abort(500)
+    print(os.getcwd())
+    access_dir = '/vote/static/uploads/'+md5(str(time.time())+str(_file.filename))+'.'+file_suffix
+    path = os.getcwd()+'/studio'+access_dir
+    try:
+        _file.save(path)
+    except Exception as e:
+        print(e)
+        return abort(500)
     c = VoteCandidates(
-        title=new_candidate.get("title"),
-        subtitle=new_candidate.get("subtitle"),
-        description=new_candidate.get("description"),
-        vote_id=vote_id
+        title=new_candidate.get("title"),#姓名
+        subtitle=new_candidate.get("subtitle"),#所在社区
+        description=new_candidate.get("description"),#周记
+        vote_id=vote_id,
+        action_at = new_candidate.get('action_at'),#时间
+        image=access_dir
     )
     db.session.add(c)
     try:

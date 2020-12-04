@@ -32,6 +32,10 @@ ALLOWED_EXTENSIONS = set(['txt', 'gif', 'png', 'jpg', 'jpeg', 'bmp', 'rar', 'zip
 IGNORED_FILES = set(['.gitignore'])
  
 #bootstrap = Bootstrap(current_app)
+@app.before_request
+@session_required('/fileservice')
+def bef_req():
+    pass
 
 
 def allowed_file(filename):
@@ -81,7 +85,6 @@ def create_thumbnail(image):
 
 
 @app.route("/upload", methods=['GET', 'POST'])
-@session_required
 def upload():
     def filename_filter(s):
         return re.sub('[\/:*?"<>|]','-',s)
@@ -135,7 +138,6 @@ def upload():
 
 
 @app.route("/delete/<string:filename>", methods=['DELETE'])
-@session_required
 def delete(filename):
     file_path = os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],g._id, filename)
     file_thumb_path = os.path.join(current_app.config['FILESERVICE_THUMBNAIL_FOLDER'],g._id, filename)
@@ -154,19 +156,16 @@ def delete(filename):
 
 # serve static files
 @app.route("/thumbnail/<string:filename>", methods=['GET'])
-@session_required
 def get_thumbnail(filename):
     return send_from_directory(os.path.join(current_app.config['FILESERVICE_THUMBNAIL_FOLDER'],g._id), filename=filename)
 
 
 @app.route("/data/<string:filename>", methods=['GET'])
-@session_required
 def get_file(filename):
     return send_from_directory(os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],g._id), filename=filename)
 
 
 @app.route('/', methods=['GET', 'POST'])
-@session_required
 def index():
     get_dir_name(g._id)
     return render_template('fileservice_index.html')

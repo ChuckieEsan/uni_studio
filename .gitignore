@@ -6,6 +6,7 @@ __pycache__/
 # C extensions
 *.so
 flask_session
+studio/vote/static/uploads
 # Distribution / packaging
 .Python
 build/
@@ -32,7 +33,7 @@ studio/vote/static/uploads/
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
-
+flask_session
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt

@@ -12,10 +12,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>{{vote_info.title}}</title>
-    <link rel="stylesheet" type="text/css"
-        href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css" href="/static/css/vote.css" />
-    <script src="https://cdn.bootcss.com/vue/2.6.8/vue.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/vote.css')}}" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 </head>
 
 <body>
@@ -51,16 +51,43 @@
         <form action="{{url_for('vote.vote_handler',vote_id=vote_info.id)}}" method="POST" id="voteForm">
 
             {% for c in candidate_all %}
-            <div class="col-md-6 col-sm-12 col-xs-12">
-                <h3>{{c.title}}</h3>
-                <h4>{{c.subtitle}}</h4>
-                <p>{{c.description}}</p>
-                <p>{{c.votes}}</p>
-                <p>{{c.action_at}}</p>
-                {% if c.image %}
-                <img src="{{c.image}}" />
-                {% endif %}
-                <input type="checkbox" name="candidates" value="{{c.id}}" required />
+            <div class="col-md-6 col-sm-12 col-xs-12 person">
+                <div class="p-info">
+                    {% if c.image %}
+                    <img src="{{c.image}}" />
+                    {% endif %}
+                    <div style="width:55%">
+                        <p>序号：{{loop.index}}&nbsp;&nbsp;&nbsp;&nbsp;姓名：{{c.title}}</p>
+                        <p>所在社区：{{c.subtitle}}</p>
+                        <p>时间：{{c.action_at}}</p>
+                        <p>已获：{{c.votes}}票</p>
+                        <div>
+                            {% if c.description|length > 100 %}
+                            <div>
+                                <div id="Desc_short_{{loop.index}}">
+                                    <p style="word-break:break-all">
+                                        周记内容：{{c.description[0:100]}}
+                                        <a id="toggleDesc_{{loop.index}}" onclick="showDesc('{{loop.index}}')"
+                                            class="showmore">...查看更多</a>
+                                    </p>
+                                </div>
+                                <div id="Desc_long_{{loop.index}}" style="display:none">
+                                    {{c.description}}
+                                </div>
+
+
+                            </div>
+                            {% else %}
+                            <div style="word-break:break-all">周记内容：{{c.description}}</div>
+                            {% endif %}
+                        </div>
+                        <!--<input type="checkbox" name="candidates" value="{{c.id}}"/> -->
+                        <input type="checkbox" name="candidates" id="vote_{{c.id}}" value="{{c.id}}"
+                            style="display: none;">
+                        <label for="vote_{{c.id}}" class="check-btn" id="label_{{c.id}}"
+                            onclick="toggleCheckedStyle('{{c.id}}')">投票</label>
+                    </div>
+                </div>
             </div>
             {% endfor %}
             <div class="col-md-12 col-xs-12 col-sm-12 col-lg-12">
@@ -72,8 +99,6 @@
 
         </form>
     </div>
-    <hr>
-    <input type="submit">
     <script src="" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>

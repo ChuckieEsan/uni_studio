@@ -84,7 +84,9 @@ def vote_handler(vote_id):
     except Exception as e:
         db.session.rollback()
         print(e)
-    return redirect(url_for('vote.root')+str(vote_id))
+    #return redirect(url_for('vote.root')+str(vote_id))
+    flash('ok')
+    return render_template('vote_result.html',vote_id=vote_id)
 
 @vote.route('/populate/<vote_id>')
 def populate_id(vote_id):

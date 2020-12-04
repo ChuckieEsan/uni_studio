@@ -8,7 +8,8 @@ except Exception as e:
 
 import os
 import socket
-from flask import Flask, Request
+from flask import Flask, Request, session
+from flask_session import Session
 from flask_bootstrap import Bootstrap  # for flask-file-uploader | fileservice
 from .test import tests
 from .fileservice.app import app as fileserviceapp
@@ -46,6 +47,7 @@ def create_app():
             app.config['SERVER_NAME'] = 'dutbit.com'
             app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
             app.config['SUBDOMAINS'] = subdomains['PRODUCTION']
+            app.config['SESSION_TYPE'] = 'filesystem'
             if 'mysql+pymysql' not in app.config['SQLALCHEMY_DATABASE_URI']:
                 raise EnvironmentError("No db connection uri provided")
                 exit(-1)
@@ -55,8 +57,12 @@ def create_app():
             app.config['SERVER_NAME'] = '127.0.0.1:5000'
             app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dev.db'
             app.config['SUBDOMAINS'] = subdomains['DEVELOPMENT']
-
+            app.config['SESSION_TYPE'] = 'filesystem'
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+        app.config['SESSION_USE_SIGNER'] = True
+        app.config['SESSION_PERMANENT'] = True  #sessons是否长期有效，false，则关闭浏览器，session失效
+        app.config['PERMANENT_SESSION_LIFETIME'] = 3600   #session长期有效，则设定session生命周期，整数秒，默认大概不到3小时。
+        Session(app)
         db.init_app(app)
         # db.drop_all()
         db.create_all()
