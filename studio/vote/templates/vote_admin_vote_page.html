@@ -31,11 +31,16 @@
         <div id="root"></div>
         <form action="{{url_for('vote.vote_handler',vote_id=vote_info.id)}}" method="POST">
             {% for v in candidate_all %}
+            <hr>
+            {{v}}
             <h3>{{v.title}}</h3>
             <h4>{{v.subtitle}}</h4>
             <p>{{v.description}}</p>
             <p>{{v.votes}}</p>
             <p>{{v.action_at}}</p>
+            {% if v.image %}
+                <img src="{{v.image}}" width="200px" height="200px" alt="img">
+            {% endif %}
             <a href="{{url_for('vote.candidate_del',vote_id=vote_info.id,candidate_id=v.id)}}">del</a>
             <input type="checkbox" name="candidates" value="{{v.id}}"/>
             {% endfor %}
@@ -44,10 +49,12 @@
         </form>
         <hr>
         {% if admin %}
-        <form action="{{url_for('vote.candidate_add',vote_id=vote_info.id)}}" method="POST">
-            <input type="text" placeholder="title" name="title">
+        <form action="{{url_for('vote.candidate_add',vote_id=vote_info.id)}}" method="POST" enctype="multipart/form-data">
+            <input type="text" placeholder="title" name="title" required>
             <input type="text" placeholder="subtitle" name="subtitle">
             <input type="text" placeholder="description" name="description">
+            <input type="text" placeholder="action at" name="action_at">
+            <input type="file" name="image" required>
             <input type="submit">submit</input>
         </form>
         

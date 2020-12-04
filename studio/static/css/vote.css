@@ -5,20 +5,26 @@
 .main{
    
 }
+.showmore{
+    color:darkblue;
+    
+}
 .person{
-    width:75%;
     margin:auto;    
     margin-bottom:25px;
     box-shadow: 5px 0px 10px #eee;
 }
 .p-info{
     padding-bottom:15px;
+    padding:0;
 }
 .p-info>img,.p-info>div{
     display: inline-block;
 }
 .p-info>img{
     width:40%;
+    max-height: 240px;
+    object-fit: cover;
 }
 .p-info>div{
     vertical-align: top;

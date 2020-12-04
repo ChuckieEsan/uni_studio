@@ -81,7 +81,7 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <span class="panel-title">
-                    <a href="/vote/{{v.id}}">{{v.title}}</a>
+                    <a href="{{url_for('vote.admin_vote_page',vote_id=v.id)}}">{{v.title}}</a>
                 </span>
                 {% if v.subtitle!='' %}
                 &nbsp;&nbsp;
