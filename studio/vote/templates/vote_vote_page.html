@@ -22,12 +22,6 @@
     <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
-
-    <!-- <div class="modal fade" id="diaryModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
-            
-        </div>
-    </div> -->
     <div class="modal fade" id="diaryModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
@@ -43,7 +37,7 @@
             </div>
         </div><!-- /.modal -->
     </div>
-    <a href="{{url_for('vote.root')}}">back</a>
+    <a href="{{url_for('vote.root')}}">返回列表</a>
     <div id="header">
         {% if vote_info.image %}
         <img src="{{vote_info.image}}" />
@@ -53,8 +47,8 @@
         <h4>{{vote_info.description}}</h4>
     </div>
     <div id="root"></div>
-    <div class="container">
-        <form action="{{url_for('vote.vote_handler',vote_id=vote_info.id)}}" method="POST">
+    <div class="container" style="margin-bottom: 50px;">
+        <form action="{{url_for('vote.vote_handler',vote_id=vote_info.id)}}" method="POST" id="voteForm">
 
             {% for c in candidate_all %}
             <div class="col-md-6 col-sm-12 col-xs-12 person">
@@ -96,8 +90,13 @@
                 </div>
             </div>
             {% endfor %}
-            <hr>
-            <button type="submit" class="btn btn-primary">提交</button>
+            <div class="col-md-12 col-xs-12 col-sm-12 col-lg-12">
+                <hr>
+                <input type="text" name="captcha" id="captchaInput" required placeholder="验证码">
+                <img src="{{captcha_b64}}" width="200px" height="50px" id="captchaImg">
+                <button type="button" class="btn btn-primary" onclick="checkForm()">提交</button>
+            </div>
+
         </form>
     </div>
     <script src="" async defer></script>
@@ -133,12 +132,41 @@
                 backgroundColor: "linear-gradient(to right, #EF100F, #EF100F)",
             }).showToast();
         }
+        let checkForm = () => {
+            let cptinput = $("#captchaInput").val()
+            console.log(cptinput)
+            if(!cptinput){
+                msgFail("验证码不可为空")
+                return
+            }
+            fetch("{{url_for('vote.check_captcha')}}", {
+                method: "POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body: JSON.stringify({
+                    "captcha":cptinput
+                })
+            }).then(res => res.json()).then((res) => {
+                    if (!res.success) {
+                        msgFail(res.data)
+                        $("#captchaImg").attr("src", res.captcha_b64)
+                        return false
+                    } else {
+                        $("#voteForm").submit()
+                    }
+                }).catch(err => {
+                    msgFail("网络错误")
+                    return false
+                })
+            return false
+        }
     </script>
     <script>
 
-{% for m in get_flashed_messages() %}
-    msgOK({{m}})
-    {% endfor %}
+        {% for m in get_flashed_messages() %}
+        msgOK({{ m }})
+        {% endfor %}
     </script>
 </body>
 

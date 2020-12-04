@@ -4,61 +4,96 @@
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
 <!--[if gt IE 8]>      <html class="no-js"> <!--<![endif]-->
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="description" content="vote page">
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-        <title>{{vote_info.title}}</title>
-        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" />
-        <link rel="stylesheet" type="text/css" href="/static/css/vote.css" />
-        <script src="https://cdn.bootcss.com/vue/2.6.8/vue.min.js"></script>
-    </head>
-    <body>
-        <!--[if lt IE 7]>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="vote page">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>{{vote_info.title}}</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="{{url_for('static',filename='css/vote.css')}}" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+</head>
+
+<body>
+    <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
-        <a href="{{url_for('vote.admin_votes_show')}}">back</a>
-        <div id="header">
-            {% if vote_info.image %}
-            <img src="{{vote_info.image}}"/>
-            {% endif %}
-            <h2>{{vote_info.title}}</h2>
-            <h3>{{vote_info.subtitle}}</h3>
-            <h4>{{vote_info.description}}</h4>
-        </div>
-        <div id="root"></div>
-        <form action="{{url_for('vote.vote_handler',vote_id=vote_info.id)}}" method="POST">
-            {% for v in candidate_all %}
-            <hr>
-            {{v}}
-            <h3>{{v.title}}</h3>
-            <h4>{{v.subtitle}}</h4>
-            <p>{{v.description}}</p>
-            <p>{{v.votes}}</p>
-            <p>{{v.action_at}}</p>
-            {% if v.image %}
-                <img src="{{v.image}}" width="200px" height="200px" alt="img">
-            {% endif %}
-            <a href="{{url_for('vote.candidate_del',vote_id=vote_info.id,candidate_id=v.id)}}">del</a>
-            <input type="checkbox" name="candidates" value="{{v.id}}"/>
-            {% endfor %}
-            <br>
-            <input type="submit">
-        </form>
-        <hr>
-        {% if admin %}
-        <form action="{{url_for('vote.candidate_add',vote_id=vote_info.id)}}" method="POST" enctype="multipart/form-data">
-            <input type="text" placeholder="title" name="title" required>
-            <input type="text" placeholder="subtitle" name="subtitle">
-            <input type="text" placeholder="description" name="description">
-            <input type="text" placeholder="action at" name="action_at">
-            <input type="file" name="image" required>
-            <input type="submit">submit</input>
-        </form>
-        
+    <div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="_myModalLabel">候选人详情</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <div class="modal-body" id="detailDisplay">
+                </div>
+            </div>
+        </div><!-- /.modal -->
+    </div>
+    <a href="{{url_for('vote.admin_votes_show')}}">返回管理列表</a>
+    <div id="header">
+        {% if vote_info.image %}
+        <img src="{{vote_info.image}}" />
         {% endif %}
-        <script src="" async defer></script>
-    </body>
+        <h2>{{vote_info.title}}</h2>
+        <h3>{{vote_info.subtitle}}</h3>
+        <h4>{{vote_info.description}}</h4>
+    </div>
+    <div id="root"></div>
+    <div class="container" style="margin-bottom: 50px;">
+        {% for v in candidate_all %}
+        <div class="col-md-2 col-lg-2 col-sm-3 col-xs-4">
+            <span>序号:{{loop.index}}&nbsp;&nbsp;&nbsp;&nbsp;姓名：{{v.title}}</span>
+            <a href="{{url_for('vote.candidate_del',vote_id=vote_info.id,candidate_id=v.id)}}">del</a>
+            <button onclick="showDetail('{{loop.index}}')">查看详情</button>
+        </div>
+        <div style="display:none" id="detail_{{loop.index}}">
+            <div class="p-info">
+                {% if v.image %}
+                <img src="{{v.image}}" />
+                {% endif %}
+                <div style="width:55%">
+                    <p>序号：{{loop.index}}&nbsp;&nbsp;&nbsp;&nbsp;姓名：{{v.title}}</p>
+                    <p>所在社区：{{v.subtitle}}</p>
+                    <p>时间：{{v.action_at}}</p>
+                    <p>已获：{{v.votes}}票</p>
+                    <div style="word-break:break-all">
+                        周记内容：{{v.description}}
+                    </div>
+                    <a href="{{url_for('vote.candidate_del',vote_id=vote_info.id,candidate_id=v.id)}}">删除</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <hr>
+    <form action="{{url_for('vote.candidate_add',vote_id=vote_info.id)}}" method="POST" enctype="multipart/form-data">
+        <label>姓名</label><input type="text" placeholder="title" name="title" required>
+        <label>所在社区</label><input type="text" placeholder="subtitle" name="subtitle">
+        <label>周记</label><input type="text" placeholder="description" name="description">
+        <label>时间</label><input type="text" placeholder="action at" name="action_at">
+        <label>选择描述图片</label>
+        <input type="file" name="image" required>
+        <hr>
+        <input type="submit">
+    </form>
+
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+    <script>
+        let showDetail = (loopindex)=>{
+            console.log(loopindex)
+            $("#detailDisplay").html($(`#detail_${loopindex}`).html())
+            $("#detailModal").modal('show')
+        }
+    </script>
+    <script src="" async defer></script>
+</body>
+
 </html>

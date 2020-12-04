@@ -42,12 +42,11 @@ def admin_votes_add():
 @vote.route('/admin/votes/<int:vote_id>',methods=["GET"])
 def admin_vote_page(vote_id):
     candidate_all = VoteCandidates.query.filter(VoteCandidates.vote_id==vote_id).all()
-    vote_info = VoteInfo.query.filter(VoteInfo.id==vote_id).first()
+    vote_info = VoteInfo.query.filter(VoteInfo.id==vote_id).first_or_404()
     return render_template(
         'vote_admin_vote_page.html',
         candidate_all=candidate_all,
         vote_info=vote_info,
-        admin=True
     )
 @vote.route('/admin/votes/<int:vote_id>/candidates',methods=["POST"])
 def candidate_add(vote_id):
@@ -103,7 +102,7 @@ def votes_del(vote_id):
     except Exception as e:
         db.session.rollback()
         print(e)
-    return redirect(url_for('vote.root'))
+    return redirect(url_for('vote.admin_votes_show'))
 
 @vote.route('/admin/votes/<vote_id>',methods=["GET"])
 def votes_details_show(vote_id):
