@@ -1,7 +1,7 @@
 from studio.vote import vote
 from studio.models import VoteInfo,VoteCandidates,VoteVotes,db
 from studio.utils.captcha_helper import get_captcha_and_img
-from flask import url_for,redirect,render_template,request,flash,session,jsonify
+from flask import url_for,redirect,render_template,request,flash,session,jsonify,Markup
 from faker import Faker
 import json
 import time
@@ -18,6 +18,8 @@ def root():
 def vote_page(vote_id):
     candidate_all = VoteCandidates.query.filter(VoteCandidates.vote_id==vote_id).all()
     vote_info = VoteInfo.query.filter(VoteInfo.id==vote_id).first_or_404()
+    for c in candidate_all:
+        c.description = Markup(c.description)
     session['captcha_time'] = int(time.time())+10*60#10分钟
     session['captcha_str'],captcha_b64 = get_captcha_and_img()
     return render_template(
@@ -85,6 +87,6 @@ def vote_handler(vote_id):
         db.session.rollback()
         print(e)
     #return redirect(url_for('vote.root')+str(vote_id))
-    flash('ok')
+    flash('投票成功')
     return render_template('vote_result.html',vote_id=vote_id)
 
