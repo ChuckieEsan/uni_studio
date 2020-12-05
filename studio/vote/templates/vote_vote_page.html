@@ -39,6 +39,7 @@
     </div>
     <a href="{{url_for('vote.root')}}">返回列表</a>
     <div id="header">
+        <a name="1F"></a>
         {% if vote_info.image %}
         <img src="{{vote_info.image}}" />
         {% endif %}
@@ -52,11 +53,11 @@
 
             {% for c in candidate_all %}
             <div class="col-md-6 col-sm-12 col-xs-12 person">
-                <div class="p-info">
+                <div class="p-info" style="word-break:break-all">
                     {% if c.image %}
                     <img src="{{c.image}}" />
                     {% endif %}
-                    <div style="width:55%">
+                    <div style="width:55%;word-break:break-all">
                         <p>序号：{{loop.index}}&nbsp;&nbsp;&nbsp;&nbsp;姓名：{{c.title}}</p>
                         <p>所在社区：{{c.subtitle}}</p>
                         <p>时间：{{c.action_at}}</p>
@@ -92,12 +93,27 @@
             {% endfor %}
             <div class="col-md-12 col-xs-12 col-sm-12 col-lg-12">
                 <hr>
+
+                <a name="2F"></a>
                 <input type="text" name="captcha" id="captchaInput" required placeholder="验证码">
                 <img src="{{captcha_b64}}" width="200px" height="50px" id="captchaImg">
                 <button type="button" class="btn btn-primary" onclick="checkForm()">提交</button>
             </div>
 
         </form>
+        <div style="position: fixed;bottom:20%;right:16%;z-index: 1;">
+            <a href="#1F">
+                <button class="btn btn-default">
+                    ↑
+                </button>
+            </a>
+            <br>
+            <a href="#2F">
+                <button class="btn btn-default">
+                    ↓
+                </button>
+            </a>
+        </div>
     </div>
     <script src="" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
@@ -133,42 +149,43 @@
             }).showToast();
         }
         let checkForm = () => {
-            let minVote = {{vote_info.vote_min}}
-            let maxVote = {{vote_info.vote_max}}
+            let minVote = {{ vote_info.vote_min }}
+            let maxVote = {{ vote_info.vote_max }}
             let count = $("input[name='candidates']:checked").length;
             console.log(count)
-            if(count<minVote || count>maxVote){
+            if (count < minVote || count > maxVote) {
                 msgFail(`最少${minVote}票，最多${maxVote}票`)
                 return
             }
             let cptinput = $("#captchaInput").val()
             console.log(cptinput)
-            if(!cptinput){
+            if (!cptinput) {
                 msgFail("验证码不可为空")
                 return
             }
             fetch("{{url_for('vote.check_captcha')}}", {
                 method: "POST",
-                headers:{
-                    "Content-Type":"application/json"
+                headers: {
+                    "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    "captcha":cptinput
+                    "captcha": cptinput
                 })
             }).then(res => res.json()).then((res) => {
-                    if (!res.success) {
-                        msgFail(res.data)
-                        $("#captchaImg").attr("src", res.captcha_b64)
-                        return false
-                    } else {
-                        $("#voteForm").submit()
-                    }
-                }).catch(err => {
-                    msgFail("网络错误")
+                if (!res.success) {
+                    msgFail(res.data)
+                    $("#captchaImg").attr("src", res.captcha_b64)
                     return false
-                })
+                } else {
+                    $("#voteForm").submit()
+                }
+            }).catch(err => {
+                msgFail("网络错误")
+                return false
+            })
             return false
         }
+        
     </script>
     <script>
 
