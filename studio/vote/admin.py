@@ -3,7 +3,7 @@ from studio.utils.time_helper import timestamp_to_datetime
 from studio.utils.hash_helper import md5
 from studio.interceptors import session_required
 from studio.models import VoteInfo,VoteCandidates,VoteVotes,db
-from flask import url_for,redirect,abort,render_template,request
+from flask import url_for,g,redirect,abort,render_template,request
 from faker import Faker
 import time
 import os
@@ -31,7 +31,7 @@ def admin_votes_add():
         end_at=timestamp_to_datetime(new_vote.get("end_at")),
         vote_min=new_vote.get("vote_min"),
         vote_max=new_vote.get("vote_max"),
-        admin="tzy15368@outlook.com"
+        admin=g._id
     )
     #VoteInfo.add(v)
     db.session.add(v)
