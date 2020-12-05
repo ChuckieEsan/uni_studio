@@ -3,7 +3,7 @@ from studio.utils.time_helper import timestamp_to_datetime
 from studio.utils.hash_helper import md5
 from studio.interceptors import session_required
 from studio.models import VoteInfo,VoteCandidates,VoteVotes,db
-from flask import url_for,g,redirect,abort,render_template,request
+from flask import url_for,g,redirect,abort,render_template,request,Markup
 from faker import Faker
 import time
 import os
@@ -47,6 +47,8 @@ def admin_votes_add():
 def admin_vote_page(vote_id):
     candidate_all = VoteCandidates.query.filter(VoteCandidates.vote_id==vote_id).all()
     vote_info = VoteInfo.query.filter(VoteInfo.id==vote_id).first_or_404()
+    for c in candidate_all:
+        c.description = Markup(c.description)
     return render_template(
         'vote_admin_vote_page.html',
         candidate_all=candidate_all,
@@ -56,7 +58,7 @@ def admin_vote_page(vote_id):
 @session_required('/vote')
 def candidate_add(vote_id):
     new_candidate = request.form
-    print(request.form)
+    #print(request.form)
     _file = request.files.get('image')
     file_suffix = _file.filename.split('.')[-1]
     if file_suffix not in ['png','PNG','jpg','JPG','JPEG','jpeg','mp3']:
@@ -69,10 +71,11 @@ def candidate_add(vote_id):
     except Exception as e:
         print(e)
         return abort(500)
+    _des = new_candidate.get('description').replace('\n','<br>')
     c = VoteCandidates(
         title=new_candidate.get("title"),#姓名
         subtitle=new_candidate.get("subtitle"),#所在社区
-        description=new_candidate.get("description"),#周记
+        description=_des,#new_candidate.get("description"),#周记
         vote_id=vote_id,
         action_at = new_candidate.get('action_at'),#时间
         image=access_dir
