@@ -88,39 +88,3 @@ def vote_handler(vote_id):
     flash('ok')
     return render_template('vote_result.html',vote_id=vote_id)
 
-@vote.route('/populate/<vote_id>')
-def populate_id(vote_id):
-    cs = []
-    for i in range(0,5):
-        c = VoteCandidates(
-            title=f.name(),
-            subtitle=f.company_prefix(),
-            description=f.paragraph(),
-            vote_id=vote_id
-            )
-        cs.append(c)
-    try:
-        db.session.add_all(cs)
-        db.session.commit()
-    except Exception as e:
-        db.session.rollback()
-        print(e)
-    return redirect(url_for('vote.root'))
-@vote.route('/populate')
-def populate(): 
-    vis = []
-    for i in range(5):
-        vi = VoteInfo(
-            title=f.bs(),
-            subtitle=f.company_suffix(),
-            description=f.credit_card_full(),
-            admin="tzy15368@outlook.com"
-            )
-        vis.append(vi)
-    try:
-        db.session.add_all(vis)
-        db.session.commit()
-    except Exception as e:
-        print(e)
-        db.session.rollback()
-    return redirect(url_for('vote.root'))
