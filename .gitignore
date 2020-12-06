@@ -129,3 +129,4 @@ dmypy.json
 .idea*
 .idea/$CACHE_FILE$
 .idea/encodings.xml
+.DS_STORE
