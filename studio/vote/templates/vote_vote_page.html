@@ -63,11 +63,11 @@
                         <p>时间：{{c.action_at}}</p>
                         <p>已获：{{c.votes}}票</p>
                         <div>
-                            {% if c.description|length > 100 %}
+                            {% if c.description|length > 80 %}
                             <div>
                                 <div id="Desc_short_{{loop.index}}">
                                     <p style="word-break:break-all">
-                                        周记内容：{{c.description[0:100]}}
+                                        周记内容：{{c.description[0:80]}}
                                         <a id="toggleDesc_{{loop.index}}" onclick="showDesc('{{loop.index}}')"
                                             class="showmore">...查看更多</a>
                                     </p>
