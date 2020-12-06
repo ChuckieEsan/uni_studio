@@ -5,6 +5,7 @@ from flask import url_for,redirect,render_template,request,flash,session,jsonify
 from faker import Faker
 import json
 import time
+import random
 f=Faker(locale='zh_CN')
 @vote.route("/")
 def root():
@@ -18,7 +19,11 @@ def root():
 def vote_page(vote_id):
     candidate_all = VoteCandidates.query.filter(VoteCandidates.vote_id==vote_id).all()
     vote_info = VoteInfo.query.filter(VoteInfo.id==vote_id).first_or_404()
+    if vote_info.shuffle:
+        random.shuffle(candidate_all)
     for c in candidate_all:
+        c.description = c.description.replace('<br>','\n')
+        c.description = c.description.replace('\r','').replace('\n','<br/>').replace('<br>','<br/>').strip()
         c.description = Markup(c.description)
     session['captcha_time'] = int(time.time())+10*60#10分钟
     session['captcha_str'],captcha_b64 = get_captcha_and_img()
