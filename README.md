@@ -19,9 +19,3 @@ A web based set of tools for operations of studios in universities.
 
 - Vote  
     Customizable voting.
-
-## known issues
-- 应该是因为app的server name没配置，有不少url_for的跳转是跳回127.0.0.1的
-- votes新建vote的图挂了
-## todo
-- 添加config（今晚）
