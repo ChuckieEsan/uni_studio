@@ -51,6 +51,10 @@
                     <input class="input" type="text" name="description" placeholder="描述文字"><br>
                     <span class="required">&nbsp;&nbsp;&nbsp;</span>
                     <input class="input" type="text" name="description" placeholder="图片链接"><br>
+                    <span class="required">&nbsp;&nbsp;&nbsp;</span>
+                    <input class="input" type="text" name="vote_min" placeholder="票数下限" required><br>
+                    <span class="required">&nbsp;&nbsp;&nbsp;</span>
+                    <input class="input" type="text" name="vote_max" placeholder="票数上限" required><br>
 
                 </div>
                 <div class="modal-footer">
@@ -66,7 +70,7 @@
         <div class="title">
             <span style="font-size:28px">
                 投票
-                <a href="/vote/populate">populate</a>
+                <!-- <a href="/vote/populate">populate</a> -->
             </span>
             <span style="float:right;margin-top:10px;margin-right:10px;">
                 <a href="{{url_for('vote.root')}}">
@@ -81,14 +85,16 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <span class="panel-title">
-                    <a href="/vote/{{v.id}}">{{v.title}}</a>
+                    <a href="{{url_for('vote.admin_vote_page',vote_id=v.id)}}">{{v.title}}</a>
                 </span>
                 {% if v.subtitle!='' %}
                 &nbsp;&nbsp;
-                {% endif %}
                 <span>
                     {{v.subtitle}}
                 </span>
+                {% endif %}
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <a href="/vote/admin/votes/drop/{{v.id}}">删除该投票 id:{{v.id}}</a>
             </div>
             <div class="panel-body">
                 <p>{{ v.description }}</p>
@@ -114,8 +120,7 @@
                 </p>
             </div>
         </div>
-        <a href="/vote/populate/{{v.id}}">populate {{v.id}}</a>
-        <a href="/vote/admin/votes/drop/{{v.id}}">drop {{v.id}}</a>
+        <!-- <a href="/vote/populate/{{v.id}}">populate {{v.id}}</a> -->
         <hr>
         {% endif %}
         {% endfor %}

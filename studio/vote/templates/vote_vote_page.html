@@ -12,18 +12,34 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
     <title>{{vote_info.title}}</title>
-    <link rel="stylesheet" type="text/css"
-        href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css" href="/static/css/vote.css" />
-    <script src="https://cdn.bootcss.com/vue/2.6.8/vue.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="{{url_for('vote.static',filename='css/vote.css')}}" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 </head>
 
 <body>
     <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
-    <a href="{{url_for('vote.root')}}">back</a>
+    <div class="modal fade" id="diaryModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="_myModalLabel">周记全文</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p id="diaryText" style="word-break:break-all">
+                    </p>
+                </div>
+            </div>
+        </div><!-- /.modal -->
+    </div>
+    <a href="{{url_for('vote.root')}}">返回列表</a>
     <div id="header">
+        <a name="1F"></a>
         {% if vote_info.image %}
         <img src="{{vote_info.image}}" />
         {% endif %}
@@ -32,28 +48,157 @@
         <h4>{{vote_info.description}}</h4>
     </div>
     <div id="root"></div>
-    <div class="container">
-        <form action="{{url_for('vote.vote_handler',vote_id=vote_info.id)}}" method="POST">
+    <div class="container" style="margin-bottom: 50px;">
+        <form action="{{url_for('vote.vote_handler',vote_id=vote_info.id)}}" method="POST" id="voteForm">
 
             {% for c in candidate_all %}
-            <div class="col-md-6 col-sm-12 col-xs-12">
-                <h3>{{c.title}}</h3>
-                <h4>{{c.subtitle}}</h4>
-                <p>{{c.description}}</p>
-                <p>{{c.votes}}</p>
-                <p>{{c.action_at}}</p>
-                {% if c.image %}
-                <img src="{{c.image}}" />
-                {% endif %}
-                <input type="checkbox" name="candidates" value="{{c.id}}" required />
+            <div class="col-md-6 col-sm-12 col-xs-12 person">
+                <div class="p-info" style="word-break:break-all">
+                    {% if c.image %}
+                    <img class="lazy" src="/static/img/loading.gif" data-original="{{c.image}}" />
+                    {% endif %}
+                    <div style="width:55%;word-break:break-all">
+                        <p>序号：{{loop.index}}&nbsp;&nbsp;&nbsp;&nbsp;姓名：{{c.title}}</p>
+                        <p>所在社区：{{c.subtitle}}</p>
+                        <p>时间：{{c.action_at}}</p>
+                        <p>已获：{{c.votes}}票</p>
+                        <div>
+                            {% if c.description|length > 80 %}
+                            <div>
+                                <div id="Desc_short_{{loop.index}}">
+                                    <p style="word-break:break-all">
+                                        周记内容：{{c.description[0:80]}}
+                                        <a id="toggleDesc_{{loop.index}}" onclick="showDesc('{{loop.index}}')"
+                                            class="showmore">...查看更多</a>
+                                    </p>
+                                </div>
+                                <div id="Desc_long_{{loop.index}}" style="display:none">
+                                    {{c.description}}
+                                </div>
+
+
+                            </div>
+                            {% else %}
+                            <div style="word-break:break-all">周记内容：{{c.description}}</div>
+                            {% endif %}
+                        </div>
+                        <!--<input type="checkbox" name="candidates" value="{{c.id}}"/> -->
+                        <input type="checkbox" name="candidates" id="vote_{{c.id}}" value="{{c.id}}"
+                            style="display: none;">
+                        <label for="vote_{{c.id}}" class="check-btn" id="label_{{c.id}}"
+                            onclick="toggleCheckedStyle('{{c.id}}')">投票</label>
+                    </div>
+                </div>
             </div>
             {% endfor %}
-            <br>
+            <div class="col-md-12 col-xs-12 col-sm-12 col-lg-12">
+                <hr>
+
+                <a name="2F"></a>
+                <input type="text" name="captcha" id="captchaInput" required placeholder="验证码">
+                <img src="{{captcha_b64}}" width="200px" height="50px" id="captchaImg">
+                <button type="button" class="btn btn-primary" onclick="checkForm()">提交</button>
+            </div>
+
         </form>
+        <div style="position: fixed;bottom:20%;right:16%;z-index: 1;">
+            <a href="#1F">
+                <button class="btn btn-default">
+                    ↑
+                </button>
+            </a>
+            <br>
+            <a href="#2F">
+                <button class="btn btn-default">
+                    ↓
+                </button>
+            </a>
+        </div>
     </div>
-    <hr>
-    <input type="submit">
     <script src="" async defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-lazyload@1.9.7/jquery.lazyload.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+    <script>
+        $(function() {
+            $("img.lazy").lazyload({
+            threshold : 200
+        });
+        });
+        let toggleCheckedStyle = (loopid) => {
+            if ($(`#label_${loopid}`).hasClass('check-btn-checked')) {
+                $(`#label_${loopid}`).removeClass('check-btn-checked')
+                //$(`#label_${loopid}`).addClass('check-btn')
+            } else {
+                $(`#label_${loopid}`).addClass('check-btn-checked')
+                //$(`#label_${loopid}`).removeClass('check-btn')
+            }
+        }
+        let showDesc = (loopid) => {
+            $("#diaryText").text($(`#Desc_long_${loopid}`).text())
+            $("#diaryModal").modal('show')
+        }
+        let msgOK = (s) => {
+            Toastify({
+                text: s,
+                duration: 3000,
+                backgroundColor: "linear-gradient(to right, #00b09b, #00b09b)",
+            }).showToast();
+        }
+        let msgFail = (s) => {
+            Toastify({
+                text: s,
+                duration: 3000,
+                backgroundColor: "linear-gradient(to right, #EF100F, #EF100F)",
+            }).showToast();
+        }
+        let checkForm = () => {
+            let minVote = {{ vote_info.vote_min }}
+            let maxVote = {{ vote_info.vote_max }}
+            let count = $("input[name='candidates']:checked").length;
+            console.log(count)
+            if (count < minVote || count > maxVote) {
+                msgFail(`最少${minVote}票，最多${maxVote}票`)
+                return
+            }
+            let cptinput = $("#captchaInput").val()
+            console.log(cptinput)
+            if (!cptinput) {
+                msgFail("验证码不可为空")
+                return
+            }
+            fetch("{{url_for('vote.check_captcha')}}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    "captcha": cptinput
+                })
+            }).then(res => res.json()).then((res) => {
+                if (!res.success) {
+                    msgFail(res.data)
+                    $("#captchaImg").attr("src", res.captcha_b64)
+                    return false
+                } else {
+                    $("#voteForm").submit()
+                }
+            }).catch(err => {
+                msgFail("网络错误")
+                return false
+            })
+            return false
+        }
+        
+    </script>
+    <script>
+
+        {% for m in get_flashed_messages() %}
+        msgOK({{ m }})
+        {% endfor %}
+    </script>
 </body>
 
 </html>
