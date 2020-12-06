@@ -16,6 +16,16 @@ def admin_votes_show():
         'vote_admin_index.html',
         info_list=voteinfo_all
         )
+        
+@vote.route('/admin/votes/shuffle/<int:vote_id>')
+def toggle_shuffle(vote_id):
+    vote_info = VoteInfo.query.filter(VoteInfo.id==vote_id).first_or_404()
+    vote_info.shuffle = not vote_info.shuffle
+    try:
+        db.session.commit()
+    except Exception as e:
+        print(e)
+    return redirect(url_for('vote.admin_vote_page',vote_id=vote_id))
 
 @vote.route('/admin/votes',methods=["POST"])#新建投票接口
 @session_required('/vote')
@@ -71,7 +81,7 @@ def candidate_add(vote_id):
     except Exception as e:
         print(e)
         return abort(500)
-    _des = new_candidate.get('description')#.replace('\n','<br>')
+    _des = new_candidate.get('description').strip()#.replace('\n','<br>')
     c = VoteCandidates(
         title=new_candidate.get("title"),#姓名
         subtitle=new_candidate.get("subtitle"),#所在社区
