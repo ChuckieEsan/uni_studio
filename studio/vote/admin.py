@@ -71,7 +71,7 @@ def candidate_add(vote_id):
     except Exception as e:
         print(e)
         return abort(500)
-    _des = new_candidate.get('description').replace('\n','<br>')
+    _des = new_candidate.get('description')#.replace('\n','<br>')
     c = VoteCandidates(
         title=new_candidate.get("title"),#姓名
         subtitle=new_candidate.get("subtitle"),#所在社区
