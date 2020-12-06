@@ -42,6 +42,12 @@
         <h2>{{vote_info.title}}</h2>
         <h3>{{vote_info.subtitle}}</h3>
         <h4>{{vote_info.description}}</h4> 
+        <h4>{% if vote_info.start_at!=vote_info.end_at%}
+            {{vote_info.start_at}}~{{vote_info.end_at}}
+            {% else %}
+            {{vote_info.start_at}}~无截止日期
+            {% endif %}
+        </h4>
         <h4><a href="{{url_for('vote.toggle_shuffle',vote_id=vote_info.id)}}">{% if vote_info.shuffle %}关闭{% else %}打开{%endif%}乱序排列</a></h4>
     </div>
     <div id="root"></div>

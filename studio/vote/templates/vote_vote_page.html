@@ -46,6 +46,12 @@
         <h2>{{vote_info.title}}</h2>
         <h3>{{vote_info.subtitle}}</h3>
         <h4>{{vote_info.description}}</h4>
+        <h4>{% if vote_info.start_at!=vote_info.end_at%}
+            {{vote_info.start_at}}~{{vote_info.end_at}}
+            {% else %}
+            {{vote_info.start_at}}~无截止日期
+            {% endif %}
+        </h4>
     </div>
     <div id="root"></div>
     <div class="container" style="margin-bottom: 50px;">
