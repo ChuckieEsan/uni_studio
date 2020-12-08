@@ -177,7 +177,7 @@
             let count = $("input[name='candidates']:checked").length;
             console.log(count)
             if (count < minVote || count > maxVote) {
-                msgFail(`最少${minVote}票，最多${maxVote}票`)
+                msgFail(`最少${minVote}票，最多${maxVote}票，已投${count}票`)
                 return
             }
             let cptinput = $("#captchaInput").val()
