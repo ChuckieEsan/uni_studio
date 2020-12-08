@@ -22,8 +22,13 @@
 .p-info>img,.p-info>div{
     display: inline-block;
 }
-.p-info>img{
+.p-info>img {
     width:40%;
+    max-height: 240px;
+    object-fit: cover;
+}
+.personimg{
+    width:90%;
     max-height: 240px;
     object-fit: cover;
 }

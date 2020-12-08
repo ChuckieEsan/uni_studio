@@ -19,6 +19,7 @@ def root():
 def vote_page(vote_id):
     candidate_all = VoteCandidates.query.filter(VoteCandidates.vote_id==vote_id).all()
     vote_info = VoteInfo.query.filter(VoteInfo.id==vote_id).first_or_404()
+    voted = VoteVotes.query.filter(VoteVotes.ip==request.remote_addr).filter(VoteVotes.vote_id==vote_id).first()
     if vote_info.shuffle:
         random.shuffle(candidate_all)
     for c in candidate_all:
@@ -31,7 +32,8 @@ def vote_page(vote_id):
         'vote_vote_page.html',
         candidate_all=candidate_all,
         vote_info=vote_info,
-        captcha_b64 =captcha_b64
+        captcha_b64 =captcha_b64,
+        voted = voted
     )
 @vote.route('/captcha',methods=['GET','POST'])
 def check_captcha():
