@@ -5,7 +5,11 @@ from flask import current_app
 from studio.utils.hash_helper import md5
 from studio import r#redis_conn
 if r is None:
-    r = redis.Redis(host='localhost',port=6379,decode_responses=False)
+    try:
+        r = redis.Redis(host='localhost',port=6379,decode_responses=False)
+    except Exception as e:
+        print(e)
+        pass
 def memoize(timeout:int=30):
     def _c(func):
         @wraps(func)
