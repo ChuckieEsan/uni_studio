@@ -1,4 +1,3 @@
-from studio.session import session_exists
 from studio import r#redis_conn
 from functools import wraps
 from flask import request,redirect,current_app,abort,g

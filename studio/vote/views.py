@@ -1,6 +1,7 @@
 from studio.vote import vote
 from studio.models import VoteInfo,VoteCandidates,VoteVotes,db
 from studio.utils.captcha_helper import get_captcha_and_img
+from studio.decorators import memoize
 from flask import url_for,redirect,render_template,request,flash,session,jsonify,Markup
 from faker import Faker
 from sqlalchemy import func
@@ -16,11 +17,18 @@ def root():
         'vote_index.html',
         info_list=voteinfo_all
         )
+@memoize(20)
+def get_vote_and_candidate(vote_id:int):
+    candidate_all = VoteCandidates.query.filter(VoteCandidates.vote_id==vote_id).all()
+    vote_info = VoteInfo.query.filter(VoteInfo.id==vote_id).first_or_404()
+    return (candidate_all,vote_info)
 
 @vote.route('/<int:vote_id>',methods=["GET"])
 def vote_page(vote_id):
-    candidate_all = VoteCandidates.query.filter(VoteCandidates.vote_id==vote_id).all()
-    vote_info = VoteInfo.query.filter(VoteInfo.id==vote_id).first_or_404()
+    #candidate_all = VoteCandidates.query.filter(VoteCandidates.vote_id==vote_id).all()
+    #vote_info = VoteInfo.query.filter(VoteInfo.id==vote_id).first_or_404()
+    t1 = time.time()
+    candidate_all,vote_info = get_vote_and_candidate(vote_id)
     voted = VoteVotes.query.filter(VoteVotes.ip==request.remote_addr).filter(VoteVotes.vote_id==vote_id).first()
     datetime_now = datetime.datetime.now()
     if vote_info.start_at > datetime_now or (vote_info.start_at!=vote_info.end_at and vote_info.end_at<datetime_now):
@@ -34,6 +42,7 @@ def vote_page(vote_id):
         c.description = Markup(c.description)
     session['captcha_time'] = int(time.time())+10*60#10分钟
     session['captcha_str'],captcha_b64 = get_captcha_and_img()
+    print('-------------this took {}----------------',time.time()-t1)
     return render_template(
         'vote_vote_page.html',
         candidate_all=candidate_all,
