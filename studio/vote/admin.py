@@ -10,6 +10,7 @@ import os
 f=Faker(locale='zh_CN')
 @vote.route('/admin/votes',methods=["GET"])#投票管理大厅，能看所有投票
 @session_required('/vote')
+@roles_required(['vote_admin','super_admin'])
 def admin_votes_show():
     voteinfo_all = VoteInfo.query.filter().all()
     return render_template(
@@ -18,6 +19,8 @@ def admin_votes_show():
         )
         
 @vote.route('/admin/votes/shuffle/<int:vote_id>')
+@session_required('/vote')
+@roles_required(['vote_admin','super_admin'])
 def toggle_shuffle(vote_id):
     vote_info = VoteInfo.query.filter(VoteInfo.id==vote_id).first_or_404()
     vote_info.shuffle = not vote_info.shuffle
@@ -29,6 +32,7 @@ def toggle_shuffle(vote_id):
 
 @vote.route('/admin/votes',methods=["POST"])#新建投票接口
 @session_required('/vote')
+@roles_required(['vote_admin','super_admin'])
 def admin_votes_add():
     #new_vote = request.get_json()
     new_vote = request.form
@@ -54,6 +58,7 @@ def admin_votes_add():
 
 @vote.route('/admin/votes/<int:vote_id>',methods=["GET"])
 @session_required('/vote')
+@roles_required(['vote_admin','super_admin'])
 def admin_vote_page(vote_id):
     candidate_all = VoteCandidates.query.filter(VoteCandidates.vote_id==vote_id).all()
     vote_info = VoteInfo.query.filter(VoteInfo.id==vote_id).first_or_404()
@@ -66,6 +71,7 @@ def admin_vote_page(vote_id):
     )
 @vote.route('/admin/votes/<int:vote_id>/candidates',methods=["POST"])
 @session_required('/vote')
+@roles_required(['vote_admin','super_admin'])
 def candidate_add(vote_id):
     new_candidate = request.form
     #print(request.form)
@@ -101,6 +107,7 @@ def candidate_add(vote_id):
 @vote.route('/admin/votes/<int:vote_id>/candidates/drop/<int:candidate_id>',methods=["GET"])
 @vote.route('/admin/candidates/<candidate_id>',methods=["DELETE"])
 @session_required('/vote')
+@roles_required(['vote_admin','super_admin'])
 def candidate_del(vote_id,candidate_id):
     VoteCandidates.query.filter(VoteCandidates.id==candidate_id).delete()
     try:
@@ -114,6 +121,7 @@ def candidate_del(vote_id,candidate_id):
 @vote.route('/admin/votes/drop/<vote_id>',methods=["GET"])
 @vote.route('/admin/votes/<vote_id>',methods=["DELETE"])
 @session_required('/vote')
+@roles_required(['vote_admin','super_admin'])
 def votes_del(vote_id):
     VoteInfo.query.filter(VoteInfo.id==vote_id).delete()
     #delete candidates and corresponding vote tickets?
@@ -126,11 +134,13 @@ def votes_del(vote_id):
 
 @vote.route('/admin/votes/<vote_id>',methods=["GET"])
 @session_required('/vote')
+@roles_required(['vote_admin','super_admin'])
 def votes_details_show(vote_id):
     all = VoteVotes.query.filter(VoteVotes.id==vote_id).all()
     return render_template('vote_admin_votes.html',votes_all=all)
 @vote.route('/populate/<vote_id>')
 @session_required('/vote')
+@roles_required(['vote_admin','super_admin'])
 def populate_id(vote_id):
     cs = []
     for i in range(0,5):
@@ -150,6 +160,7 @@ def populate_id(vote_id):
     return redirect(url_for('vote.root'))
 @vote.route('/populate')
 @session_required('/vote')
+@roles_required(['vote_admin','super_admin'])
 def populate(): 
     vis = []
     for i in range(5):
