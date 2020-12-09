@@ -37,7 +37,6 @@
             </div>
         </div><!-- /.modal -->
     </div>
-    <a href="{{url_for('vote.root')}}">返回列表</a>
     <div id="header">
         <a name="1F"></a>
         {% if vote_info.image %}
@@ -133,6 +132,12 @@
                 </button>
             </a>
         </div>
+        
+    </div>
+    <div id="footer">
+        <p>技术支持:<a href="/" style="color:white;">2020 校团委宣传部比特网络工作室</a>|
+            <a href="{{url_for('issues.root')}}">问题/建议反馈</a> |
+            <a href="{{url_for('vote.root')}}">返回列表</a></p>
     </div>
     <script src="" async defer></script>
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
