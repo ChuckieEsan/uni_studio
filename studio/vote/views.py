@@ -3,9 +3,11 @@ from studio.models import VoteInfo,VoteCandidates,VoteVotes,db
 from studio.utils.captcha_helper import get_captcha_and_img
 from flask import url_for,redirect,render_template,request,flash,session,jsonify,Markup
 from faker import Faker
+from sqlalchemy import func
 import json
 import time
 import random
+import datetime
 f=Faker(locale='zh_CN')
 @vote.route("/")
 def root():
@@ -20,6 +22,10 @@ def vote_page(vote_id):
     candidate_all = VoteCandidates.query.filter(VoteCandidates.vote_id==vote_id).all()
     vote_info = VoteInfo.query.filter(VoteInfo.id==vote_id).first_or_404()
     voted = VoteVotes.query.filter(VoteVotes.ip==request.remote_addr).filter(VoteVotes.vote_id==vote_id).first()
+    datetime_now = datetime.datetime.now()
+    if vote_info.start_at > datetime_now or (vote_info.start_at!=vote_info.end_at and vote_info.end_at<datetime_now):
+        flash('不在有效的投票时间段内')
+        return render_template('vote_result.html',vote_id=vote_id)
     if vote_info.shuffle:
         random.shuffle(candidate_all)
     for c in candidate_all:
