@@ -14,6 +14,8 @@ def memoize(timeout:int=30):
     def _c(func):
         @wraps(func)
         def func_wrapper(*args,**kwargs):
+            if r is None:
+                return func(*args,**kwargs)
             if len(args)!=1:
                 print('not for us')
                 return func(*args,**kwargs)
