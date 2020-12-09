@@ -29,7 +29,7 @@ def session_required(target:str=None):
             _id = r.get(sessionid)
             if _id is not None:
                 g.sessionid = sessionid
-                g._id = _id
+                g._id = _id.decode('UTF-8')
                 return func(*args,**kwargs)
             else:
                 return redirect(redirect_target)
@@ -37,7 +37,7 @@ def session_required(target:str=None):
     return _check_session
 
 
-def roles_required(roles:list,redirect=None):
+def roles_required(roles:list,_redirect=None):
     def check_roles(func):
         @wraps(func)
         def func_wrapper(*args,**kwargs):
@@ -54,19 +54,21 @@ def roles_required(roles:list,redirect=None):
                 return func(*args,**kwargs) 
             try:
                 role_info = r.hgetall("userservice:rolemap:"+g._id)
-                role_intersection = set(roles)&set(role_info.keys())
+                role_keys = [j.decode('UTF-8') for j in role_info.keys()]
+                role_intersection = set(roles)&set(role_keys)
                 if not role_intersection:
                     raise ValueError
                 g.role = role_intersection
             except redis.DataError:#no sessionid
                 #print('no sessionid')
-                return redirect('/userservice/index.html?target={}#1'.format(redirect))
+                return redirect('/userservice/index.html?target={}#1'.format(_redirect))
             except TypeError:#hmget returned none, no valid userservice session.
                 #print('no valid session')
-                return redirect('/userservice/index.html?target={}#2'.format(redirect))
+                return redirect('/userservice/index.html?target={}#2'.format(_redirect))
             except ValueError:
                 #print('no valid role')
-                return abort(404)
+                #return abort(404)
+                return redirect('/userservice/index.html?target={}#2'.format(_redirect))
             except Exception as e:
                 print(e)
                 return abort(500)
