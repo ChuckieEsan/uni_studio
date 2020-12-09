@@ -60,10 +60,10 @@ def roles_required(roles:list,redirect=None):
                 g.role = role_intersection
             except redis.DataError:#no sessionid
                 #print('no sessionid')
-                return redirect('/userservice/index.html?target={}#1'.format(request.path))
+                return redirect('/userservice/index.html?target={}#1'.format(redirect))
             except TypeError:#hmget returned none, no valid userservice session.
                 #print('no valid session')
-                return redirect('/userservice/index.html?target={}#2'.format(request.path))
+                return redirect('/userservice/index.html?target={}#2'.format(redirect))
             except ValueError:
                 #print('no valid role')
                 return abort(404)
