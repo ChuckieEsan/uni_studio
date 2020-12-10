@@ -66,14 +66,23 @@
             </thead>
             <tbody>
                 {% for c in candidate_all_sorted%}
+                {% if loop.index <6 %}
                 <tr>
                     <th scope="row">{{loop.index}}</th>
                     <td>{{c.title}}</td>
                     <td>{{c.votes}}</td>
                 </tr>
+                {% else %}
+                <tr class="hiddenLeaderboard" style="display:none">
+                    <th scope="row">{{loop.index}}</th>
+                    <td>{{c.title}}</td>
+                    <td>{{c.votes}}</td>
+                </tr>
+                {% endif %}
                 {% endfor %}
             </tbody>
         </table>
+        <button class="btn btn-default" id="leaderboardToggle">开/关完整排行榜</button>
         {% endif %}
         </div>
         <form action="{{url_for('vote.vote_handler',vote_id=vote_info.id)}}" method="POST" id="voteForm">
@@ -170,6 +179,9 @@
     <script>
         $(function() {
             $("img.lazy").lazyload({threshold : 200});
+            $("#leaderboardToggle").click(()=>{
+                $(".hiddenLeaderboard").toggle()
+            })
         });
         let toggleCheckedStyle = (loopid) => {
             if ($(`#label_${loopid}`).hasClass('check-btn-checked')) {
