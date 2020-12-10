@@ -54,6 +54,28 @@
     </div>
     <div id="root"></div>
     <div class="container" style="margin-bottom: 50px;">
+        <div>
+        {% if voted %}
+        <table class="table table-condensed table-hover">
+            <thead>
+                <tr>
+                    <th>排行榜</th>
+                    <th>姓名</th>
+                    <th>票数</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in candidate_all_sorted%}
+                <tr>
+                    <th scope="row">{{loop.index}}</th>
+                    <td>{{c.title}}</td>
+                    <td>{{c.votes}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+        </div>
         <form action="{{url_for('vote.vote_handler',vote_id=vote_info.id)}}" method="POST" id="voteForm">
 
             {% for c in candidate_all %}
