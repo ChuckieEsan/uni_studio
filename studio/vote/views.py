@@ -20,15 +20,16 @@ def root():
 @memoize(20)
 def get_vote_and_candidate(vote_id:int):
     candidate_all = VoteCandidates.query.filter(VoteCandidates.vote_id==vote_id).all()
+    candidate_all_sorted = sorted(candidate_all,key=lambda x:x.votes,reverse=True)
     vote_info = VoteInfo.query.filter(VoteInfo.id==vote_id).first_or_404()
-    return (candidate_all,vote_info)
+    return (candidate_all,candidate_all_sorted,vote_info)
 
 @vote.route('/<int:vote_id>',methods=["GET"])
 def vote_page(vote_id):
     #candidate_all = VoteCandidates.query.filter(VoteCandidates.vote_id==vote_id).all()
     #vote_info = VoteInfo.query.filter(VoteInfo.id==vote_id).first_or_404()
     t1 = time.time()
-    candidate_all,vote_info = get_vote_and_candidate(vote_id)
+    candidate_all,candidate_all_sorted,vote_info = get_vote_and_candidate(vote_id)
     voted = VoteVotes.query.filter(VoteVotes.ip==request.remote_addr).filter(VoteVotes.vote_id==vote_id).first()
     datetime_now = datetime.datetime.now()
     if vote_info.start_at > datetime_now or (vote_info.start_at!=vote_info.end_at and vote_info.end_at<datetime_now):
@@ -48,7 +49,8 @@ def vote_page(vote_id):
         candidate_all=candidate_all,
         vote_info=vote_info,
         captcha_b64 =captcha_b64,
-        voted = voted
+        voted = voted,
+        candidate_all_sorted=candidate_all_sorted
     )
 @vote.route('/captcha',methods=['GET','POST'])
 def check_captcha():
