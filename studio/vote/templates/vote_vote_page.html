@@ -55,9 +55,10 @@
     </div>
     <div id="root"></div>
     <div class="container" style="margin-bottom: 50px;">
+        
+        {% if voted %}
         <div class="row">
             <div class="col-md-6 col-sm-12 col-xs-12">
-                {% if voted %}
                 <table class="table table-condensed table-hover">
                     <thead>
                         <tr>
@@ -85,13 +86,13 @@
                     </tbody>
                 </table>
                 <button class="btn btn-default" id="leaderboardToggle">开/关完整排行榜</button>
-                {% endif %}
             </div>
             <div class="col-md-6 col-sm-12 col-xs-12" id="timeline" style="min-height: 300px;">
 
             </div>
 
         </div>
+        {% endif %}
         <form action="{{url_for('vote.vote_handler',vote_id=vote_info.id)}}" method="POST" id="voteForm">
 
             {% for c in candidate_all %}
