@@ -32,6 +32,7 @@ def vote_page(vote_id):
     candidate_all,candidate_all_sorted,vote_info = get_vote_and_candidate(vote_id)
     voted = VoteVotes.query.filter(VoteVotes.ip==request.remote_addr).filter(VoteVotes.vote_id==vote_id).first()
     datetime_now = datetime.datetime.now()
+    voted = None #------------------
     if vote_info.start_at > datetime_now or (vote_info.start_at!=vote_info.end_at and vote_info.end_at<datetime_now):
         flash('不在有效的投票时间段内')
         return render_template('vote_result.html',vote_id=vote_id)
@@ -52,6 +53,44 @@ def vote_page(vote_id):
         voted = voted,
         candidate_all_sorted=candidate_all_sorted
     )
+
+
+@memoize(1)
+def get_tickets_and_candidates(vote_id:int):
+    vote_tickets = VoteVotes.query.filter(VoteVotes.vote_id==vote_id).all()
+    candidate_info = VoteCandidates.query.filter(VoteCandidates.vote_id==vote_id).all()
+    return(vote_tickets,candidate_info)
+def tostamp(dt1):
+    Unixtime = time.mktime(time.strptime(dt1.strftime('%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S'))
+    return Unixtime
+
+@vote.route('/stats')
+def g2():
+    return render_template('vote_stats.html')
+
+
+@vote.route('/statistics/<int:vote_id>')
+def get_stats(vote_id):
+    vote_tickets,candidate_info = get_tickets_and_candidates(vote_id)
+    candi_set = set([c.candidate for c in vote_tickets])#set of candidate id
+    result = {}
+    for c in candi_set:
+        sum = 0
+        for v in vote_tickets:
+            if v.candidate == c:
+                for _c in candidate_info:
+                    if str(_c.id)==str(c):
+                        key = _c.title
+                        break
+                if not result.get(key):
+                    result[key] = {}
+                sum = sum+1
+                result[key][int(tostamp(v.created_at))] = sum#int to enable front-end cmp??
+    info = {}
+    info["result"] = result
+    return jsonify(result)
+
+
 @vote.route('/captcha',methods=['GET','POST'])
 def check_captcha():
     if request.method=='GET':
@@ -77,6 +116,7 @@ def check_captcha():
 @vote.route('/<int:vote_id>',methods=["POST"])
 def vote_handler(vote_id):
     voted = VoteVotes.query.filter(VoteVotes.ip==request.remote_addr).filter(VoteVotes.vote_id==vote_id).first()
+    voted = None #------------------
     if voted:
         print('voted!!')
         flash("您已投过票！")
@@ -84,16 +124,9 @@ def vote_handler(vote_id):
     vote_list = request.get_json()
     print(request.form.getlist('candidates'))
     vote_list = request.form.getlist('candidates')
-
-    #return '1'
-    #votes_list = json.loads(votes)
-    #print(vote_list)
     vs=[]
     id_list = []
     for v in vote_list:
-        #if v.get('candidate') == None:
-        #    continue
-        #print(v)
         _v = VoteVotes(
             ip = request.remote_addr,
             candidate = int(v),#['candidate']),
@@ -110,7 +143,6 @@ def vote_handler(vote_id):
     except Exception as e:
         db.session.rollback()
         print(e)
-    #return redirect(url_for('vote.root')+str(vote_id))
     flash('投票成功')
     return render_template('vote_result.html',vote_id=vote_id)
 

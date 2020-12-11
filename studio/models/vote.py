@@ -58,19 +58,3 @@ class VoteInfo(TimestampMixin, db.Model):
 
     def __str__(self):
         return "<VoteInfo NO {}>".format(self.id)
-
-    def add(self, info):
-        try:
-            db.session.add(info)
-            db.session.commit()
-        except Exception as e:
-            print(e)
-            db.session.rollback()
-
-    def badd_all(self, info_list: list):
-        try:
-            db.session.add_all(info_list)
-            db.session.commit()
-        except Exception as e:
-            print(e)
-            db.session.rollback()
