@@ -264,19 +264,22 @@
         msgFail("您已投过票！")
         {% endif %}
     </script>
-    <!-- <script type="text/javascript">
+    <script type="text/javascript">
         // based on prepared DOM, initialize echarts instance
+        function getLocalTime(nS) {     
+            return new Date(parseInt(nS) * 1000).toLocaleString().replace(/:\d{1,2}$/,' ');     
+        }
         var myChart = echarts.init(document.getElementById('timeline'));
         myChart.showLoading();
-        fetch('{{url_for("vote.get_stats",vote_id=vote_info.id)}}').then(res => res.json()).then(res => {
+        fetch('/vote/statistics/6').then(res => res.json()).then(res => {
             console.log(res)
             let legends = Object.keys(res)
             let data = {}
             for(let i=0;i<legends.length;i++){
                 data[legends[i]] = []
                 let now = 1607601600//1607601600//1607601600//12.10 20:00
-                let step = 1500//15min
-                let end = 1608135600//1607659200//1608135600
+                let step = 900//15min
+                let end = 1607601600 + 48*3600//1608135600//1607659200//1608135600//12.16 24:00 
                 let max = 0
                 let timeArr = Object.keys(res[legends[i]])
                 //console.log(res[legends[i]])
@@ -293,12 +296,12 @@
                             t++;
                         }
                         max = res[legends[i]][timeArr[t]]
-                        data[legends[i]].push(max)
+                        data[legends[i]].push(max) 
                         now = now + step
                         continue
-                    }
+                    } 
                 }
-                //console.log(data[legends[i]])
+                console.log(data[legends[i]])
                 //console.log('-------')
                 //break
             }
@@ -307,13 +310,13 @@
                 result[i] = {
                     name:v,
                     type:'line',
-                    stack:'total',
                     data:data[v]
                 }
             })
             let ta = []
-            for(let i=0;i<355;i++){
-                ta.push(i)
+            for(let i=0;i<192;i++){
+                let ts = 1607601600 + i*900
+                ta.push(getLocalTime(ts))
             }
             //console.log('ta:',ta)
             //console.log('result:',result)
@@ -339,12 +342,14 @@
                     }
                 },
                 xAxis: {
-                    type: 'category',
-                    boundaryGap: false,
                     data: ta
                 },
                 yAxis: {
-                    type: 'value'
+                    type: 'value',
+                    name: '票数',
+                    min:0,
+                    max:300,
+                    interval:15
                 },
                 series: result
             };
@@ -356,7 +361,7 @@
             myChart.hideLoading();
         })
         
-    </script> -->
+    </script>
 </body>
 
 </html>

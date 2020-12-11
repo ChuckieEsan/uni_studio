@@ -56,25 +56,20 @@ def vote_page(vote_id):
 
 
 @memoize(1)
-def get_tickets_and_candidates(vote_id:int):
-    vote_tickets = VoteVotes.query.filter(VoteVotes.vote_id==vote_id).all()
-    candidate_info = VoteCandidates.query.filter(VoteCandidates.vote_id==vote_id).all()
+def get_tickets_and_candidates(vote_id:int): 
+    candidate_info = VoteCandidates.query.filter(VoteCandidates.vote_id==vote_id).order_by(VoteCandidates.votes.desc()).limit(5).all()
+    vote_tickets = VoteVotes.query.filter(VoteVotes.vote_id==vote_id).filter(VoteVotes.candidate.in_([str(c.id) for c in candidate_info])).all()
     return(vote_tickets,candidate_info)
 def tostamp(dt1):
     Unixtime = time.mktime(time.strptime(dt1.strftime('%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S'))
     return Unixtime
-
-@vote.route('/stats')
-def g2():
-    return render_template('vote_stats.html')
-
 
 @vote.route('/statistics/<int:vote_id>')
 def get_stats(vote_id):
     vote_tickets,candidate_info = get_tickets_and_candidates(vote_id)
     candi_set = set([c.candidate for c in vote_tickets])#set of candidate id
     result = {}
-    for c in candi_set:
+    for c in list(candi_set):
         sum = 0
         for v in vote_tickets:
             if v.candidate == c:
@@ -86,8 +81,6 @@ def get_stats(vote_id):
                     result[key] = {}
                 sum = sum+1
                 result[key][int(tostamp(v.created_at))] = sum#int to enable front-end cmp??
-    info = {}
-    info["result"] = result
     return jsonify(result)
 
 
