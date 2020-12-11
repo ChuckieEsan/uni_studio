@@ -32,7 +32,7 @@ def vote_page(vote_id):
     candidate_all,candidate_all_sorted,vote_info = get_vote_and_candidate(vote_id)
     voted = VoteVotes.query.filter(VoteVotes.ip==request.remote_addr).filter(VoteVotes.vote_id==vote_id).first()
     datetime_now = datetime.datetime.now()
-    voted = None #------------------
+    #voted = None #------------------
     if vote_info.start_at > datetime_now or (vote_info.start_at!=vote_info.end_at and vote_info.end_at<datetime_now):
         flash('不在有效的投票时间段内')
         return render_template('vote_result.html',vote_id=vote_id)
@@ -116,7 +116,7 @@ def check_captcha():
 @vote.route('/<int:vote_id>',methods=["POST"])
 def vote_handler(vote_id):
     voted = VoteVotes.query.filter(VoteVotes.ip==request.remote_addr).filter(VoteVotes.vote_id==vote_id).first()
-    voted = None #------------------
+    #voted = None #------------------
     if voted:
         print('voted!!')
         flash("您已投过票！")
