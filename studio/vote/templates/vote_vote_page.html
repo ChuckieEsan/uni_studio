@@ -279,7 +279,7 @@
                 data[legends[i]] = []
                 let now = 1607601600//1607601600//1607601600//12.10 20:00
                 let step = 900//15min
-                let end = 1607601600 + 48*3600//1608135600//1607659200//1608135600//12.16 24:00 
+                let end = Date.parse(new Date())/1000;//1607601600 + 48*3600//1608135600//1607659200//1608135600//12.16 24:00 
                 let max = 0
                 let timeArr = Object.keys(res[legends[i]])
                 //console.log(res[legends[i]])
@@ -314,7 +314,10 @@
                 }
             })
             let ta = []
-            for(let i=0;i<192;i++){
+            let now = 1607601600//1607601600//1607601600//12.10 20:00
+            let step = 900//15min
+            let end = Date.parse(new Date())/1000;//1607601600 + 48*3600//1608135600//1607659200//1608135600//12.16 24:00 
+            for(let i=0;i<(end-now)/step;i++){
                 let ts = 1607601600 + i*900
                 ta.push(getLocalTime(ts))
             }
