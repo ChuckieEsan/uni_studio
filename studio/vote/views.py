@@ -75,7 +75,7 @@ def get_stats(vote_id):
             if v.candidate == c:
                 for _c in candidate_info:
                     if str(_c.id)==str(c):
-                        key = _c.title
+                        key = str(_c.id) + "-"+_c.title
                         break
                 if not result.get(key):
                     result[key] = {}
