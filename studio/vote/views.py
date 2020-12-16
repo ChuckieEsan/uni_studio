@@ -56,8 +56,8 @@ def vote_page(vote_id):
 
 
 @memoize(1)
-def get_tickets_and_candidates(vote_id:int): 
-    candidate_info = VoteCandidates.query.filter(VoteCandidates.vote_id==vote_id).order_by(VoteCandidates.votes.desc()).limit(5).all()
+def get_tickets_and_candidates(vote_id:int,lim=5): 
+    candidate_info = VoteCandidates.query.filter(VoteCandidates.vote_id==vote_id).order_by(VoteCandidates.votes.desc()).limit(lim).all()
     vote_tickets = VoteVotes.query.filter(VoteVotes.vote_id==vote_id).filter(VoteVotes.candidate.in_([str(c.id) for c in candidate_info])).all()
     return(vote_tickets,candidate_info)
 def tostamp(dt1):
@@ -66,7 +66,8 @@ def tostamp(dt1):
 
 @vote.route('/statistics/<int:vote_id>')
 def get_stats(vote_id):
-    vote_tickets,candidate_info = get_tickets_and_candidates(vote_id)
+    lim = 5 if request.values.get('lim') is None else int(request.values.get('lim'))
+    vote_tickets,candidate_info = get_tickets_and_candidates(vote_id,lim=lim)
     candi_set = set([c.candidate for c in vote_tickets])#set of candidate id
     result = {}
     for c in list(candi_set):
