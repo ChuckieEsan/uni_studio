@@ -66,7 +66,7 @@ def tostamp(dt1):
 
 @vote.route('/statistics/<int:vote_id>')
 def get_stats(vote_id):
-    lim = 5 if request.values.get('lim') is None else int(request.values.get(lim))
+    lim = 5 if request.values.get('lim') is None else int(request.values.get('lim'))
     vote_tickets,candidate_info = get_tickets_and_candidates(vote_id,lim=lim)
     candi_set = set([c.candidate for c in vote_tickets])#set of candidate id
     result = {}
