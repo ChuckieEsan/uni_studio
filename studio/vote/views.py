@@ -2,13 +2,16 @@ from studio.vote import vote
 from studio.models import VoteInfo,VoteCandidates,VoteVotes,db
 from studio.utils.captcha_helper import get_captcha_and_img
 from studio.decorators import memoize
-from flask import url_for,redirect,render_template,request,flash,session,jsonify,Markup
+from flask import url_for,redirect,render_template,request,flash,session,jsonify,Markup,send_file
 from faker import Faker
 from sqlalchemy import func
 import json
 import time
 import random
 import datetime
+import csv
+import codecs
+import os
 f=Faker(locale='zh_CN')
 @vote.route("/")
 def root():
@@ -55,19 +58,26 @@ def vote_page(vote_id):
     )
 
 
-@memoize(1)
 def get_tickets_and_candidates(vote_id:int,lim=5): 
     candidate_info = VoteCandidates.query.filter(VoteCandidates.vote_id==vote_id).order_by(VoteCandidates.votes.desc()).limit(lim).all()
-    vote_tickets = VoteVotes.query.filter(VoteVotes.vote_id==vote_id).filter(VoteVotes.candidate.in_([str(c.id) for c in candidate_info])).all()
+    vote_tickets = VoteVotes.query.filter(VoteVotes.vote_id==vote_id).all()
     return(vote_tickets,candidate_info)
 def tostamp(dt1):
     Unixtime = time.mktime(time.strptime(dt1.strftime('%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S'))
     return Unixtime
 
-@vote.route('/statistics/<int:vote_id>')
+@vote.route('/statisticss/<int:vote_id>')
 def get_stats(vote_id):
     lim = 5 if request.values.get('lim') is None else int(request.values.get('lim'))
+    res = {}
     vote_tickets,candidate_info = get_tickets_and_candidates(vote_id,lim=lim)
+    for c in candidate_info:
+        key = str(c.id)+"-"+c.title
+        res[key] = []
+        for v in vote_tickets:
+            if v.candidate == c.id:
+                res[key].append(int(tostamp(v.created_at)))
+    return jsonify(res)
     candi_set = set([c.candidate for c in vote_tickets])#set of candidate id
     result = {}
     for c in list(candi_set):
@@ -83,6 +93,47 @@ def get_stats(vote_id):
                 sum = sum+1
                 result[key][int(tostamp(v.created_at))] = sum#int to enable front-end cmp??
     return jsonify(result)
+
+@vote.route('/getcsv/<int:vote_id>')
+def getcsv(vote_id):
+    res = {}
+    data = {}
+    head = []
+    vote_tickets,candidate_info = get_tickets_and_candidates(vote_id,lim=80)
+    for c in candidate_info:
+        key = str(c.id)+"-"+c.title
+        res[key] = []
+        for v in vote_tickets:
+            if v.candidate == c.id:
+                res[key].append(int(tostamp(v.created_at)))
+    _start = 1607601600
+    _step = 600 if request.values.get('step') is None else int(request.values.get('step'))
+    _end = 1608136800
+    head.append('姓名')
+    for i in range(0,int((_end-_start)/600)):
+        timeArray = time.localtime(_start+_step*i)
+        otherStyleTime = time.strftime("%Y-%m-%d %H:%M:%S", timeArray)
+        head.append(otherStyleTime)
+    names = list(res.keys())
+    for i in range(len(names)):
+        data[names[i]] = []
+        now = _start
+        step = _step
+        end = _end
+        while now <= end:
+            count = 0
+            for j in range(len(res[names[i]])):
+                if res[names[i]][j]<now:
+                    count = count + 1
+            data[names[i]].append(count)
+            now = now + step
+    fname = 'vote_'+str(vote_id)+'_'+time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime(time.time()))+'.csv'
+    with codecs.open(fname, 'wb', "gbk") as csvfile:
+        csv_writer = csv.writer(csvfile)
+        csv_writer.writerow(head)
+        for k in data:
+            csv_writer.writerow([k]+data[k])
+    return send_file(os.path.join(os.getcwd(),fname),as_attachment=True,attachment_filename=fname)
 
 
 @vote.route('/captcha',methods=['GET','POST'])
