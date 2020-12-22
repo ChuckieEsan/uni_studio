@@ -11,7 +11,8 @@ def root():
             "issues_index.html",
             referer=referer,
             timeout=timeout,
-            issuetypes=issuetypes
+            issuetypes=issuetypes,
+            title="反馈"
         )
     if request.method=='POST':
         _i = IssuesIssues(

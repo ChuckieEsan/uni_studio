@@ -1,12 +1,15 @@
-
+html{height:100%}
+body{min-height:100%}
 #footer{
+    position: relative;
+    bottom:0%;
     background-color:#286090;
     min-height: 4vh;
 }
 #footer p{
     text-align: center;
     color:#eee;
-    font-size: 1em;
+    font-size: .8em;
     padding:.5em;
     margin:0;
 }

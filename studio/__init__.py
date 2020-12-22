@@ -29,7 +29,7 @@ from .common import common as commonfileapp
 from .issues import issues as issuesapp
 from .staticfile.app import app as staticfileapp
 from .utils.dir_helper import join_upload_dir
-
+from .apps.console import console as consoleapp
 subdomains = {
     'DEVELOPMENT':{
         'www':'',
@@ -60,7 +60,6 @@ def create_app():
                 exit(-1)
         else:
             print('------ starting service in development ------')
-            print("Redis connection using",r.__class__.__name__)
             app.config['DEBUG'] = True
             app.config['SERVER_NAME'] = '127.0.0.1:5000'
             app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dev.db'
@@ -82,6 +81,7 @@ def create_app():
         app.register_blueprint(postcardapp)
         app.register_blueprint(issuesapp,url_prefix="/issues",subdomain=app.config['SUBDOMAINS']['www'])
         app.register_blueprint(commonfileapp,url_prefix="/common",subdomain=app.config['SUBDOMAINS']['www'])
+        app.register_blueprint(consoleapp,url_prefix="/console",subdomain=app.config['SUBDOMAINS']['www'])
         #app.config['SERVER_NAME'] = 'dutbit.com'
         app.config['SECRET_KEY'] = 'Do not go gentle into that good night'
         app.config['FILESERVICE_UPLOAD_FOLDER'] = join_upload_dir('data/')
