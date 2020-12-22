@@ -12,3 +12,4 @@ Pillow==8.0.1
 flake8==3.8.4
 flask-cache
 flask-session
+fakeredis==1.4.5

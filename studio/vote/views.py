@@ -1,7 +1,7 @@
 from studio.vote import vote
 from studio.models import VoteInfo,VoteCandidates,VoteVotes,db
 from studio.utils.captcha_helper import get_captcha_and_img
-from studio.decorators import memoize
+from studio.cache import memoize
 from flask import url_for,redirect,render_template,request,flash,session,jsonify,Markup,send_file
 from faker import Faker
 from sqlalchemy import func
@@ -18,9 +18,10 @@ def root():
     voteinfo_all = VoteInfo.query.all()
     return render_template(
         'vote_index.html',
-        info_list=voteinfo_all
+        info_list=voteinfo_all,
+        title="投票列表"
         )
-@memoize(20)
+#@memoize(20)
 def get_vote_and_candidate(vote_id:int):
     candidate_all = VoteCandidates.query.filter(VoteCandidates.vote_id==vote_id).all()
     candidate_all_sorted = sorted(candidate_all,key=lambda x:x.votes,reverse=True)
@@ -38,7 +39,7 @@ def vote_page(vote_id):
     #voted = None #------------------
     if vote_info.start_at > datetime_now or (vote_info.start_at!=vote_info.end_at and vote_info.end_at<datetime_now):
         flash('不在有效的投票时间段内')
-        return render_template('vote_result.html',vote_id=vote_id)
+        return render_template('vote_result.html',vote_id=vote_id,title="投票结果")
     if vote_info.shuffle:
         random.shuffle(candidate_all)
     for c in candidate_all:

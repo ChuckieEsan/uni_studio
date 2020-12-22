@@ -1,13 +1,23 @@
-import redis
-r = redis.Redis(host='localhost',port=6379,decode_responses=False,password='Bit_redis_123', socket_timeout=0.5)
+import socket
+hostname = socket.gethostname()
+ip = socket.gethostbyname(hostname)
+config = {}
+DEBUG = False if ip == '172.31.240.127' else True  # 172.31.240.127 is dutbit.com
+config['DEBUG'] = DEBUG
+if DEBUG:
+    import fakeredis
+    sv = fakeredis.FakeServer()
+    r = fakeredis.FakeStrictRedis(server=sv)
+else:
+    import redis
+    r = redis.Redis(host='localhost',port=6379,decode_responses=False,password='Bit_redis_123', socket_timeout=0.5)
 try:
     r.ping()
 except Exception as e:
     print(e)
-    r = None
+    exit()
 
 import os
-import socket
 from flask import Flask, Request, session
 from flask_session import Session
 from flask_bootstrap import Bootstrap  # for flask-file-uploader | fileservice
@@ -15,13 +25,10 @@ from .test import tests
 from .fileservice.app import app as fileserviceapp
 from .vote import vote as voteapp
 from .api import postcardapp
+from .common import common as commonfileapp
 from .issues import issues as issuesapp
 from .staticfile.app import app as staticfileapp
 from .utils.dir_helper import join_upload_dir
-
-
-hostname = socket.gethostname()
-ip = socket.gethostbyname(hostname)
 
 subdomains = {
     'DEVELOPMENT':{
@@ -53,6 +60,7 @@ def create_app():
                 exit(-1)
         else:
             print('------ starting service in development ------')
+            print("Redis connection using",r.__class__.__name__)
             app.config['DEBUG'] = True
             app.config['SERVER_NAME'] = '127.0.0.1:5000'
             app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dev.db'
@@ -73,6 +81,7 @@ def create_app():
         app.register_blueprint(voteapp,url_prefix='/vote',subdomain=app.config['SUBDOMAINS']['www'])
         app.register_blueprint(postcardapp)
         app.register_blueprint(issuesapp,url_prefix="/issues",subdomain=app.config['SUBDOMAINS']['www'])
+        app.register_blueprint(commonfileapp,url_prefix="/common",subdomain=app.config['SUBDOMAINS']['www'])
         #app.config['SERVER_NAME'] = 'dutbit.com'
         app.config['SECRET_KEY'] = 'Do not go gentle into that good night'
         app.config['FILESERVICE_UPLOAD_FOLDER'] = join_upload_dir('data/')
