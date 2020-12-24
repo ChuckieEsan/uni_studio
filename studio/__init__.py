@@ -1,4 +1,5 @@
 import socket
+import os
 hostname = socket.gethostname()
 ip = socket.gethostbyname(hostname)
 config = {}
@@ -11,13 +12,16 @@ if DEBUG:
 else:
     import redis
     r = redis.Redis(host='localhost',port=6379,decode_responses=False,password='Bit_redis_123', socket_timeout=0.5)
+
 try:
+    rs = os.popen('git rev-parse --short HEAD')
+    res = rs.read()
     r.ping()
+    r.set('studio_version',res)
 except Exception as e:
     print(e)
     exit()
 
-import os
 from flask import Flask, Request, session
 from flask_session import Session
 from flask_bootstrap import Bootstrap  # for flask-file-uploader | fileservice
@@ -25,11 +29,12 @@ from .test import tests
 from .fileservice.app import app as fileserviceapp
 from .vote import vote as voteapp
 from .api import postcardapp
-from .common import common as commonfileapp
 from .issues import issues as issuesapp
 from .staticfile.app import app as staticfileapp
 from .utils.dir_helper import join_upload_dir
+from .utils.ver_helper import get_ver
 from .apps.console import console as consoleapp
+from .apps.common import common as commonfileapp
 subdomains = {
     'DEVELOPMENT':{
         'www':'',
@@ -69,6 +74,7 @@ def create_app():
         app.config['SESSION_USE_SIGNER'] = True
         app.config['SESSION_PERMANENT'] = True  #sessons是否长期有效，false，则关闭浏览器，session失效
         app.config['PERMANENT_SESSION_LIFETIME'] = 3600   #session长期有效，则设定session生命周期，整数秒，默认大概不到3小时。
+        app.add_template_global(get_ver)
         Session(app)
         db.init_app(app)
         # db.drop_all()

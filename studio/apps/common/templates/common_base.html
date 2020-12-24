@@ -35,10 +35,16 @@
     {% block content%}
     {% endblock %}
     <div id="footer">
-        <p>&copy;<a href="/">2020校团委·比特网络工作室</a>|
+        <p>
+            <a href="https://github.com/dutbit/uni_studio">
+                <span class="badge badge-info">{{get_ver()}}</span>
+            </a>
+            &nbsp;&nbsp;|&copy;
+            <a href="/">校团委·比特网络工作室</a>|
             <a href="{{url_for('issues.root')}}">问题/建议反馈</a> |
             <a href="{{root}}">返回主页</a>
         </p>
     </div>
+    
 </body>
 </html>
