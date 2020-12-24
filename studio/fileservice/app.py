@@ -109,7 +109,7 @@ def upload():
 
                 # create thumbnail after saving
                 if mime_type.startswith('image'):
-                    create_thumbnail(filename,g._id)
+                    create_thumbnail(filename)
                 
                 # get file size after saving
                 size = os.path.getsize(uploaded_file_path)
