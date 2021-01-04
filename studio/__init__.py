@@ -29,12 +29,12 @@ from .test import tests
 from .fileservice.app import app as fileserviceapp
 from .vote import vote as voteapp
 from .api import postcardapp
-from .issues import issues as issuesapp
 from .staticfile.app import app as staticfileapp
 from .utils.dir_helper import join_upload_dir
 from .utils.ver_helper import get_ver
 from .apps.console import console as consoleapp
 from .apps.common import common as commonfileapp
+from .apps.issues import issues as issuesapp
 subdomains = {
     'DEVELOPMENT':{
         'www':'',
