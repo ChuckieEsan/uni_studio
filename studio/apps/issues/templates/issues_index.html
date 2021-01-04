@@ -1,19 +1,14 @@
 {% extends 'common_base.html'%}
 {% block content %}
-<div class="container" style="margin-top:10px;">
+<div class="container" style="margin-top:10px;margin-bottom: 300px;">
     <div class="row">
-        <span style="font-size:30px">反馈</span>
-        <span style="float:right;margin-top:10px">
-            <a href="{{url_for('issues.manage_home')}}">
-                <img src="{{url_for('common.static',filename='img/wrench64.png')}}" width="24px" height="24px" />
-            </a>
-        </span>
+        <span style="font-size:30px;margin-left: 10px;">反馈</span>
     </div>
     <hr>
     <form enctype="multipart/form-data" action="{{url_for('issues.root')}}" method="POST" name="discForm" id="discForm"
         onsubmit="return check()">
         <div class="form-group">
-            <span>
+            <span style="display: none;">
                 来源页面：
                 <input type="text" disabled value="{{referer}}" id="source" style="width:50%" name="url" />
             </span>
@@ -21,7 +16,7 @@
         <div class="form-group">
             <span>
                 联系方式：
-                <input type="text" id="contact" style="width:50%" name="contact" placeholder="（邮件/电话/qq号等）" />
+                <input type="text" id="contact" style="width:50%" name="contact" placeholder="邮件/电话/qq号等" />
             </span>
         </div>
         <div class="form-group">
@@ -37,7 +32,7 @@
             </span>
         </div>
         <div class="form-group">
-            <textarea class="form-control" rows="5" placeholder="遇到的问题或您的建议;信息更正类请提供同时姓名和学号以便我们核对信息" id="content"
+            <textarea class="form-control" rows="5" placeholder="遇到的问题或您的建议;  信息更正类请提供同时姓名和学号以便我们核对信息" id="content"
                 name="content"></textarea>
         </div>
         <div class="form-group">

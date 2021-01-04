@@ -55,6 +55,9 @@ def roles_required(roles:list,_redirect=None):
             try:
                 role_info = r.hgetall("userservice:rolemap:"+g._id)
                 role_keys = [j.decode('UTF-8') for j in role_info.keys()]
+                if '*' in roles:
+                    g.role = role_keys
+                    return func(*args,**kwargs)
                 role_intersection = set(roles)&set(role_keys)
                 if not role_intersection:
                     raise ValueError

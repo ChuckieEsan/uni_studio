@@ -13,7 +13,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.15.3/dist/bootstrap-table.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-    
+    {% if bootstrap_table %}
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.15.3/dist/bootstrap-table.min.css">
+    {% endif %}
     <link rel="stylesheet" href="{{url_for('vote.static',filename='css/vote.css')}}" />
     <link rel="stylesheet" href="{{url_for('common.static',filename='css/common.css')}}" />
     <link rel="shortcut icon" href="https://static.dutbit.com/img/dutbit.ico"
@@ -36,13 +38,16 @@
     {% endblock %}
     <div id="footer">
         <p>
-            <a href="https://github.com/dutbit/uni_studio">
+            <a href="https://github.com/dutbit/uni_studio" style="text-decoration:none;">
                 <span class="badge badge-info">{{get_ver()}}</span>
             </a>
             &nbsp;&nbsp;|&copy;
             <a href="/">校团委·比特网络工作室</a>|
-            <a href="{{url_for('issues.root')}}">问题/建议反馈</a> |
+            <a href="{{url_for('issues.root')}}">问题/建议反馈</a> 
+            {% if root %}
+            |
             <a href="{{root}}">返回主页</a>
+            {% endif %}
         </p>
     </div>
     

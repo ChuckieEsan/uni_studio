@@ -1,4 +1,4 @@
-from studio.issues import issues
+from studio.apps.issues import issues
 from flask import url_for,redirect,render_template,request,flash
 from studio.models import IssueTypes,IssuesIssues,db
 @issues.route('/',methods=['GET','POST'])
@@ -13,7 +13,6 @@ def root():
             timeout=timeout,
             issuetypes=issuetypes,
             title="反馈",
-            root="/"
         )
     if request.method=='POST':
         _i = IssuesIssues(
@@ -24,10 +23,7 @@ def root():
             content=request.form.get('content'),
             user_id=None
         )
-        print('type:',request.form.get('type'))
-        print('1:{}'.format(_i.id))
         db.session.add(_i)
-        print('2:{}'.format(_i.id))
         try:
             db.session.commit()
             print('3:{}'.format(_i.id))
