@@ -27,7 +27,6 @@ from flask_session import Session
 from flask_bootstrap import Bootstrap  # for flask-file-uploader | fileservice
 from .test import tests
 from .fileservice.app import app as fileserviceapp
-from .vote import vote as voteapp
 from .api import postcardapp
 from .utils.dir_helper import join_upload_dir
 from .utils.ver_helper import get_ver
@@ -35,6 +34,7 @@ from .apps.console import console as consoleapp
 from .apps.common import common as commonfileapp
 from .apps.issues import issues as issuesapp
 from .staticfile.app import app as staticfileapp
+from .apps.vote import vote as voteapp
 subdomains = {
     'DEVELOPMENT':{
         'www':'',
@@ -70,6 +70,8 @@ def create_app():
             app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dev.db'
             app.config['SUBDOMAINS'] = subdomains['DEVELOPMENT']
             app.config['SESSION_TYPE'] = 'filesystem'
+        app.config['CAPTCHA_LEN'] = 4
+        app.config['CAPTCHA_TTL'] = 60
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         app.config['SESSION_USE_SIGNER'] = True
         app.config['SESSION_PERMANENT'] = True  #sessons是否长期有效，false，则关闭浏览器，session失效

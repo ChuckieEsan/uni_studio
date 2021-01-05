@@ -1,4 +1,4 @@
-from studio.vote import vote
+from studio.apps.console import console as vote
 from studio.utils.time_helper import timestamp_to_datetime
 from studio.utils.hash_helper import md5
 from studio.interceptors import session_required,roles_required
@@ -8,7 +8,7 @@ from faker import Faker
 import time
 import os
 f=Faker(locale='zh_CN')
-@vote.route('/admin/votes',methods=["GET"])#投票管理大厅，能看所有投票
+@vote.route('/vote',methods=["GET"])#投票管理大厅，能看所有投票
 @session_required('/vote')
 @roles_required(['vote_admin','super_admin'],_redirect='/vote')
 def admin_votes_show():
@@ -18,7 +18,7 @@ def admin_votes_show():
         info_list=voteinfo_all
         )
         
-@vote.route('/admin/votes/shuffle/<int:vote_id>')
+@vote.route('/vote/shuffle/<int:vote_id>')
 @session_required('/vote')
 @roles_required(['vote_admin','super_admin'],_redirect='/vote')
 def toggle_shuffle(vote_id):
@@ -30,7 +30,7 @@ def toggle_shuffle(vote_id):
         print(e)
     return redirect(url_for('vote.admin_vote_page',vote_id=vote_id))
 
-@vote.route('/admin/votes',methods=["POST"])#新建投票接口
+@vote.route('/vote',methods=["POST"])#新建投票接口
 @session_required('/vote')
 @roles_required(['vote_admin','super_admin'],_redirect='/vote')
 def admin_votes_add():
@@ -56,7 +56,7 @@ def admin_votes_add():
         print(e)
     return redirect(url_for('vote.admin_votes_show'))
 
-@vote.route('/admin/votes/<int:vote_id>',methods=["GET"])
+@vote.route('/vote/<int:vote_id>',methods=["GET"])
 @session_required('/vote')
 @roles_required(['vote_admin','super_admin'],_redirect='/vote')
 def admin_vote_page(vote_id):
@@ -69,7 +69,9 @@ def admin_vote_page(vote_id):
         candidate_all=candidate_all,
         vote_info=vote_info,
     )
-@vote.route('/admin/votes/<int:vote_id>/candidates',methods=["POST"])
+
+
+@vote.route('/vote/<int:vote_id>/candidates',methods=["POST"])
 @session_required('/vote')
 @roles_required(['vote_admin','super_admin'],_redirect='/vote')
 def candidate_add(vote_id):
@@ -104,8 +106,10 @@ def candidate_add(vote_id):
         db.session.rollback()
     return redirect(url_for('vote.admin_vote_page',vote_id=vote_id))
 
-@vote.route('/admin/votes/<int:vote_id>/candidates/drop/<int:candidate_id>',methods=["GET"])
-@vote.route('/admin/candidates/<candidate_id>',methods=["DELETE"])
+
+
+@vote.route('/vote/<int:vote_id>/candidates/drop/<int:candidate_id>',methods=["GET"])
+@vote.route('/vote/candidates/<candidate_id>',methods=["DELETE"])
 @session_required('/vote')
 @roles_required(['vote_admin','super_admin'],_redirect='/vote')
 def candidate_del(vote_id,candidate_id):
@@ -115,11 +119,11 @@ def candidate_del(vote_id,candidate_id):
     except Exception as e:
         db.session.rollback()
         print(e)
-    return redirect(url_for('vote.admin_vote_page',vote_id=vote_id))
+    return redirect(url_for('console.admin_vote_page',vote_id=vote_id))
 
 
-@vote.route('/admin/votes/drop/<vote_id>',methods=["GET"])
-@vote.route('/admin/votes/<vote_id>',methods=["DELETE"])
+@vote.route('/vote/drop/<vote_id>',methods=["GET"])
+@vote.route('/vote/<vote_id>',methods=["DELETE"])
 @session_required('/vote')
 @roles_required(['vote_admin','super_admin'],_redirect='/vote')
 def votes_del(vote_id):
@@ -130,15 +134,17 @@ def votes_del(vote_id):
     except Exception as e:
         db.session.rollback()
         print(e)
-    return redirect(url_for('vote.admin_votes_show'))
+    return redirect(url_for('console.admin_votes_show'))
 
-@vote.route('/admin/votes/<vote_id>',methods=["GET"])
+@vote.route('/vote/ballots/<vote_id>',methods=["GET"])
 @session_required('/vote')
 @roles_required(['vote_admin','super_admin'],_redirect='/vote')
 def votes_details_show(vote_id):
     all = VoteVotes.query.filter(VoteVotes.id==vote_id).all()
     return render_template('vote_admin_votes.html',votes_all=all)
-@vote.route('/populate/<vote_id>')
+
+
+@vote.route('/vote/populate/<vote_id>')
 @session_required('/vote')
 @roles_required(['vote_admin','super_admin'],_redirect='/vote')
 def populate_id(vote_id):
@@ -158,7 +164,7 @@ def populate_id(vote_id):
         db.session.rollback()
         print(e)
     return redirect(url_for('vote.root'))
-@vote.route('/populate')
+@vote.route('/vote/populate')
 @session_required('/vote')
 @roles_required(['vote_admin','super_admin'],_redirect='/vote')
 def populate(): 

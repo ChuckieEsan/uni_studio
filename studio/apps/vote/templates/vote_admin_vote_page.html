@@ -34,7 +34,7 @@
             </div>
         </div><!-- /.modal -->
     </div>
-    <a href="{{url_for('vote.admin_votes_show')}}">返回管理列表</a>
+    <a href="{{url_for('console.admin_votes_show')}}">返回管理列表</a>
     <div id="header">
         {% if vote_info.image %}
         <img src="{{vote_info.image}}" />
@@ -48,14 +48,14 @@
             {{vote_info.start_at}}~无截止日期
             {% endif %}
         </h4>
-        <h4><a href="{{url_for('vote.toggle_shuffle',vote_id=vote_info.id)}}">{% if vote_info.shuffle %}关闭{% else %}打开{%endif%}乱序排列</a></h4>
+        <h4><a href="{{url_for('console.toggle_shuffle',vote_id=vote_info.id)}}">{% if vote_info.shuffle %}关闭{% else %}打开{%endif%}乱序排列</a></h4>
     </div>
     <div id="root"></div>
     <div class="container" style="margin-bottom: 50px;">
         {% for v in candidate_all %}
         <div class="col-md-2 col-lg-2 col-sm-3 col-xs-4">
             <span>序号:{{loop.index}}&nbsp;&nbsp;&nbsp;&nbsp;姓名：{{v.title}}</span><br>
-            <a href="{{url_for('vote.candidate_del',vote_id=vote_info.id,candidate_id=v.id)}}">删除此候选人</a>
+            <a href="{{url_for('console.candidate_del',vote_id=vote_info.id,candidate_id=v.id)}}">删除此候选人</a>
             <button onclick="showDetail('{{loop.index}}')">查看详情</button>
         </div>
         <div style="display:none" id="detail_{{loop.index}}">
@@ -71,7 +71,7 @@
                     <div style="word-break:break-all">
                         周记内容：{{v.description}}
                     </div>
-                    <a href="{{url_for('vote.candidate_del',vote_id=vote_info.id,candidate_id=v.id)}}">删除此候选人</a>
+                    <a href="{{url_for('console.candidate_del',vote_id=vote_info.id,candidate_id=v.id)}}">删除此候选人</a>
                 </div>
             </div>
         </div>
@@ -79,7 +79,7 @@
     </div>
     <div class="container">
         <hr>
-        <form action="{{url_for('vote.candidate_add',vote_id=vote_info.id)}}" method="POST"
+        <form action="{{url_for('console.candidate_add',vote_id=vote_info.id)}}" method="POST"
             enctype="multipart/form-data">
             <div class="row">
                 <div class="col-md-3">

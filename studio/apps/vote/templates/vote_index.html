@@ -1,17 +1,18 @@
-{% extends 'vote_base.html' %}
+{% extends 'common_base.html' %}
 {% block content %}
     <div class="container">
         <!--title start-->
-        <div class="title">
-            <span style="font-size:28px">
+        <div class="title" style="margin-top: 10px;">
+            <span style="font-size:30px">
                 投票
             </span>
-            <span style="float:right;margin-top:10px;margin-right:10px;">
-                <a href="{{url_for('vote.admin_votes_show')}}">
+            <!-- <span style="float:right;margin-top:10px;margin-right:10px;">
+                <a href="{{url_for('console.admin_votes_show')}}">
                     <img src="{{url_for('common.static',filename='img/wrench64.png')}}" width="24px" height="24px" />
                 </a>
-            </span>
+            </span> -->
         </div>
+        <hr>
         <!--title end-->
         <!--template list iteration start-->
         {% for v in info_list %}

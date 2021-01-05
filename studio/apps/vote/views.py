@@ -1,7 +1,8 @@
-from studio.vote import vote
+from studio.apps.vote import vote
 from studio.models import VoteInfo,VoteCandidates,VoteVotes,db
 from studio.utils.captcha_helper import get_captcha_and_img
 from studio.cache import memoize
+from studio.interceptors import set_captcha,validate_captcha
 from flask import url_for,redirect,render_template,request,flash,session,jsonify,Markup,send_file
 from faker import Faker
 from sqlalchemy import func
@@ -29,6 +30,7 @@ def get_vote_and_candidate(vote_id:int):
     return (candidate_all,candidate_all_sorted,vote_info)
 
 @vote.route('/<int:vote_id>',methods=["GET"])
+@set_captcha
 def vote_page(vote_id):
     #candidate_all = VoteCandidates.query.filter(VoteCandidates.vote_id==vote_id).all()
     #vote_info = VoteInfo.query.filter(VoteInfo.id==vote_id).first_or_404()
@@ -55,7 +57,8 @@ def vote_page(vote_id):
         vote_info=vote_info,
         captcha_b64 =captcha_b64,
         voted = voted,
-        candidate_all_sorted=candidate_all_sorted
+        candidate_all_sorted=candidate_all_sorted,
+        echarts = True
     )
 
 
@@ -67,8 +70,8 @@ def tostamp(dt1):
     Unixtime = time.mktime(time.strptime(dt1.strftime('%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S'))
     return Unixtime
 
-@vote.route('/statisticss/<int:vote_id>')
-def get_stats(vote_id):
+@vote.route('/statistics/<int:vote_id>')
+def get_vote_stats(vote_id):
     lim = 5 if request.values.get('lim') is None else int(request.values.get('lim'))
     res = {}
     vote_tickets,candidate_info = get_tickets_and_candidates(vote_id,lim=lim)
@@ -79,21 +82,7 @@ def get_stats(vote_id):
             if v.candidate == c.id:
                 res[key].append(int(tostamp(v.created_at)))
     return jsonify(res)
-    candi_set = set([c.candidate for c in vote_tickets])#set of candidate id
-    result = {}
-    for c in list(candi_set):
-        sum = 0
-        for v in vote_tickets:
-            if v.candidate == c:
-                for _c in candidate_info:
-                    if str(_c.id)==str(c):
-                        key = str(_c.id) + "-"+_c.title
-                        break
-                if not result.get(key):
-                    result[key] = {}
-                sum = sum+1
-                result[key][int(tostamp(v.created_at))] = sum#int to enable front-end cmp??
-    return jsonify(result)
+
 
 @vote.route('/getcsv/<int:vote_id>')
 def getcsv(vote_id):
@@ -137,36 +126,13 @@ def getcsv(vote_id):
     return send_file(os.path.join(os.getcwd(),fname),as_attachment=True,attachment_filename=fname)
 
 
-@vote.route('/captcha',methods=['GET','POST'])
-def check_captcha():
-    if request.method=='GET':
-        session['captcha_str'],captcha_64 = get_captcha_and_img()
-        return captcha_64
-    if request.method=='POST':
-        jsoninput = request.get_json()
-        if not session.get('captcha_str'):
-            session['captcha_time'] = int(time.time())+10*60 
-            session['captcha_str'],captcha_64 = get_captcha_and_img()
-            return jsonify({"success":False,"captcha_b64":captcha_64,"data":"无有效验证码"})
-        if int(time.time())>session['captcha_time']:
-            session['captcha_time'] = int(time.time())+10*60 
-            session['captcha_str'],captcha_64 = get_captcha_and_img()
-            return jsonify({"success":False,"captcha_b64":captcha_64,"data":"验证码超时"})
-        if session['captcha_str']!=jsoninput.get('captcha'):
-            session['captcha_time'] = int(time.time())+10*60 
-            session['captcha_str'],captcha_64 = get_captcha_and_img()
-            return jsonify({"success":False,"captcha_b64":captcha_64,"data":"验证码错误"})
-        else:
-            return jsonify({"success":True})
-    
 @vote.route('/<int:vote_id>',methods=["POST"])
+@validate_captcha
 def vote_handler(vote_id):
     voted = VoteVotes.query.filter(VoteVotes.ip==request.remote_addr).filter(VoteVotes.vote_id==vote_id).first()
     #voted = None #------------------
     if voted:
-        print('voted!!')
-        flash("您已投过票！")
-        return render_template('vote_result.html',vote_id=vote_id)
+        return jsonify({"success":False,"details":"您已投过票"})
     vote_list = request.get_json()
     print(request.form.getlist('candidates'))
     vote_list = request.form.getlist('candidates')
@@ -189,6 +155,10 @@ def vote_handler(vote_id):
     except Exception as e:
         db.session.rollback()
         print(e)
-    flash('投票成功')
-    return render_template('vote_result.html',vote_id=vote_id)
+    return redirect(url_for('vote.vote_result_handler',vote_id=vote_id))
 
+
+@vote.route('/result/<int:vote_id>',methods=['GET'])
+def vote_result_handler(vote_id):
+    flash("投票成功")
+    return render_template('vote_result.html',vote_id=vote_id,title="投票结果")

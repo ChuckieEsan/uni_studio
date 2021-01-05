@@ -10,4 +10,4 @@ def console_root():
 
 
     
-from studio.apps.console import issues
+from studio.apps.console import issues,vote

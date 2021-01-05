@@ -39,7 +39,7 @@
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                     <h4 class="modal-title" id="myModalLabel">新建投票</h4>
                 </div>
-                <form action="{{url_for('vote.admin_votes_add')}}" method="POST" name="newVoteForm">
+                <form action="{{url_for('console.admin_votes_add')}}" method="POST" name="newVoteForm">
                 <div class="modal-body">
 
 
@@ -85,7 +85,7 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <span class="panel-title">
-                    <a href="{{url_for('vote.admin_vote_page',vote_id=v.id)}}">{{v.title}}</a>
+                    <a href="{{url_for('console.admin_vote_page',vote_id=v.id)}}">{{v.title}}</a>
                 </span>
                 {% if v.subtitle!='' %}
                 &nbsp;&nbsp;
@@ -94,7 +94,7 @@
                 </span>
                 {% endif %}
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <a href="/vote/admin/votes/drop/{{v.id}}">删除该投票 id:{{v.id}}</a>
+                <a href="{{url_for('console.votes_del',vote_id=v.id)}}">删除该投票 id:{{v.id}}</a>
             </div>
             <div class="panel-body">
                 <p>{{ v.description }}</p>
@@ -127,7 +127,7 @@
         <!--template list iteration end-->
         <button class="btn btn-default" data-toggle="modal" data-target="#myModal"
             style="position: fixed;bottom:20%;right:16%;z-index: 1;">
-            <img src="/static/img/edit.png" width="30px" height="30px" />
+            <img src="{{url_for('common.static',filename='img/edit.png')}}" width="30px" height="30px" />
         </button>
         <p style="margin-top:50px">
             <!--position:fixed;bottom:5%-->
