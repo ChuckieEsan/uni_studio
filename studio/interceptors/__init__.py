@@ -1,6 +1,9 @@
-from studio import r,fake_id,fake_sessionid#redis_conn
+
 from functools import wraps
 from flask import request,redirect,current_app,abort,g,session,jsonify
+from studio import r#redis_conn
+if current_app.config['DEBUG']:
+    from studio import fake_id,fake_sessionid
 import json
 import redis
 import time
