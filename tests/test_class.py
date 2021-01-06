@@ -13,9 +13,9 @@ class TestThis(unittest.TestCase):
         pass
 
     def test_vote_page(self):
-        res = self.app.get('/vote/populate', follow_redirects=True)
+        res = self.app.get('/console/vote/populate', follow_redirects=True)
         self.assertEqual(res.status_code, 200)
-        res = self.app.get('/vote/populate/1', follow_redirects=True)
+        res = self.app.get('/console/vote/populate/1', follow_redirects=True)
         self.assertEqual(res.status_code, 200)
         
 

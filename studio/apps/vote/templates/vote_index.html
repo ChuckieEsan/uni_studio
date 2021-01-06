@@ -1,0 +1,61 @@
+{% extends 'common_base.html' %}
+{% block content %}
+    <div class="container">
+        <!--title start-->
+        <div class="title" style="margin-top: 10px;">
+            <span style="font-size:30px">
+                投票
+            </span>
+            <!-- <span style="float:right;margin-top:10px;margin-right:10px;">
+                <a href="{{url_for('console.admin_votes_show')}}">
+                    <img src="{{url_for('common.static',filename='img/wrench64.png')}}" width="24px" height="24px" />
+                </a>
+            </span> -->
+        </div>
+        <hr>
+        <!--title end-->
+        <!--template list iteration start-->
+        {% for v in info_list %}
+        {% if not v.disabled %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <span class="panel-title">
+                    <a href="/vote/{{v.id}}">{{v.title}}</a>
+                </span>
+                {% if v.subtitle!='' %}
+                &nbsp;&nbsp;
+                {% endif %}
+                <span>
+                    {{v.subtitle}}
+                </span>
+            </div>
+            <div class="panel-body">
+                <p>{{ v.description }}</p>
+                <p>
+                    {{ v.start_at }} ~
+                    {% if v.start_at != v.end_at %}
+                    {{ v.end_at }}
+                    {% else %}
+                    无截止日期
+                    {% endif %}
+                </p>
+                <p>
+                    {% if v.vote_min == v.vote_max %}
+                    只可投{{v.vote_min}}票
+                    {% else %}
+                    {% if v.vote_min != 0 %}
+                    最少{{v.vote_min}}票&nbsp;&nbsp;
+                    {% endif %}
+                    {% if v.vote_max != 999 %}
+                    最多{{v.vote_max}}票&nbsp;&nbsp;
+                    {% endif %}
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+        <hr>
+        {% endif %}
+        {% endfor %}
+        <!--template list iteration end-->
+    </div>
+{% endblock %}

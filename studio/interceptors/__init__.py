@@ -1,8 +1,11 @@
-from studio import r#redis_conn
+from studio import r,fake_id,fake_sessionid#redis_conn
 from functools import wraps
-from flask import request,redirect,current_app,abort,g
+from flask import request,redirect,current_app,abort,g,session,jsonify
 import json
 import redis
+import time
+from studio.utils.captcha_helper import getcaptcha
+from studio.utils.rules_helper import get_rules
 """ USAGE:
 @app.route('/<id>')
 @session_required
@@ -14,22 +17,48 @@ def ho(id):
 
 # for flexibility, DO NOT do direct redis operations out of this interceptor module!!!
 """
+def global_interceptor():
+    rules = get_rules()
+    for r in rules:
+        if request.path.startswith(r):
+            abort(503)
+    pass
+
+
+def set_captcha(func):
+    @wraps(func)
+    def func_wrapper(*args,**kwargs):
+        session['captcha_text'] = getcaptcha(current_app.config['CAPTCHA_LEN'])
+        session['captcha_time'] = int(time.time())
+
+        return func(*args,**kwargs)
+    return func_wrapper
+
+def validate_captcha(func):
+    @wraps(func)
+    def func_wrapper(*args,**kwargs):
+        if not request.values.get('captcha'):
+            return jsonify({'success':False,'details':'验证码缺失'})
+        if request.values.get('captcha') != session['captcha_text']:
+            return jsonify({'success':False,'details':'验证码错误'})
+        if int(time.time()) > (session['captcha_time']+current_app.config['CAPTCHA_TTL']):
+            return jsonify({'success':False,'details':'验证码超时'})
+        return func(*args,**kwargs)
+    return func_wrapper
+
 def session_required(target:str=None):
     def _check_session(func):
         @wraps(func)
         def func_wrapper(*args,**kwargs):
             redirect_target = '/userservice/index.html' if target is None else "/userservice/index.html?target={}".format(target)
-            if current_app.config['DEBUG']:
-                g.sessionid = 'abcdefgh'*4
-                g._id = '_id-test123'
-                return func(*args,**kwargs)
-            sessionid = request.cookies.get('SESSIONID')
-            if sessionid is None or len(sessionid)!=32:
+
+            sessionid = request.cookies.get('SESSIONID') if not current_app.config['DEBUG'] else fake_sessionid
+            if not current_app.config['DEBUG'] and (sessionid is None or len(sessionid)!=32):
                 return redirect(redirect_target)
             _id = r.get(sessionid)
             if _id is not None:
                 g.sessionid = sessionid
-                g._id = _id.decode('UTF-8')
+                g._id = _id.decode('UTF-8') if not current_app.config['DEBUG'] else fake_id
                 return func(*args,**kwargs)
             else:
                 return redirect(redirect_target)
@@ -46,12 +75,6 @@ def roles_required(roles:list,_redirect=None):
             except:
                 print('programming error: no session_required decorator previously used in this context.')
                 return abort(500)
-            if current_app.config['DEBUG']:
-                g.role = ['super_admin']
-                if request.values.get('role') is not None:
-                    g.role = [request.values.get('role')]
-                print('debug mode, ignoring requirements, role is now',g.role)
-                return func(*args,**kwargs) 
             try:
                 role_info = r.hgetall("userservice:rolemap:"+g._id)
                 role_keys = [j.decode('UTF-8') for j in role_info.keys()]
@@ -63,15 +86,12 @@ def roles_required(roles:list,_redirect=None):
                     raise ValueError
                 g.role = role_intersection
             except redis.DataError:#no sessionid
-                #print('no sessionid')
                 return redirect('/userservice/index.html?target={}#1'.format(_redirect))
             except TypeError:#hmget returned none, no valid userservice session.
-                #print('no valid session')
                 return redirect('/userservice/index.html?target={}#2'.format(_redirect))
-            except ValueError:
-                #print('no valid role')
-                #return abort(404)
-                return redirect('/userservice/index.html?target={}#2'.format(_redirect))
+            except ValueError:#no valid role
+                return abort(401)
+                #return redirect('/userservice/index.html?target={}#2'.format(_redirect))
             except Exception as e:
                 print(e)
                 return abort(500)
