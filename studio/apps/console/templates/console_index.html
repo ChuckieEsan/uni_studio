@@ -4,7 +4,9 @@
     <div class="row">
         <span style="font-size:30px;margin-left: 10px;">Console</span>
         {% for r in g.role %}
-        <span class="badge badge-dark" style="float:right;margin-top:13px;margin-right: 10px;padding-bottom: 0%;">{{r}}</span>
+        <span class="badge badge-dark"style="float:right;margin-top:13px;margin-right: 10px;">
+            {{r}}
+        </span>
         {% endfor %}
     </div>
     <hr>
@@ -17,5 +19,16 @@
     <p>
         <a href="{{url_for('console.admin_votes_show')}}">投票管理</a>
     </p>
+    <hr>
+    <div id="rules">
+        <!--interceptor rules-->
+
+    </div>
 </div>
+{% if 'super_admin' in g.role %}
+<script>
+let RULES_URL = "{{url_for('console.rules_handler')}}"
+</script>
+<script src="{{url_for('console.static',filename='js/index.js')}}"></script>
+{% endif %}
 {% endblock %}

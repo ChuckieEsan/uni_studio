@@ -4,6 +4,7 @@ from studio.utils.captcha_helper import get_captcha_and_img
 from studio.cache import memoize
 from studio.interceptors import set_captcha,validate_captcha
 from flask import url_for,redirect,render_template,request,flash,session,jsonify,Markup,send_file
+from flask import current_app
 from faker import Faker
 from sqlalchemy import func
 import json
@@ -29,16 +30,13 @@ def get_vote_and_candidate(vote_id:int):
     vote_info = VoteInfo.query.filter(VoteInfo.id==vote_id).first_or_404()
     return (candidate_all,candidate_all_sorted,vote_info)
 
+
 @vote.route('/<int:vote_id>',methods=["GET"])
-@set_captcha
 def vote_page(vote_id):
-    #candidate_all = VoteCandidates.query.filter(VoteCandidates.vote_id==vote_id).all()
-    #vote_info = VoteInfo.query.filter(VoteInfo.id==vote_id).first_or_404()
     t1 = time.time()
     candidate_all,candidate_all_sorted,vote_info = get_vote_and_candidate(vote_id)
     voted = VoteVotes.query.filter(VoteVotes.ip==request.remote_addr).filter(VoteVotes.vote_id==vote_id).first()
     datetime_now = datetime.datetime.now()
-    #voted = None #------------------
     if vote_info.start_at > datetime_now or (vote_info.start_at!=vote_info.end_at and vote_info.end_at<datetime_now):
         flash('不在有效的投票时间段内')
         return render_template('vote_result.html',vote_id=vote_id,title="投票结果")
@@ -50,7 +48,7 @@ def vote_page(vote_id):
         c.description = Markup(c.description)
     session['captcha_time'] = int(time.time())+10*60#10分钟
     session['captcha_str'],captcha_b64 = get_captcha_and_img()
-    print('-------------this took {}----------------',time.time()-t1)
+    current_app.logger.debug('timing-of-vote_page:'+str(time.time()-t1))
     return render_template(
         'vote_vote_page.html',
         candidate_all=candidate_all,
@@ -130,18 +128,18 @@ def getcsv(vote_id):
 @validate_captcha
 def vote_handler(vote_id):
     voted = VoteVotes.query.filter(VoteVotes.ip==request.remote_addr).filter(VoteVotes.vote_id==vote_id).first()
-    #voted = None #------------------
     if voted:
+        current_app.logger.warn('vote_attempt:'+request.remote_addr)
         return jsonify({"success":False,"details":"您已投过票"})
     vote_list = request.get_json()
-    print(request.form.getlist('candidates'))
+    current_app.logger.debug('candidates:'+str(request.form.getlist('candidates')))
     vote_list = request.form.getlist('candidates')
     vs=[]
     id_list = []
     for v in vote_list:
         _v = VoteVotes(
             ip = request.remote_addr,
-            candidate = int(v),#['candidate']),
+            candidate = int(v),
             vote_id = vote_id
         )
         vs.append(_v)
