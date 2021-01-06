@@ -63,6 +63,10 @@ def create_app():
     app = Flask(__name__)
 
     #set up logger
+    try:
+        os.mkdir('log')
+    except:
+        pass
     handler = logging.FileHandler('log/service.log')
     logging_format = logging.Formatter('%(levelname)s - %(asctime)s - %(filename)s - %(funcName)s - %(lineno)s - %(message)s')
     handler.setFormatter(logging_format)
