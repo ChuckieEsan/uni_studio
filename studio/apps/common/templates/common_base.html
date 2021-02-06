@@ -38,10 +38,13 @@
     <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
-    {% block content%}
-    {% endblock %}
-    <div id="footer">
-        <p>
+    <div style="padding-bottom: 35px;">
+
+        {% block content%}
+        {% endblock %}
+    </div>
+    <nav class="navbar fixed-bottom navbar-dark bg-dark">
+        <div style="font-size: .8em; text-align: center;width: 100%;" id="footer">
             <a href="https://github.com/dutbit/uni_studio" style="text-decoration:none;">
                 <span class="badge badge-info">{{get_ver()}}</span>
             </a>
@@ -52,8 +55,8 @@
             |
             <a href="{{root}}">返回主页</a>
             {% endif %}
-        </p>
-    </div>
+        </div>
+      </nav>
     {% block script %}
     {% endblock %}
 </body>

@@ -1,3 +1,4 @@
 from studio import r
+from flask import current_app
 def get_ver():
-    return bytes.decode(r.get('studio_version'),encoding='utf-8')
+    return current_app.config.get('VERSION')

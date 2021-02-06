@@ -1,8 +1,8 @@
 {% extends 'common_base.html'%}
 {% block content %}
-<div class="container" style="margin-top:10px;margin-bottom: 300px;">
+<div class="container">
     <div class="row">
-        <span style="font-size:30px;margin-left: 10px;">反馈</span>
+        <span class="title">反馈</span>
     </div>
     <hr>
     <form enctype="multipart/form-data" action="{{url_for('issues.root')}}" method="POST" name="discForm" id="discForm"

@@ -1,19 +1,23 @@
 html{height:100%}
 body{min-height:100%}
+
 #footer{
-    position: absolute;
-    bottom:0%;
-    background-color:#286090;
-    height: 32px;
-    width: 100%;
-}
-#footer p{
     text-align: center;
     color:#eee;
     font-size: .8em;
-    padding:.5em;
-    margin:0;
 }
 #footer a{
     color:#eee;
+}
+.navbar-custom {
+    background-color: #ff5500;
+}
+.bg-dark {
+    background-color: #286090 !important;
+}
+.container {
+    margin-top:10px;
+}
+.title {
+    font-size:30px;margin-left: 20px;
 }
