@@ -115,7 +115,8 @@
                         $("#queryButton").text('查询')},1000)
                         return;
                     }
-                    var res_p = $.parseJSON(res);
+                    //var res_p = $.parseJSON(res);
+                    var res_p = res
                     //console.log(res_p.name);
                     //console.log(res_p.all_time);
                     $("#usr-name").text("Hi,"+res_p.name);

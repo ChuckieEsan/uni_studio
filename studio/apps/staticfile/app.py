@@ -15,7 +15,7 @@ from flask import Flask, request, render_template, redirect, url_for, send_from_
 from flask_bootstrap import Bootstrap
 from werkzeug.utils import secure_filename
 from studio.interceptors import roles_required,session_required
-from studio.fileservice.libs.upload_file import uploadfile
+from studio.apps.fileservice.libs.upload_file import uploadfile
 
 
 app = Blueprint("staticfile",__name__,template_folder='templates',static_folder='static')

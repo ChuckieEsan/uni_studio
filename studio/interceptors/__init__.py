@@ -18,9 +18,12 @@ def ho(id):
 
 #this is intended to be read-only
 
-# for flexibility, DO NOT do direct redis operations out of this interceptor module!!!
+# for flexibility, DO NOT operate directly on redis outside of this interceptor module!!!
 """
 def global_interceptor():
+    sessionid = request.cookies.get('SESSIONID') if not current_app.config['DEBUG'] else fake_sessionid
+    if sessionid != None:
+        return
     rules = get_rules()
     for r in rules:
         if request.path.startswith(r):

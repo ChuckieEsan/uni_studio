@@ -68,6 +68,8 @@ def tostamp(dt1):
     Unixtime = time.mktime(time.strptime(dt1.strftime('%Y-%m-%d %H:%M:%S'), '%Y-%m-%d %H:%M:%S'))
     return Unixtime
 
+
+
 @vote.route('/statistics/<int:vote_id>')
 def get_vote_stats(vote_id):
     lim = 5 if request.values.get('lim') is None else int(request.values.get('lim'))
@@ -115,13 +117,14 @@ def getcsv(vote_id):
                     count = count + 1
             data[names[i]].append(count)
             now = now + step
-    fname = 'vote_'+str(vote_id)+'_'+time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime(time.time()))+'.csv'
+    fname = os.path.join(os.getcwd(),'studio','apps','vote','static','csv',\
+    'vote_'+str(vote_id)+'_'+time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime(time.time()))+'.csv')
     with codecs.open(fname, 'wb', "gbk") as csvfile:
         csv_writer = csv.writer(csvfile)
         csv_writer.writerow(head)
         for k in data:
             csv_writer.writerow([k]+data[k])
-    return send_file(os.path.join(os.getcwd(),fname),as_attachment=True,attachment_filename=fname)
+    return send_file(fname,as_attachment=True,attachment_filename=fname)
 
 
 @vote.route('/<int:vote_id>',methods=["POST"])
