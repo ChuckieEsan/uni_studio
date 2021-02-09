@@ -96,7 +96,8 @@ def create_app():
             app.config['SERVER_NAME'] = '127.0.0.1:5000'
             app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dev.db'
             app.config['SUBDOMAINS'] = subdomains['DEVELOPMENT']
-            app.config['SESSION_TYPE'] = 'filesystem'
+            app.config['SESSION_TYPE'] = 'redis'
+            app.config['SESSION_REDIS'] = r
         app.config['VERSION'] = VERSION
         app.config['CAPTCHA_LEN'] = 4
         app.config['CAPTCHA_TTL'] = 60
