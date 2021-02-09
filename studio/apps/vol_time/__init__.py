@@ -23,3 +23,10 @@ def vol_time_search():
         d['activity_name'],d['duty_person'])
         r['all_time'] = r['all_time'] + float(d['time'])
     return jsonify(r)
+
+@vol_time.route('/update',methods=['GET'])
+def vol_time_update():
+    cursor = db.session.execute("select count(*) from vol_time")
+    res = cursor.fetchall()
+    count = res[0][0]
+    return render_template("vol_time_update.html",count=count)
