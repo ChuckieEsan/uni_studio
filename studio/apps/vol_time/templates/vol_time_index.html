@@ -1,0 +1,132 @@
+{% extends 'common_base.html'%}
+{% block stylesheet %}
+<style>
+    .error {
+        color:red;
+    }
+</style>
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="row">   
+            <span class="title">
+                志愿时长查询
+            </span>
+        </div>
+        <hr>
+        <form id="myform" class="form-horizontal" style="padding-bottom: 20px;">
+            <div class="form-group">
+                <label for="number" class="col-sm-2 control-label">学号</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="number" name="Number" placeholder="学号">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="name" class="col-sm-2 control-label">姓名</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="name" name="Name" placeholder="姓名">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <span>
+                        <button type="submit" class="btn btn-primary" id="queryButton">查询</button>
+                    </span>
+                    <span style="float:right">
+                        <i>数据有缺失？</i><a href="{{url_for('issues.root')}}">联系我们</a>
+                    </span>
+                </div>
+            </div>
+        </form>
+        <h3 id="usr-name"></h3>
+        <table id="data-table" class="table" style="font-size:14px">
+            <thead>
+                <tr>
+                    <td>记录时间</td>
+                    <td>姓名</td>
+                    <td>学院</td>
+                    <td>学号</td>
+                    <td>时长</td>
+                    <td>组织学院</td>
+                    <td>任务名称</td>
+                    <td>组织人</td>
+                </tr>
+            </thead>
+            <tbody id="table-con">
+                
+            </tbody> 
+        </table>
+        <p id="all-time"></p>   
+    </div>
+    <script src="https://static.runoob.com/assets/jquery-validation-1.14.0/lib/jquery.js"></script>
+    <script src="https://static.runoob.com/assets/jquery-validation-1.14.0/dist/jquery.validate.min.js"></script>
+    <script>
+         $.validator.setDefaults({
+                submitHandler: function(form) {
+                    console.log("form check over!");
+                    submit_info();
+                }
+            });
+        $(document).ready(function() {
+            $("#myform").validate({
+                rules: {
+                    Number:{
+                        required:true,
+                        digits:true
+                    },
+                    Name: "required"
+                },
+                messages:{　　　
+                　　Name: {
+                　　　　required: "请输入姓名"
+                　　　　},
+                    Number:{
+                        required: "请输入学号",
+                        digits:"请输入正确的学号",
+                        number:"number"
+                    }
+                }
+            });
+        });
+        function submit_info(){
+            console.log("hhh");
+            var number = $("#number").val();
+            var name=$("#name").val();
+            $.ajax({
+                type:"post",
+                data:{
+                    name:name,
+                    number:number
+                },
+                url:"{{url_for('vol_time.vol_time_search')}}",
+                success:function(res){
+                    console.log(res)
+                    if(!res){
+                        $("#table-con").html("");
+                        $("#all-time").text("你无志愿时长。");
+                        return;
+                    }
+                    if(res==='NOSPAM'||res.data==='NOSPAM'){
+                        alert("NO SPAM")
+                        $("#queryButton").attr("disabled","disabled")
+                        $("#queryButton").text('请等待')
+                        setTimeout(()=>{$("#queryButton").removeAttr("disabled");
+                        
+                        $("#queryButton").text('查询')},1000)
+                        return;
+                    }
+                    //var res_p = $.parseJSON(res);
+                    var res_p = res
+                    //console.log(res_p.name);
+                    //console.log(res_p.all_time);
+                    $("#usr-name").text("Hi,"+res_p.name);
+                    $("#table-con").html(res_p.data);
+                    $("#all-time").text("总时长:"+res_p.all_time);
+                },
+                error:function(e){
+                    console.log(e);
+                }
+            })
+        }
+    </script>
+    {% endblock %}

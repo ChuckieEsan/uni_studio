@@ -36,7 +36,7 @@ from flask_session import Session
 from flask_bootstrap import Bootstrap  # for flask-file-uploader | fileservice
 from flask_migrate import Migrate
 from .test import tests
-from .fileservice.app import app as fileserviceapp
+from .apps.fileservice.app import app as fileserviceapp
 from .api import postcardapp
 from .utils.dir_helper import join_upload_dir
 from .utils.ver_helper import get_ver
@@ -46,7 +46,7 @@ from .apps.console import console as consoleapp
 from .apps.common import common as commonfileapp
 from .apps.issues import issues as issuesapp
 from .apps.vol_time import vol_time as vol_timeapp
-from .staticfile.app import app as staticfileapp
+from .apps.staticfile.app import app as staticfileapp
 from .apps.vote import vote as voteapp
 subdomains = {
     'DEVELOPMENT':{
@@ -121,7 +121,7 @@ def create_app():
         app.register_blueprint(issuesapp,url_prefix="/issues",subdomain=app.config['SUBDOMAINS']['www'])
         app.register_blueprint(commonfileapp,url_prefix="/common",subdomain=app.config['SUBDOMAINS']['www'])
         app.register_blueprint(consoleapp,url_prefix="/console",subdomain=app.config['SUBDOMAINS']['www'])
-        app.register_blueprint(vol_timeapp,url_prefix="/vol_time",subdomains=app.config['SUBDOMAINS']['www'])
+        app.register_blueprint(vol_timeapp,url_prefix="/vol_time",subdomain=app.config['SUBDOMAINS']['www'])
         #app.config['SERVER_NAME'] = 'dutbit.com'
         app.config['SECRET_KEY'] = 'Do not go gentle into that good night'
         app.config['FILESERVICE_UPLOAD_FOLDER'] = join_upload_dir('data/')
