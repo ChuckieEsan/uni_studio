@@ -1,6 +1,5 @@
 from flask import Blueprint,render_template,request,session,jsonify
 from studio.models import db
-from pymysql.cursors import DictCursor
 vol_time = Blueprint("vol_time",__name__,template_folder="templates")
 
 @vol_time.route('/',methods=["GET"])
