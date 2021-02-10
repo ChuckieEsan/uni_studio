@@ -86,7 +86,8 @@ def create_app():
             app.config['SERVER_NAME'] = 'dutbit.com'
             app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
             app.config['SUBDOMAINS'] = subdomains['PRODUCTION']
-            app.config['SESSION_TYPE'] = 'filesystem'
+            app.config['SESSION_TYPE'] = 'redis'
+            app.config['SESSION_REDIS'] = r
             if 'mysql+pymysql' not in app.config['SQLALCHEMY_DATABASE_URI']:
                 raise EnvironmentError("No db connection uri provided")
                 exit(-1)
@@ -96,8 +97,7 @@ def create_app():
             app.config['SERVER_NAME'] = '127.0.0.1:5000'
             app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dev.db'
             app.config['SUBDOMAINS'] = subdomains['DEVELOPMENT']
-            app.config['SESSION_TYPE'] = 'redis'
-            app.config['SESSION_REDIS'] = r
+            app.config['SESSION_TYPE'] = 'filesystem'
         app.config['VERSION'] = VERSION
         app.config['CAPTCHA_LEN'] = 4
         app.config['CAPTCHA_TTL'] = 60
@@ -118,14 +118,14 @@ def create_app():
         app.register_blueprint(fileserviceapp,url_prefix='',subdomain=app.config['SUBDOMAINS']['files'])
         app.register_blueprint(staticfileapp,url_prefix='/staticfile',subdomain='www')
         app.register_blueprint(voteapp,url_prefix='/vote',subdomain=app.config['SUBDOMAINS']['www'])
-        app.register_blueprint(postcardapp)
+        app.register_blueprint(postcardapp,url_prefix='/postcard',subdomain=app.config['SUBDOMAINS']['www'])
         app.register_blueprint(issuesapp,url_prefix="/issues",subdomain=app.config['SUBDOMAINS']['www'])
         app.register_blueprint(commonfileapp,url_prefix="/common",subdomain=app.config['SUBDOMAINS']['www'])
         app.register_blueprint(consoleapp,url_prefix="/console",subdomain=app.config['SUBDOMAINS']['www'])
         app.register_blueprint(vol_timeapp,url_prefix="/vol_time",subdomain=app.config['SUBDOMAINS']['www'])
         #app.config['SERVER_NAME'] = 'dutbit.com'
         app.config['SECRET_KEY'] = 'Do not go gentle into that good night'
-        app.config['FILESERVICE_UPLOAD_FOLDER'] = join_upload_dir('data/')
-        app.config['FILESERVICE_THUMBNAIL_FOLDER'] = join_upload_dir('data/thumbnail/')
+        app.config['FILESERVICE_UPLOAD_FOLDER'] = join_upload_dir('data/fileservice')
+        app.config['FILESERVICE_THUMBNAIL_FOLDER'] = join_upload_dir('data/fileservice/thumbnail')
         app.config['FILESERVICE_MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
         return app

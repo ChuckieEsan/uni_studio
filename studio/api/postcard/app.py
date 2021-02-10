@@ -1,6 +1,6 @@
 # coding: utf-8
 from __future__ import division
-from flask import Flask,request,render_template,redirect,url_for,jsonify,make_response,send_file,session,Response,Blueprint
+from flask import Flask,request,render_template,redirect,url_for,jsonify,make_response,send_file,session,Response,Blueprint,current_app
 import datetime
 import time,os,copy,requests,json,hashlib
 from shutil import copyfile
@@ -16,9 +16,12 @@ from studio.models import PostcardUsers as Users
 
 postcard = Blueprint('postcard',__name__,template_folder='templates',url_prefix='/postcard')
 sizes = ['small','large']
-APPID = '*'
-APPSECRET = '*'
+APPID = os.environ['POSTCARD_APPID']
+APPSECRET = os.environ['POSTCARD_APPSECRET']
 
+if not APPID or not APPSECRET:
+    current_app.logger.error('no appid or appsecret in env')
+    exit(-11)
 def md5(arg):
     m = hashlib.md5()
     b = arg.encode(encoding='utf-8')
@@ -50,7 +53,7 @@ def uploader():
         msg['errorCode'] = 2
         msg['data'] = 'bad suffix'
         return jsonify(msg)
-    path = os.getcwd()+'/static/upload/'+wxid+'/temp'
+    path = os.getcwd()+'/data/postcard/static/upload/'+wxid+'/temp'
     if not os.path.exists(path):
         os.makedirs(path) 
     if file_suffix in ['png','PNG','jpg','JPG','JPEG','jpeg']:
@@ -77,7 +80,7 @@ def resource_handler(op_type,id):
             this_card = Cards.query.filter(Cards.id==id).first()
             if this_card:
                 try:
-                    return send_file(os.getcwd()+'/static/upload/'+this_card.wx_openid+'/'+this_card.dir_name+'/'+size+'.png')
+                    return send_file(os.getcwd()+'/data/postcard/static/upload/'+this_card.wx_openid+'/'+this_card.dir_name+'/'+size+'.png')
                 except Exception as e:
                     return do_return(500,repr(e))
             else:
@@ -86,7 +89,7 @@ def resource_handler(op_type,id):
             this_card = Cards.query.filter(Cards.id==id).first()
             if this_card.with_audio==0:
                 try:
-                    response = send_file(os.getcwd()+'/static/upload/'+this_card.wx_openid+'/'+this_card.dir_name+'/'+'audio.mp3')
+                    response = send_file(os.getcwd()+'/data/postcard/static/upload/'+this_card.wx_openid+'/'+this_card.dir_name+'/'+'audio.mp3')
                     response.headers["Content-Type"] = 'audio/mp3'
                     return response
                 except Exception as e:
@@ -102,13 +105,13 @@ def resource_handler(op_type,id):
                     size = 'small'
                 if target=='image':
                     try:
-                        return send_file(os.getcwd()+'/static/templates/'+str(id)+'/'+size+'.png')
+                        return send_file(os.getcwd()+'/data/postcard/static/templates/'+str(id)+'/'+size+'.png')
                     except Exception as e:
                         return do_return(500,repr(e))
                 elif target=='audio':
                     if this_template.with_audio:
                         try:
-                            return send_file(os.getcwd()+'/static/templates/'+str(id)+'/audio.mp3')
+                            return send_file(os.getcwd()+'/data/postcard/static/templates/'+str(id)+'/audio.mp3')
                         except Exception as e:
                             return do_return(500,repr(e))
                     else:
@@ -148,13 +151,13 @@ def card_handler():
                     db.session.add(new_card)
                     db.session.commit()
                     try:
-                        path = os.getcwd()+'/static/upload/'+wx_openid+'/'+dir_name
+                        path = os.getcwd()+'/data/postcard/static/upload/'+wx_openid+'/'+dir_name
                         if not os.path.exists(path):
                             os.makedirs(path)
 
                         if with_img==0:
-                            if os.path.exists(os.getcwd()+'/static/upload/'+wx_openid+'/temp/image.png'):
-                                copyfile(os.getcwd()+'/static/upload/'+wx_openid+'/temp/image.png',path+'/large.png')
+                            if os.path.exists(os.getcwd()+'/data/postcard/static/upload/'+wx_openid+'/temp/image.png'):
+                                copyfile(os.getcwd()+'/data/postcard/static/upload/'+wx_openid+'/temp/image.png',path+'/large.png')
                                 img = Image.open(path+'/large.png')
                                 width = int(img.size[0])
                                 height = int(img.size[1])
@@ -166,8 +169,8 @@ def card_handler():
                                 img.save(path+'/small.png')
 
                         if with_audio==0:
-                            if os.path.exists(os.getcwd()+'/static/upload/'+wx_openid+'/temp/audio.mp3'):
-                                copyfile(os.getcwd()+'/static/upload/'+wx_openid+'/temp/audio.mp3',path+'/audio.mp3')
+                            if os.path.exists(os.getcwd()+'/data/postcard/static/upload/'+wx_openid+'/temp/audio.mp3'):
+                                copyfile(os.getcwd()+'/data/postcard/static/upload/'+wx_openid+'/temp/audio.mp3',path+'/audio.mp3')
                     
                         new_id = Cards.query.filter(Cards.dir_name==dir_name).first().id
                         msg['success']=1;msg['data']='新建成功';msg['id']= new_id
@@ -300,7 +303,7 @@ def pcode():
                     })
                     if len(r2.text)>100:
                         try:
-                            with open('./static/qr/'+str(id)+'.jpg',"wb") as f:
+                            with open(os.getcwd()+'/data/postcard/static/qr/'+str(id)+'.jpg',"wb") as f:
                                 f.write(r2.content)
                             msg['data']='https://www.dutbit.com/postcard/static/qr/'+str(id)+'.jpg';msg['success']=1
                         except Exception as e:

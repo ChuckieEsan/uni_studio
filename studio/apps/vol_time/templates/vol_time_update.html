@@ -25,13 +25,13 @@
     </p>
 
     <hr>
-    <form action="/vol_time/index.php/Vol/doupd" method="post" enctype="multipart/form-data" accept-charset="utf-8"
+    <form action="{{url_for('vol_time.do_vol_time_update')}}" method="post" enctype="multipart/form-data" accept-charset="utf-8"
         class="form-horizontal">
         <!-- <input class="btn btn-default" type="file" name="data" accept=".csv" required/> -->
         <!-- 
             <input type="radio" name="fileIndex" value="0"> -->
         <h3>文件选择</h3>
-        <span><a href="/vol_time/index.php/Vol/doupd">刷新文件库</a></span>
+        <span><button onclick="fetchFiles()" class="btn btn-info">刷新文件库</button></span>
         <span><a href="https://files.dutbit.com" target="_blank">文件库</a></span>
         <div id="fileChoices"></div>
         <br>
@@ -44,7 +44,10 @@
         <input class="btn btn-primary" style="margin-top:10px;" type="submit" value="提交" />
     </form>
     <hr>
-    <div>
+    <div style="color:orange">
+        <p style="font-size:20px">
+            当前行数：{{count}}
+        </p>
             {% for m in get_flashed_messages() %}
             <p style="font-size:20px">
                 {{m}}
@@ -58,6 +61,7 @@
         let fetchFiles = ()=>{
             fetch("/fileservice/upload").then(res=>res.json()).then((res)=>{
                 //console.log(res)
+                $("#fileChoices").html('')
                 for(let i=0;i<res.files.length;i++){
                     let node = $(`<input type="radio" name="fileIndex" value="${res.files[i].name}" required/>`)
                     let name = $(`<span>${res.files[i].name}</span>`)
@@ -65,8 +69,9 @@
                     $("#fileChoices").append(br)
                     $("#fileChoices").append(node)
                     $("#fileChoices").append(name)
-                    msgOk("文件库列表刷新成功")
                 }
+                
+                msgOK("文件库列表刷新成功")
                 }).catch(err=>{
                     console.log(err)
                     alert(err)

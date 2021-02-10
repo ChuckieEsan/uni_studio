@@ -10,6 +10,7 @@ studio/apps/vote/static/uploads
 # Distribution / packaging
 .Python
 build/
+data/
 develop-eggs/
 dist/
 downloads/
