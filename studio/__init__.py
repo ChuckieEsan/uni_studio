@@ -41,6 +41,7 @@ from .api import postcardapp
 from .utils.dir_helper import join_upload_dir
 from .utils.ver_helper import get_ver
 from .utils.error_helper import error_handler
+from .utils.log import LiveLog
 from .interceptors import global_interceptor
 from .apps.console import console as consoleapp
 from .apps.common import common as commonfileapp
@@ -48,6 +49,7 @@ from .apps.issues import issues as issuesapp
 from .apps.vol_time import vol_time as vol_timeapp
 from .apps.staticfile.app import app as staticfileapp
 from .apps.vote import vote as voteapp
+from .apps.users import users as usersapp
 subdomains = {
     'DEVELOPMENT':{
         'www':'',
@@ -58,7 +60,6 @@ subdomains = {
         'files':'files',
     }
 }
-
 def create_app():
     app = Flask(__name__)
 
@@ -98,6 +99,7 @@ def create_app():
             app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///dev.db'
             app.config['SUBDOMAINS'] = subdomains['DEVELOPMENT']
             app.config['SESSION_TYPE'] = 'filesystem'
+        app.config['LIVE_LOG'] = LiveLog()
         app.config['VERSION'] = VERSION
         app.config['CAPTCHA_LEN'] = 4
         app.config['CAPTCHA_TTL'] = 60
@@ -123,6 +125,7 @@ def create_app():
         app.register_blueprint(commonfileapp,url_prefix="/common",subdomain=app.config['SUBDOMAINS']['www'])
         app.register_blueprint(consoleapp,url_prefix="/console",subdomain=app.config['SUBDOMAINS']['www'])
         app.register_blueprint(vol_timeapp,url_prefix="/vol_time",subdomain=app.config['SUBDOMAINS']['www'])
+        app.register_blueprint(usersapp,url_prefix="/user",subdomain=app.config['SUBDOMAINS']['www'])
         #app.config['SERVER_NAME'] = 'dutbit.com'
         app.config['SECRET_KEY'] = 'Do not go gentle into that good night'
         app.config['FILESERVICE_UPLOAD_FOLDER'] = join_upload_dir('data/fileservice')

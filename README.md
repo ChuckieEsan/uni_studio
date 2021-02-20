@@ -19,3 +19,6 @@ A web based set of tools for operations of studios in universities.
 
 - Vote  
     Customizable voting.
+
+
+http://www.ttlsa.com/python/flask-migrate-management-database-upgrade-and-migrate/

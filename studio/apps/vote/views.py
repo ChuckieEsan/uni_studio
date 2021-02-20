@@ -82,7 +82,9 @@ def get_vote_stats(vote_id):
             if v.candidate == c.id:
                 res[key].append(int(tostamp(v.created_at)))
     return jsonify(res)
-
+@vote.route('/stats/<int:vote_id>')
+def show_stats(vote_id):
+    return render_template('vote_stats.html',vote_id=vote_id)
 
 @vote.route('/getcsv/<int:vote_id>')
 def getcsv(vote_id):

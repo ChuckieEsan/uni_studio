@@ -14,7 +14,6 @@ import traceback
 from flask import Flask, request, render_template, redirect, url_for, send_from_directory,g,current_app,Blueprint
 from flask_bootstrap import Bootstrap
 from werkzeug.utils import secure_filename
-from studio.interceptors import roles_required,session_required
 from studio.apps.fileservice.libs.upload_file import uploadfile
 
 
@@ -26,8 +25,6 @@ UPLOAD_FOLDER = '/usr/share/nginx/html/static'
 THUMBNAIL_FOLDER = '/usr/share/nginx/html/static/img/thumbnails'
 #bootstrap = Bootstrap(app)
 @app.before_request
-@session_required('/staticfile')
-@roles_required(['super_admin'])
 def befreq():
     pass
 

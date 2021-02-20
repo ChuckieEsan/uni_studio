@@ -11,31 +11,18 @@ from PIL import Image
 import simplejson
 import traceback
 
-from flask import Flask, Blueprint,request, current_app, render_template, redirect, url_for, send_from_directory, g
+from flask import Flask, Blueprint,request, current_app, render_template, redirect, url_for, send_from_directory, g,session
 from flask_bootstrap import Bootstrap
 from werkzeug.utils import secure_filename
 
-from studio.interceptors import session_required
 from .libs.upload_file import uploadfile
  
- 
-#app = Flask(__name__)
 
 app = Blueprint("fileservice",__name__,template_folder='templates',static_folder='static')
 
-# current_app.config['SECRET_KEY'] = 'hard to guess string'
-# current_app.config['UPLOAD_FOLDER'] = 'data/'
-# current_app.config['THUMBNAIL_FOLDER'] = 'data/thumbnail/'
-# current_app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
 
 ALLOWED_EXTENSIONS = set(['txt', 'gif', 'png', 'jpg', 'jpeg', 'bmp', 'rar', 'zip', '7zip', 'doc', 'docx'])
 IGNORED_FILES = set(['.gitignore'])
- 
-#bootstrap = Bootstrap(current_app)
-@app.before_request
-@session_required('/fileservice')
-def bef_req():
-    pass
 
 
 def allowed_file(filename):
@@ -71,11 +58,11 @@ def get_dir_name(uid):
 def create_thumbnail(image):
     try:
         base_width = 80
-        img = Image.open(os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'], g._id,image))
+        img = Image.open(os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'], str(session['id']),image))
         w_percent = (base_width / float(img.size[0]))
         h_size = int((float(img.size[1]) * float(w_percent)))
         img = img.resize((base_width, h_size), PIL.Image.ANTIALIAS)
-        img.save(os.path.join(current_app.config['FILESERVICE_THUMBNAIL_FOLDER'],g._id, image))
+        img.save(os.path.join(current_app.config['FILESERVICE_THUMBNAIL_FOLDER'],str(session['id']), image))
 
         return True
 
@@ -103,7 +90,7 @@ def upload():
 
             else:
                 # save file to disk
-                uploaded_file_path = os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'], g._id,filename)
+                uploaded_file_path = os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'], str(session['id']),filename)
                 files.save(uploaded_file_path)
                 os.chmod(uploaded_file_path,0o666)
 
@@ -121,14 +108,14 @@ def upload():
 
     if request.method == 'GET':
         # get all file in ./data directory
-        files = [f for f in os.listdir(os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],g._id))\
-                 if os.path.isfile(os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],g._id,f)) \
+        files = [f for f in os.listdir(os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],str(session['id'])))\
+                 if os.path.isfile(os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],str(session['id']),f)) \
                      and f not in IGNORED_FILES ]
         
         file_display = []
 
         for f in files:
-            size = os.path.getsize(os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],g._id, f))
+            size = os.path.getsize(os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],str(session['id']), f))
             file_saved = uploadfile(name=f, size=size)
             file_display.append(file_saved.get_file())
 
@@ -139,8 +126,8 @@ def upload():
 
 @app.route("/delete/<string:filename>", methods=['DELETE'])
 def delete(filename):
-    file_path = os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],g._id, filename)
-    file_thumb_path = os.path.join(current_app.config['FILESERVICE_THUMBNAIL_FOLDER'],g._id, filename)
+    file_path = os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],str(session['id']), filename)
+    file_thumb_path = os.path.join(current_app.config['FILESERVICE_THUMBNAIL_FOLDER'],str(session['id']), filename)
 
     if os.path.exists(file_path):
         try:
@@ -157,17 +144,17 @@ def delete(filename):
 # serve static files
 @app.route("/thumbnail/<string:filename>", methods=['GET'])
 def get_thumbnail(filename):
-    return send_from_directory(os.path.join(current_app.config['FILESERVICE_THUMBNAIL_FOLDER'],g._id), filename=filename)
+    return send_from_directory(os.path.join(current_app.config['FILESERVICE_THUMBNAIL_FOLDER'],str(session['id'])), filename=filename)
 
 
 @app.route("/data/<string:filename>", methods=['GET'])
 def get_file(filename):
-    return send_from_directory(os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],g._id), filename=filename)
+    return send_from_directory(os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],str(session['id'])), filename=filename)
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    get_dir_name(g._id)
+    get_dir_name(str(session['id']))
     return render_template('fileservice_index.html')
 
 

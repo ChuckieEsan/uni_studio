@@ -1,0 +1,29 @@
+{% extends 'common_base.html'%}
+{% block content %}
+
+<div class="container">
+
+</div>
+<hr>
+<button id="start">start</button> <button id="stop">stop</button>
+<script>
+    let logging = true
+    setInterval(() => {
+        if (logging) {
+            fetch("{{url_for('console.get_livelog')}}").then(res => res.text()).then((res) => {
+                //console.log(res.length)
+                $(".container").append(res)
+                document.scrollingElement.scrollTop = document.scrollingElement.scrollHeight;
+            }).catch((err) => {
+                msgFail("err:", err)
+            })
+        }
+    }, 500);
+    $("#start").click(()=>{
+        logging = true
+    })
+    $("#stop").click(()=>{
+        logging = false
+    })
+</script>
+{% endblock %}

@@ -1,32 +1,26 @@
-from flask import Blueprint,current_app,render_template,jsonify,request
-from studio.interceptors import session_required,roles_required
-from studio.utils.rules_helper import get_rules,add_rule,remove_rule
+from flask import Blueprint,current_app,render_template,jsonify,request,session
 import docker
 import re
+import time
+import os
+from studio.models import db,UserRoles,RouteInterceptors
 console = Blueprint("console",__name__,template_folder='templates',static_folder='static')#static folder and template folder are set here to avoid ambiguity
 
 @console.route('/')
-@session_required('/console/')
-@roles_required(['*'])
 def console_root():
-    return render_template('console_index.html',title='Console')
+    roles = UserRoles.query.filter(UserRoles.delete==False).all()
+    routes = RouteInterceptors.query.filter(RouteInterceptors.delete==False).all()
+    user_role = int(session.get('role_bits'))
 
-@console.route('/rules',methods=['GET','POST','DELETE'])
-@session_required('/console/')
-@roles_required(['super_admin'])
-def rules_handler():
-    if request.method=='GET':
-        return jsonify(list(get_rules()))
-    elif request.method=='DELETE':
-        remove_rule(request.values.get('rule'))
-        return jsonify({'success':True})
-    elif request.method=='POST':
-        add_rule(request.values.get('rule'))
-        return jsonify({'success':True})
+    valid_routes = [r for r in routes if user_role & r.role_bits or user_role==1]
+
+    valid_roles = [r for r in roles if user_role & r.role_bit or user_role==1]
+
+    return render_template('console_index.html',\
+        title='Console',session=session,roles=valid_roles,routes=valid_routes)
+
 
 @console.route('/tskey',methods=['GET'])
-@session_required('/console/')
-@roles_required(['super_admin'])
 def get_tslog():
     client = docker.from_env()
     cli_lists = client.containers.list()
@@ -43,5 +37,12 @@ def get_tslog():
                 break
     return 'not found'
 
+@console.route('/livelog',methods=['GET'])
+def get_livelog():
+    return current_app.config['LIVE_LOG'].read()
 
-from studio.apps.console import issues,vote
+@console.route('/log',methods=['GET'])
+def show_livelog():
+    return render_template('console_livelog.html')
+
+from studio.apps.console import issues,vote,user,vol_time

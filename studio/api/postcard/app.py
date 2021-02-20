@@ -16,12 +16,15 @@ from studio.models import PostcardUsers as Users
 
 postcard = Blueprint('postcard',__name__,template_folder='templates',url_prefix='/postcard')
 sizes = ['small','large']
-APPID = os.environ['POSTCARD_APPID']
-APPSECRET = os.environ['POSTCARD_APPSECRET']
+APPID = os.environ.get('POSTCARD_APPID')
+APPSECRET = os.environ.get('POSTCARD_APPSECRET')
 
 if not APPID or not APPSECRET:
-    current_app.logger.error('no appid or appsecret in env')
-    exit(-11)
+    try:
+        current_app.logger.error('no appid or appsecret in env')
+        exit(-11)
+    except:
+        pass
 def md5(arg):
     m = hashlib.md5()
     b = arg.encode(encoding='utf-8')

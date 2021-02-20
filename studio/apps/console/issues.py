@@ -1,11 +1,8 @@
 from studio.apps.console import console
-from flask import url_for, redirect, render_template, request, jsonify,g
+from flask import url_for, redirect, render_template, request, jsonify,session
 from studio.models import db, IssuesIssues, IssueTypes
-from studio.interceptors import roles_required,session_required
 
 @console.route('/issues/data/<int:page_id>')
-@session_required('/issues')
-@roles_required(['vol_time_admin','super_admin'])
 def get_issues(page_id=1):
     role = '志愿时长查询管理员'
     vt = False#i dont know what this is for
@@ -22,10 +19,9 @@ def get_issues(page_id=1):
         u.pop('_sa_instance_state')
         a.append(u)
     return jsonify(a) 
-    #return jsonify(issues)
+
+    
 @console.route('/issues')
-@session_required('/issues')
-@roles_required(['vol_time_admin','super_admin'])
 def issues_root():
     max_page = db.session.query(IssuesIssues).count()
     per_page = 10
@@ -40,13 +36,11 @@ def issues_root():
     )
 
 @console.route('/issues/types', methods=['POST'])
-@session_required('/issues')
-@roles_required(['super_admin'])
 def issues_types_handler():
     _t = IssueTypes(
             typename=request.form.get('name'),
             typevalue=request.form.get('value'),
-            created_by=g._id
+            created_by=session['id']
         )
     try:
         db.session.add(_t)

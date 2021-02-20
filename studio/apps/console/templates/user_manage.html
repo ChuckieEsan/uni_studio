@@ -1,0 +1,66 @@
+{% extends 'common_base.html'%}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <table class="table">
+            <thead>
+                <tr> 
+                    <th scope="col">role_bit</th>
+                    <th scope="col">role_text</th>
+                    <th scope="col">description</th>
+                    <th scope="col">created_by</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in roles %}
+                
+                <tr>
+                    <th scope="row">{{r.role_bit}}</th>
+                    <td>{{r.role_text}}</td>
+                    <td>{{r.description}}</td>
+                    <td>{{r.created_by}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <form method="POST" action="{{url_for('console.role_update')}}">
+        <input type="text" name="role_text" placeholder="role_text" required>
+        <input type="text" name="description" placeholder="description">
+        <input type="submit">
+    </form>
+    <hr>
+    <div class="row">
+        <table class="table">
+            <thead>
+                <tr> 
+                    <th scope="col">id</th>
+                    <th scope="col">用户名</th>
+                    <th scope="col">邮箱</th>
+                    <th scope="col">role_bits</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in users %}
+                
+                <tr>
+                    <th scope="row">{{u.id}}</th>
+                    <td>{{u.username}}</td>
+                    <td>{{u.email}}</td>
+                    <td>
+                        {{u.role_bits}}:
+                        {% for r in roles %}
+                        {% if and_op(u.role_bits,r.role_bit) %}
+                        {{r.role_text}}| 
+                        {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+   
+    
+</div>
+{% endblock %}

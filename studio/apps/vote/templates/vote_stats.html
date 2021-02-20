@@ -40,7 +40,7 @@
         let _now = 1607601600
         let _step = 600
         let _end = 1608136800//Date.parse(new Date())/1000;
-        fetch('/vote/statisticss/6?lim=80').then(res => res.json()).then(res => {
+        fetch('/vote/statistics/{{vote_id}}?lim=80').then(res => res.json()).then(res => {
             let names = Object.keys(res)
             console.log(names)
             let data = {}

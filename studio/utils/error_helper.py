@@ -14,7 +14,7 @@ def error_handler(e):
     if isinstance(e, NotFound):
         return render_template('common_error.html', code=e.code, msg='要访问的页面找不到了，但我们可以复习一下傅里叶变换')
     if isinstance(e, Forbidden):
-        return render_template('common_error.html', code=e.code, msg='本页面禁止访问')
+        return render_template('common_error.html', code=e.code, msg='本页面禁止访问',title="oops")
     if isinstance(e, ServiceUnavailable):
         return render_template('common_error.html', code=e.code, msg='服务维护中，请稍后再试')
     return render_template('common_error.html', code=500, msg='遇到了错误')
