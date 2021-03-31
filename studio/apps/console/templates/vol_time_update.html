@@ -31,7 +31,7 @@
         <!-- 
             <input type="radio" name="fileIndex" value="0"> -->
         <h3>文件选择</h3>
-        <span><button onclick="fetchFiles()" class="btn btn-info">刷新文件库</button></span>
+        <span><button class="btn btn-info" id="fetchFiles">刷新文件库</button></span>
         <span><a href="{{url_for('fileservice.index')}}" target="_blank">文件库</a></span>
         <div id="fileChoices"></div>
         <br>
@@ -58,6 +58,10 @@
         let toggleHowTo = ()=>{
                     $("#howto").toggle()
                 }
+        $("#fetchFiles").click((e)=>{
+            e.preventDefault()
+            fetchFiles()
+        })
         let fetchFiles = ()=>{
             fetch("/fileservice/upload").then(res=>res.json()).then((res)=>{
                 //console.log(res)

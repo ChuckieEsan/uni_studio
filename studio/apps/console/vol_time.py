@@ -2,7 +2,9 @@ from flask import flash,render_template,redirect,request,g,url_for,current_app,s
 from studio.apps.console import console
 from studio.models import db,VolTime
 import os
+import time
 import pandas as pd
+import codecs,chardet
 @console.route('/vol_time',methods=['POST'])
 def do_vol_time_update():
     old_rows = get_rows()
@@ -17,6 +19,16 @@ def do_vol_time_update():
         flash('文件格式错误')
         return render_template("vol_time_update.html",count=old_rows)
     fpath = os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],str(session['id']),fname)
+    with open(fpath,'rb') as f:
+        data = f.read(512)
+        code_type = chardet.detect(data)['encoding']
+        if 'utf' not in code_type.lower():
+            flash("文件编码({})错误，转换成csv UTF-8编码".format(code_type))
+            return render_template("vol_time_update.html",count=old_rows)
+    # new_file_path = os.path.join(os.getcwd(),"data",str(time.time())+".csv")
+    # r = os.popen("iconv -f gbk -t utf8 {} -o {}".format(fpath,new_file_path))
+    # r.read()
+    # fpath = new_file_path
     df = pd.read_csv(fpath,nrows=1)
     columns = df.columns
     valid_columns = ['id', 'name', 'sex', 'faculty', 'stu_id', 'time', 'activity_name',
@@ -43,7 +55,7 @@ def do_vol_time_update():
 
     
 def get_rows():
-    cursor = db.session.execute("select count(*) from vt")
+    cursor = db.session.execute("select count(*) from vol_time")
     res = cursor.fetchall()
     count = res[0][0]
     return count

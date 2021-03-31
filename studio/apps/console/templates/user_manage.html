@@ -12,13 +12,13 @@
                 </tr>
             </thead>
             <tbody>
-                {% for r in roles %}
+                {% for r in r2 %}
                 
                 <tr>
                     <th scope="row">{{r.role_bit}}</th>
                     <td>{{r.role_text}}</td>
                     <td>{{r.description}}</td>
-                    <td>{{r.created_by}}</td>
+                    <td>{{r.username}}</td>
                 </tr>
                 {% endfor %}
             </tbody>

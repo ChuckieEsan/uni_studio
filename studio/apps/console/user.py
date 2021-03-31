@@ -11,7 +11,10 @@ def user_show():
     users = UserUsers.query.filter(UserUsers.delete == False).all()
     def and_op(a,b):
         return int(a) & int(b)
-    return render_template("user_manage.html",and_op=and_op,roles=roles,users=users,title="用户管理") 
+    r2 = db.session.query(UserRoles.role_bit,UserRoles.role_text,UserRoles.description,UserUsers.username)\
+        .outerjoin(UserUsers,UserRoles.created_by==UserUsers.id).all()
+    return render_template("user_manage.html",and_op=and_op,\
+    roles=roles,users=users,title="用户管理",r2=r2) 
 
 @console.route('/role',methods=['POST'])
 def role_update():

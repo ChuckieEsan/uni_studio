@@ -25,7 +25,10 @@ def vol_time_search():
         <td><p>{}</p></td> <td><p>{}</p></td> <td><p>{}</p></td> <td><p>{}</p></td> </tr>"\
         .format(d['activity_time'],d['name'],d['faculty'],d['stu_id'],d['time'],d['activity_faculty'],\
         d['activity_name'],d['duty_person'])
-        r['all_time'] = r['all_time'] + float(d['time'])
+        try:
+            r['all_time'] = r['all_time'] + float(d['time'])
+        except:
+            pass
     return jsonify(r)
 
 @vol_time.route('/top')
