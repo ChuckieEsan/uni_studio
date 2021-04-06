@@ -1,4 +1,5 @@
 from flask import Blueprint,render_template,request,jsonify,session,redirect
+from flask.helpers import url_for
 from studio.models import db,UserUsers
 users = Blueprint("users",__name__,template_folder="templates",static_folder="static")
 
@@ -27,4 +28,5 @@ def users_login():
 
 @users.route('/logout')
 def users_logout():
-    return 'out'
+    session.clear()
+    return redirect(url_for('users.users_entrypoint'))
