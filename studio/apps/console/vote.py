@@ -2,7 +2,7 @@ from studio.apps.console import console as vote
 from studio.utils.time_helper import timestamp_to_datetime
 from studio.utils.hash_helper import md5
 from studio.models import VoteInfo,VoteCandidates,VoteVotes,db
-from flask import url_for,redirect,abort,render_template,request,Markup
+from flask import url_for,redirect,abort,render_template,request,Markup,session
 from faker import Faker
 import time
 import os
