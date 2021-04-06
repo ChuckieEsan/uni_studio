@@ -5,7 +5,8 @@ class UserUsers(db.Model,TimestampMixin,DeleteMixin):
     __tablename__ = "user_users"
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100),nullable=False)
-    email = db.Column(db.String(100),nullable=False)
+    email = db.Column(db.String(100),nullable=False,unique=True)
+    phone = db.Column(db.String(100),nullable=True,unique=True)
     password = db.Column(db.String(100),nullable=False)
     role_bits = db.Column(db.Integer,default=0)
     current_ip = db.Column(db.String(100),nullable=True)
