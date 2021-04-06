@@ -10,7 +10,7 @@ console = Blueprint("console",__name__,template_folder='templates',static_folder
 def console_root():
     roles = UserRoles.query.filter(UserRoles.delete==False).all()
     routes = RouteInterceptors.query.filter(RouteInterceptors.delete==False).all()
-    user_role = int(session.get('role_bits'))
+    user_role = int(session.get('role_bits') or 2)
 
     valid_routes = [r for r in routes if user_role & r.role_bits or user_role==1]
 
