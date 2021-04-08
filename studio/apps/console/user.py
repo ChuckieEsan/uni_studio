@@ -7,26 +7,39 @@ import struct
 def user_show():
     roles = UserRoles.query.filter(UserRoles.delete == False).all()
     for role in roles:
-        role.role_bit = bin(role.role_bit)[2:]
+        role.role_bit_bin = bin(role.role_bit)[2:]
     users = UserUsers.query.filter(UserUsers.delete == False).all()
     def and_op(a,b):
         return int(a) & int(b)
     r2 = db.session.query(UserRoles.role_bit,UserRoles.role_text,UserRoles.description,UserUsers.username)\
         .outerjoin(UserUsers,UserRoles.created_by==UserUsers.id).all()
     return render_template("user_manage.html",and_op=and_op,\
-    roles=roles,users=users,title="用户管理",r2=r2) 
+    roles=roles,users=users,title="用户管理",r2=r2,bin_op=bin) 
 
 @console.route('/role',methods=['POST'])
-def role_update():
+def role_add():
     role_max = db.session.query(func.max(UserRoles.role_bit).label('role_bit')).one()
     i = 0
-    while 1 << i <role_max.role_bit:
-        i = i+1
+    if role_max.role_bit:
+        while 1 << i <role_max.role_bit:
+            i = i+1
     role_bit = 1 << (i+1)
     _u = UserRoles(role_bit = role_bit,role_text=request.values.get('role_text'),description=request.values.get('description'))
     db.session.add(_u)
     db.session.commit()
     return redirect(url_for('console.user_show')) 
+
+@console.route('/update',methods=['POST'])
+def role_update():
+    roles = request.form.getlist('roles')
+    id = request.form['id']
+    user = UserUsers.query.filter(UserUsers.id==id).first()
+    user.role_bits = 0
+    for r in roles:
+        user.role_bits |= int(r)
+    db.session.commit()
+    return redirect(url_for('console.user_show'))
+
 
 # @console.route('/import')
 # def imports():
