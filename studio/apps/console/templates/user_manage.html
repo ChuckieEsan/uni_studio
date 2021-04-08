@@ -4,7 +4,7 @@
     <div class="row">
         <table class="table">
             <thead>
-                <tr> 
+                <tr>
                     <th scope="col">role_bit</th>
                     <th scope="col">role_text</th>
                     <th scope="col">description</th>
@@ -13,9 +13,9 @@
             </thead>
             <tbody>
                 {% for r in r2 %}
-                
+
                 <tr>
-                    <th scope="row">{{r.role_bit}}</th>
+                    <th scope="row">{{bin_op(r.role_bit)[2:]}}</th>
                     <td>{{r.role_text}}</td>
                     <td>{{r.description}}</td>
                     <td>{{r.username}}</td>
@@ -24,7 +24,7 @@
             </tbody>
         </table>
     </div>
-    <form method="POST" action="{{url_for('console.role_update')}}">
+    <form method="POST" action="{{url_for('console.role_add')}}">
         <input type="text" name="role_text" placeholder="role_text" required>
         <input type="text" name="description" placeholder="description">
         <input type="submit">
@@ -33,7 +33,7 @@
     <div class="row">
         <table class="table">
             <thead>
-                <tr> 
+                <tr>
                     <th scope="col">id</th>
                     <th scope="col">用户名</th>
                     <th scope="col">邮箱</th>
@@ -42,25 +42,31 @@
             </thead>
             <tbody>
                 {% for u in users %}
-                
+
                 <tr>
                     <th scope="row">{{u.id}}</th>
                     <td>{{u.username}}</td>
                     <td>{{u.email}}</td>
                     <td>
-                        {{u.role_bits}}:
-                        {% for r in roles %}
-                        {% if and_op(u.role_bits,r.role_bit) %}
-                        {{r.role_text}}| 
-                        {% endif %}
-                        {% endfor %}
+                        <div hidden>{{u.role_bits}}</div>
+
+                        <form method="POST" action="{{url_for('console.role_update')}}">
+                            <input type="text" hidden value="{{u.id}}" name="id">
+                            {% for r in roles %}
+
+                            <input type="checkbox" name="roles" value="{{r.role_bit}}" {% if and_op(u.role_bits,r.role_bit) %}
+                                checked="checked" {% endif %}>
+                            <label for="vehicle1">{{r.role_text}}</label>
+                            {% endfor %}
+                        <input type="submit">
+                        </form>
                     </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-   
-    
+
+
 </div>
 {% endblock %}
