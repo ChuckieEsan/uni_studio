@@ -1,0 +1,47 @@
+{% extends 'common_base.html'%}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <table class="table">
+            <thead>
+                <tr>
+                    {% for c in _class.__dict__.keys() %}
+                    {% if c[0]!="_" %}
+                    <th scope="col">{{c}}:{{type(getattr(_class,c))}}</th>
+                    {% endif %}
+                    {% endfor %}
+                    <th scope="col">Form</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for d in data %}
+                <tr>
+                    {% for c in _class.__dict__.keys() %}
+                    {% if c[0] != '_' %}
+                    {% if loop.index0 == 1 %}
+                    <th scope="row">{{d.__dict__[c]}}</th>
+                    {% else %}
+                    <td>{{d.__dict__[c]}}</td>
+                    {% endif %}
+                    {% endif %}
+                    {% endfor %}
+                    <td>
+                        <form method="POST" action="{{url_for('console.user_crud')}}" id="updateForm{{loop.index}}">
+                            <select name="key" form="updateForm{{loop.index}}">
+                                {% for c in _class.__dict__.keys() %}
+                                {% if c[0] != '_' %}
+                                <option value="{{c}}">{{c}}</option>
+                                {% endif %}
+                                {% endfor %}
+                            </select>
+                            <input type="text" hidden name="id" value="{{d.id}}">
+                            <input type="text" name="value">
+                            <input type="submit">
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+    </div>
+</div>
+{% endblock %}
