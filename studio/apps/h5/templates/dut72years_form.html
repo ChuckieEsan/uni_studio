@@ -1,0 +1,20 @@
+{% extends 'common_base.html'%}
+{% block content %}
+<link href="{{url_for('h5.static',filename='css/72years.css')}}" rel="stylesheet" type="text/css">
+<div class="container main">
+    <div style="text-align: center;">
+
+        <form action="{{url_for('h5.celeb_72_card')}}" method="POST" 
+        style="margin-top: 50%;">
+            <a href="#">
+                <img src="{{url_for('h5.static',filename='72years/button.jpg')}}" width="50px" height="50px">
+                
+            </a>
+            <br>
+            <input type="text" name="name" class="input">
+            <input type="text" name="identity" class="input">
+            <input type="text" name="location" class="input">
+        </form>
+    </div>
+</div>
+{% endblock %}
