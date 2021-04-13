@@ -10,11 +10,6 @@
     >
         <button type="submit" style="display: none" id="submit"></button>
         <div class="form-group">
-            <a href="#" onclick="handleSubmit()">
-                <img src="{{url_for('h5.static',filename='72years/button.png')}}" width="50px" height="50px" />
-            </a>
-        </div>
-        <div class="form-group">
             <input type="text" name="name" class="form-control" placeholder="我的名字：" required maxlength="6" />
         </div>
         <div class="form-group">
@@ -42,6 +37,11 @@
         </div>
         <div class="form-group" style="display: none" id="wish_other">
             <input type="text" name="wish_other" placeholder="我的祝福：" class="form-control" maxlength="100" />
+        </div>
+        <div class="form-group">
+            <a href="#" onclick="handleSubmit()">
+                <img src="{{url_for('h5.static',filename='72years/button.png')}}" width="50px" height="50px" />
+            </a>
         </div>
     </form>
 </div>
