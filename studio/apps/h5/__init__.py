@@ -1,4 +1,4 @@
-from flask import Blueprint,render_template,request,make_response
+from flask import Blueprint,render_template,request,make_response,current_app
 import random
 h5 = Blueprint("h5",__name__,template_folder="templates",static_folder="static")
 
@@ -9,6 +9,7 @@ def celeb_72_form():
 @h5.route('/72years/card',methods=['GET','POST'])
 def celeb_72_card():
     data = request.values.to_dict()
+    current_app.logger.info(data)
     back_images = ['orange.png','blue.png','gold.png','green.png','purple.png','red.png','silver.png']
     if data['wish'] =='others':
         data['wish'] = data['wish_other']
