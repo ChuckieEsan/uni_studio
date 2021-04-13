@@ -1,0 +1,49 @@
+{% extends 'common_base.html'%}
+{% block content %}
+<style>
+</style>
+<div class="container" style="padding: 0;text-align: center; ">
+
+    <canvas id="cvs" style="width:100%;height:fit-content">
+
+    </canvas>
+    <div class="btn-group" role="group">
+        <button type="button" class="btn btn-secondary">保存</button>
+        <button type="button" class="btn btn-secondary">分享</button>
+        <button type="button" class="btn btn-secondary">重新生成</button>
+    </div>
+</div>
+<script>
+    let cvs = document.getElementById("cvs")
+    let text = `亲爱的大工：<br/>\t我是${"{{data.name}}"}，
+    是一名${"{{data.identity}}"}，
+    我在${"{{data.location}}"}祝大工${"{{data.wish}}"}
+    <br/><br/>`
+    console.log(text)
+    text = `<svg xmlns='http://www.w3.org/2000/svg' width='${cvs.width*0.6}' height='200'>` +
+                "<foreignObject width='100%' height='100%'>" +
+                "<div xmlns='http://www.w3.org/1999/xhtml' style='font-size:14px;'>"+
+                `<p style='margin-top: 0px'>${text}</p>` +`<p style='text-align:right'>你的DUTER</p>`+
+                "</div>" +
+                "</foreignObject>" +
+                "</svg>";
+    let img = new Image()
+    img.src = "{{url_for('h5.static',filename='72years/'+image[0])}}"
+    cvs.height = cvs.width * 1.5
+    img.onload = function () {
+        let ctx = cvs.getContext('2d')
+        console.log(cvs.height, cvs.width)
+        ctx.drawImage(this, 0, 0, cvs.width, cvs.height)
+
+        let DOMURL = window.URL || window.webkitURL || window
+        let svg = new Blob([text], { type: 'image/svg+xml' })
+        let url = DOMURL.createObjectURL(svg)
+        let imgText = new Image()
+        imgText.onload = function(){
+            ctx.drawImage(this,0.2*cvs.width,0.4*cvs.width)
+            DOMURL.revokeObjectURL(url)
+        }
+        imgText.src = url
+    }
+</script>
+{% endblock %}

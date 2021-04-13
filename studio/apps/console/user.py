@@ -1,4 +1,4 @@
-from flask import render_template,redirect,request,g,url_for,current_app
+from flask import render_template,redirect,request,abort,g,url_for,current_app
 from studio.models import db,UserRoles,UserUsers
 from studio.apps.console import console
 from sqlalchemy import func
@@ -40,6 +40,27 @@ def role_update():
     db.session.commit()
     return redirect(url_for('console.user_show'))
 
+@console.route('/user/crud',methods=['GET','POST','PUT','DELETE'])
+def user_crud():
+    target_class = UserUsers
+    if request.method == "GET":
+        users = target_class.query.all()
+        # wip: figure out the actual data type
+        print(getattr(target_class,'id').impl)
+        return render_template('common_crud.html',
+        data=users,_class=target_class,type=type,getattr=getattr)
+
+    elif request.method=="POST":
+        key = request.values.get('key')
+        value = request.values.get('value')
+        _id = request.values.get('id')
+        if not key or not value:
+            abort(500)
+        data = target_class.query.filter(getattr(target_class,'id')==_id).first()
+        if data:
+            setattr(data,key,value)
+            db.session.commit()
+        return redirect(url_for('console.user_crud'))
 
 # @console.route('/import')
 # def imports():

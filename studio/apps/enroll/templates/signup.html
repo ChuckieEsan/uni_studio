@@ -1,0 +1,274 @@
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+        <title>报名</title>
+        <link rel="stylesheet" type="text/css" href="https://www.layuicdn.com/layui/css/layui.css" />
+        <script src="https://static.runoob.com/assets/jquery-validation-1.14.0/lib/jquery.js"></script>
+        <script src="https://static.runoob.com/assets/jquery-validation-1.14.0/dist/jquery.validate.min.js"></script>
+        <style>
+            *{
+                box-sizing: border-box;
+            }
+            body{
+                background-color: rgb(85, 85, 85);
+            }
+            .error {
+                color: rgba(255, 0, 0, 0.8);
+            }
+            .signup__main {
+                width: 50%;
+                height: 100%;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #fff;
+            }
+            .signup__header {
+                margin-bottom: 20px;
+                padding: 10px;
+                text-align: center;
+            }
+            .signup__body {
+            }
+        </style>
+    </head>
+    <body>
+        <div class="signup__main">
+            <h1 class="signup__header">报名表</h1>
+            <div class="signup__body">
+                <form class="layui-form layui-form-pane" id="application" action="">
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">id</label>
+                        <div class="layui-input-block">
+                            <input type="text" name="id" placeholder="" autocomplete="off" class="layui-input" />
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">姓名</label>
+                        <div class="layui-input-block">
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                placeholder="姓名"
+                                autocomplete="off"
+                                class="layui-input"
+                            />
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">性别</label>
+                        <div class="layui-input-block">
+                            <input type="radio" name="sex" value="男" title="男" checked />
+                            <input type="radio" name="sex" value="女" title="女" />
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">学号</label>
+                        <div class="layui-input-inline">
+                            <input
+                                type="text"
+                                id="num"
+                                name="num"
+                                placeholder="学号"
+                                autocomplete="off"
+                                class="layui-input"
+                            />
+                        </div>
+                        <div id="num-tips" class="layui-form-mid error"></div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">学部</label>
+                        <div class="layui-input-block">
+                            <select id="dept" name="dept">
+                                <option value=""></option>
+                                <option value="电子信息与电气工程学部">电子信息与电气工程学部</option>
+                                <option value="建设工程学部">建设工程学部</option>
+                                <option value="人文与社会科学学部">人文与社会科学学部</option>
+                                <option value="运载工程与力学学部">运载工程与力学学部</option>
+                                <option value="材料科学与工程学院">材料科学与工程学院</option>
+                                <option value="光电工程与仪器科学学院">光电工程与仪器科学学院</option>
+                                <option value="化工学院">化工学院</option>
+                                <option value="环境学院">环境学院</option>
+                                <option value="机械工程学院">机械工程学院</option>
+                                <option value="建筑与艺术学院">建筑与艺术学院</option>
+                                <option value="经济管理学院">经济管理学院</option>
+                                <option value="能源与动力学院">能源与动力学院</option>
+                                <option value="生物工程学院">生物工程学院</option>
+                                <option value="数学科学学院">数学科学学院</option>
+                                <option value="外国语学院">外国语学院</option>
+                                <option value="物理学院">物理学院</option>
+                                <option value="张大煜学院">张大煜学院</option>
+                                <option value="大连理工大学白俄罗斯国立大学联合学院">
+                                    大连理工大学白俄罗斯国立大学联合学院
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">手机</label>
+                        <div class="layui-input-block">
+                            <input
+                                type="text"
+                                id="phone"
+                                name="phone"
+                                placeholder="手机"
+                                autocomplete="off"
+                                class="layui-input"
+                            />
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">邮箱</label>
+                        <div class="layui-input-block">
+                            <input
+                                type="text"
+                                id="email"
+                                name="email"
+                                placeholder="邮箱"
+                                autocomplete="off"
+                                class="layui-input"
+                            />
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="layui-form-label">特长</label>
+                        <div class="layui-input-block">
+                            <input
+                                type="text"
+                                id="speciality"
+                                name="speciality"
+                                placeholder="特长（如：写作/办公软件/ps/摄影...）"
+                                autocomplete="off"
+                                class="layui-input"
+                            />
+                        </div>
+                    </div>
+                    <div class="layui-form-item layui-form-text">
+                        <label class="layui-form-label">学生工作经历</label>
+                        <div class="layui-input-block">
+                            <textarea
+                                id="info"
+                                name="info"
+                                placeholder="学生工作经历"
+                                class="layui-textarea"
+                            ></textarea>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <div class="layui-input-block">
+                            <button class="layui-btn" lay-submit lay-filter="formDemo">提交</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script src="https://www.layuicdn.com/layui/layui.js"></script>
+        <script>
+            layui.use(["form"], function () {
+                var form = layui.form;
+            });
+        </script>
+        <script>
+            $.validator.setDefaults({
+                submitHandler: function (form) {
+                    if ($("#dept").val() == "") alert("请选择学部");
+                    else if ($("#num-tips").text() == "") {
+                        form.submit();
+                        alert("报名成功啦");
+                    }
+                },
+            });
+            $(document).ready(function () {
+                // 在键盘按下并释放及提交后验证提交表单
+                $("#application").validate({
+                    rules: {
+                        name: "required",
+                        sex: "required",
+                        num: {
+                            required: true,
+                            digits: true,
+                            maxlength: 20,
+                        },
+                        phone: {
+                            required: true,
+                            digits: true,
+                            maxlength: 11,
+                            minlength: 11,
+                        },
+                        email: {
+                            required: true,
+                            email: true,
+                        },
+                        speciality: "required",
+                        dept: "required",
+                        info: "required",
+                    },
+                    messages: {
+                        //验证错误信息
+                        name: {
+                            required: "请输入用户名",
+                        },
+                        sex: {
+                            required: "请输入性别",
+                        },
+                        num: {
+                            required: "请输入学号",
+                            digits: "请输入正确的学号",
+                            maxlength: "请输入正确的学号",
+                        } /*
+                        faculty:{
+                            required: "请输入所在的学部（院）"
+                        },*/,
+                        dept: "请选择学部",
+                        phone: {
+                            required: "请输入手机号",
+                            digits: "请输入正确的手机号",
+                            maxlength: "请输入正确的手机号",
+                            minlength: "请输入正确的手机号",
+                        },
+                        email: "请输入正确的邮箱",
+                        speciality: {
+                            required: "此字段不能为空",
+                        },
+                        info: {
+                            required: "此字段不能为空",
+                        },
+                    },
+                });
+
+                var form_id = document.location.search;
+                if (form_id) {
+                    form_id = form_id.substr(4);
+                    $("#form-id").val(form_id);
+                }
+                //判断学号输入框
+
+                $("#num")
+                    .on("blur", function () {
+                        if (!$("#num").val()) $("#num-tips").text("");
+                        else if (!isNaN($("#num").val())) {
+                            check_num(form_id);
+                        }
+                    })
+                    .on("keydown", function (e) {
+                        if (e.keyCode == 13 && $("num").val() && !isNaN($("#num").val())) check_num(form_id);
+                    });
+            });
+
+            function check_num(id) {
+                var num = $("#num").val();
+                var url = "https://www.dutbit.com/enroll/index.php/form/checknum/" + id + "?num=" + num;
+                $.ajax({
+                    type: "post",
+                    url: url,
+                    datatype: "text",
+                    success: function (res) {
+                        console.log(res);
+                        if (res == 0) $("#num-tips").text("该学号已报名过");
+                        else $("#num-tips").text("");
+                    },
+                });
+            }
+        </script>
+    </body>
+</html>

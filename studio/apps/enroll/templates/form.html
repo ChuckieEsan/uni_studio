@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>报名管理</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css" />
+        <script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
+        <script src="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+        <link
+            href="https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.18.2/bootstrap-table.min.css"
+            rel="stylesheet"
+        />
+        <script src="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+        <script src="https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.18.2/bootstrap-table.min.js"></script>
+        <script src="https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.18.2/locale/bootstrap-table-zh-CN.min.js"></script>
+        <script type="text/javascript">
+            function doSummary() {
+                var jsonarray = $.parseJSON($("#form_content_src").text());
+                //alert(jsonarray);
+                /*$.each(jsonarray,function(i,n){
+                    alert(n.email);
+                })*/
+                var sum1 = jsonarray.length;
+                var acceptedSum = 0;
+                var declinedSum = 0;
+                var notDecidedSum = 0;
+                var pendingSum = 0;
+                var maleSum = 0;
+                var femaleSum = 0;
+                $.each(jsonarray, function (i, n) {
+                    if (n.status == "1") acceptedSum += 1;
+                    else if (n.status == "-1") notDecidedSum += 1;
+                    else if (n.status == "999") pendingSum += 1;
+                    else if (n.status == "0") declinedSum += 1;
+                    else console.log("");
+                    if (n.sex == "男") maleSum += 1;
+                    else if (n.sex == "女") femaleSum += 1;
+                    else console.log("");
+                });
+                $("#sum1").text(sum1);
+                $("#pending").text(pendingSum);
+                $("#accepted").text(acceptedSum);
+                $("#declined").text(declinedSum);
+                $("#notDecided").text(notDecidedSum);
+                $("#maleSum").text(maleSum);
+                $("#femaleSum").text(femaleSum);
+            }
+
+            function opt_treat() {
+                var data = $.parseJSON($("#form_content_src").text());
+                for (let i = 0; i < data.length; ++i) {
+                    if (data[i].status == 999) data[i].state_show = "未处理";
+                    else if (data[i].status == 1) data[i].state_show = "入选";
+                    else if (data[i].status == 0) data[i].state_show = "不要";
+                    else if (data[i].status == -1) data[i].state_show = "待定";
+                }
+                $("#form_content_src").text(JSON.stringify(data));
+                //console.log(data);
+                console.log("status处理完成");
+            }
+
+            function refreshContent() {
+                $.ajax({
+                    type: "POST",
+                    async: true,
+                    url: "/enroll/index.php/Form/ajax/<?php echo $form_spec_array[0]['identifier']; ?>",
+                    success: function (result) {
+                        console.log("ajax get refreshed content success:" + result);
+                        $("#form_content_src").text(result);
+                        opt_treat();
+                        var data = $.parseJSON($("#form_content_src").text());
+                        $("#table").bootstrapTable("load", data);
+                        doSummary();
+                    },
+                    error: function (e) {
+                        console.log("fail:" + e.status);
+                        console.log(e.responseText);
+                    },
+                });
+            }
+
+            function doFilter(selection) {
+                var opdata = $.parseJSON($("#form_content_src").text());
+                if (selection == "all") {
+                    refreshContent();
+                } else if (selection == "tbp") {
+                    opdata = opdata.filter(function (n) {
+                        return n.status == "999";
+                    });
+                    $("#table").bootstrapTable("load", opdata);
+                } else if (selection == "acc") {
+                    opdata = opdata.filter(function (n) {
+                        return n.status == "1";
+                    });
+                    $("#table").bootstrapTable("load", opdata);
+                } else if (selection == "dec") {
+                    opdata = opdata.filter(function (n) {
+                        return n.status == "0";
+                    });
+                    $("#table").bootstrapTable("load", opdata);
+                } else if (selection == "tbd") {
+                    opdata = opdata.filter(function (n) {
+                        return n.status == "-1";
+                    });
+                    $("#table").bootstrapTable("load", opdata);
+                } else {
+                }
+            }
+        </script>
+        <style>
+            .info-box__wrap {
+                display: flex;
+                width: 100%;
+            }
+            .info-box__box {
+                display: flex;
+                flex: 5 1 auto;
+                margin: 10px;
+                border-radius: 5px;
+            }
+            .info-box__left {
+                display: flex;
+                flex: none;
+                justify-content: center;
+                align-items: center;
+                width: 80px;
+                color: #fff;
+            }
+            .info-box__right {
+                display: flex;
+                flex: auto;
+                justify-content: center;
+                align-items: center;
+            }
+            .info-box__box--total {
+                background-color: #fff4e5;
+                border: 1px solid #fed69e;
+                color: #ff9706;
+            }
+            .info-box__box--total .info-box__left {
+                background-color: #feb95b;
+                border-right: 1px solid #fed69e;
+            }
+            .info-box__box--type {
+                background-color: #e6f3e0;
+                border: 1px solid #aed79a;
+                color: #4bc010;
+            }
+            .info-box__box--type .info-box__left {
+                background-color: #99cd7f;
+                border-right: 1px solid #aed79a;
+            }
+            .info-box__box--gender {
+                background-color: #fde8ef;
+                border: 1px solid #f7aac4;
+                color: #ff518b;
+            }
+            .info-box__box--gender .info-box__left {
+                background-color: #f1729d;
+                border-right: 1px solid #f7aac4;
+            }
+            .info-box__box--qrcode {
+                flex: 1 1 auto;
+                background-color: #e2f4fc;
+                border: 1px solid #6ec9ef;
+                color: #26beff;
+            }
+            .info-box__box--qrcode .info-box__left {
+                background-color: #4cbdec;
+                border-right: 1px solid #6ec9ef;
+            }
+            .data-block__block {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin: 0 10px;
+            }
+            .data-block__title {
+                font-size: 20px;
+                margin-right: 5px;
+            }
+            .data-block__value {
+                font-size: 35px;
+            }
+            .data-block__tail {
+                font-size: 20px;
+                margin-left: 5px;
+            }
+        </style>
+    </head>
+    <body style="margin-top: 40px">
+        <span style="display: none" id="form_content_src">
+            [ { "create_time": "11", "num": "2019", "name": "刘", "sex": "男", "dept": "电信", "email": "11", "phone":
+            "11", "speciality": "11", "info": "11", "status": "1", "id": "11" } ,{ "create_time": "11", "num": "2019",
+            "name": "刘", "sex": "男", "dept": "电信", "email": "11", "phone": "11", "speciality": "11", "info": "11",
+            "status": "1", "id": "11" },{ "create_time": "11", "num": "2019", "name": "刘", "sex": "男", "dept": "电信",
+            "email": "11", "phone": "11", "speciality": "11", "info": "11", "status": "1", "id": "11" }]
+        </span>
+        <nav class="navbar navbar-expand-sm bg-secondary navbar-dark fixed-top" style="height: 40px">
+            <a class="navbar-brand" href="#">报名管理：</a>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">当前登录:</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">退出登录</a>
+                </li>
+            </ul>
+        </nav>
+        <div class="container-fluid">
+            <div class="info-box__wrap">
+                <div class="info-box__box info-box__box--total">
+                    <div class="info-box__left">
+                        <i class="fa fa-user fa-3x"></i>
+                    </div>
+                    <div class="info-box__right">
+                        <div class="data-block__block">
+                            <span class="data-block__title">总人数:</span>
+                            <span class="data-block__value" id="sum">999</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-box__box info-box__box--type">
+                    <div class="info-box__left">
+                        <i class="fa fa-list fa-3x"></i>
+                    </div>
+                    <div class="info-box__right">
+                        <div class="data-block__block">
+                            <span class="data-block__title">待处理:</span>
+                            <span class="data-block__value" id="pending">100</span>
+                        </div>
+                        <div class="data-block__block">
+                            <span class="data-block__title">入选人数:</span>
+                            <span class="data-block__value" id="accepted">100</span>
+                        </div>
+                        <div class="data-block__block">
+                            <span class="data-block__title">待定人数:</span>
+                            <span class="data-block__value" id="notDecided">100</span>
+                        </div>
+                        <div class="data-block__block">
+                            <span class="data-block__title">已拒人数:</span>
+                            <span class="data-block__value" id="declined">100</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-box__box info-box__box--gender">
+                    <div class="info-box__left">
+                        <i class="fa fa-venus-mars fa-3x"></i>
+                    </div>
+                    <div class="info-box__right">
+                        <div class="data-block__block">
+                            <span class="data-block__value" id="maleSum">20</span>
+                            <span class="data-block__value">/</span>
+                            <span class="data-block__value" id="femaleSum">20</span>
+                            <span class="data-block__tail">男/女</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-box__box info-box__box--qrcode">
+                    <span class="icon fa-stack fa-2x" id="qrcode" data-toggle="modal" data-target="#myModal"></span>
+                    <a href="#" style="text-decoration: none; color: black" class="data-content" id="enrollLink">
+                        报名页面
+                    </a>
+                </div>
+            </div>
+        </div>
+        <!-- <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="card">
+                <div class="card-header">总览</div>
+                <div class="card-body"></div>
+            </div>
+        </div> -->
+        <!--      modal for qr code      -->
+        <div
+            class="modal fade"
+            id="myModal"
+            tabindex="-1"
+            role="dialog"
+            aria-labelledby="myModalLabel"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="myModalLabel">报名二维码</h4>
+                    </div>
+                    <div class="modal-body">
+                        <span id="qrcode-big"><!-- qr code here --></span>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal -->
+        </div>
+        <!--        end of modal        -->
+        <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="btn-group btn-group-justified" role="group" aria-label="...">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-primary" onclick="doFilter('all')">全部</button>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-primary" onclick="doFilter('tbp')">待处理</button>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-primary" onclick="doFilter('acc')">已录取</button>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-primary" onclick="doFilter('tbd')">待定</button>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-primary" onclick="doFilter('dec')">已拒绝</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body"></div>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <table id="table"></table>
+        </div>
+        <script type="text/javascript" src="/enroll/static/js/qrcode.min.js"></script>
+        <script>
+            var $table = $("#table");
+            $(function () {
+                opt_treat(); //处理status
+                var data = $.parseJSON($("#form_content_src").text());
+                $table.bootstrapTable({
+                    data: data,
+                    search: true,
+                    showColumns: true,
+                    showRefresh: true,
+                    columns: [
+                        {
+                            field: "create_time",
+                            title: "报名时间",
+                        },
+                        {
+                            field: "num",
+                            title: "学号",
+                        },
+                        {
+                            field: "name",
+                            title: "姓名",
+                        },
+                        {
+                            field: "sex",
+                            title: "性别",
+                        },
+                        {
+                            field: "dept",
+                            title: "学部院",
+                        },
+                        {
+                            field: "email",
+                            title: "邮箱",
+                        },
+                        {
+                            field: "phone",
+                            title: "手机号",
+                        },
+                        {
+                            field: "speciality",
+                            title: "特长",
+                        },
+                        {
+                            field: "info",
+                            title: "工作经历",
+                        },
+                        {
+                            field: "state_show",
+                            title: "状态",
+                        },
+                        {
+                            field: "id",
+                            title: "操作",
+                            events: operateEvents,
+                            formatter: operateFormatter,
+                        },
+                    ],
+                });
+            });
+
+            function operateFormatter(value, row, index) {
+                return [
+                    '<button type="button" class="RoleOfIn btn btn-primary  btn-sm" >入选</button>',
+
+                    '<button type="button" class="RoleOfdelete btn btn-default  btn-sm" >不要</button>',
+
+                    '<button type="button" class="RoleOfwait btn btn-default  btn-sm" >待定</button>',
+                ].join("");
+            }
+            window.operateEvents = {
+                //999未处理，0不要，-1待定，1要
+                "click .RoleOfIn": function (e, value, row, index) {
+                    console.log("要了");
+                    var treat_info = {
+                        num: row.num,
+                        status: 1,
+                    };
+                    //alert(JSON.stringify(treat_info));
+                    $.ajax({
+                        type: "POST",
+                        async: true,
+                        //contentType: "application/json;charset=UTF-8",
+                        url: "/enroll/index.php/Form/page/<?php echo $form_spec_array[0]['identifier']; ?>",
+                        //data : JSON.stringify(treat_info),
+                        data: {
+                            num: row.num,
+                            status: 1,
+                        },
+                        success: function (result) {
+                            console.log("success:" + result);
+                            refreshContent();
+                        },
+                        error: function (e) {
+                            console.log("fail:" + e.status);
+                            console.log(e.responseText);
+                        },
+                    });
+                },
+                "click .RoleOfdelete": function (e, value, row, index) {
+                    console.log("不要");
+                    console.log(row.num);
+                    var treat_info = {
+                        num: row.num,
+                        status: 0,
+                    };
+                    $.ajax({
+                        type: "POST",
+                        //contentType: "application/json;charset=UTF-8",
+                        url: "/enroll/index.php/Form/page/<?php echo $form_spec_array[0]['identifier']; ?>",
+                        data: {
+                            num: row.num,
+                            status: 0,
+                        },
+                        success: function (result) {
+                            console.log("success:" + result);
+                            refreshContent();
+                        },
+                        error: function (e) {
+                            console.log("fail:" + e.status);
+                            console.log(e.responseText);
+                        },
+                    });
+                },
+                "click .RoleOfwait": function (e, value, row, index) {
+                    console.log("待定");
+                    var treat_info = {
+                        num: row.num,
+                        status: -1,
+                    };
+                    $.ajax({
+                        type: "POST",
+                        //contentType: "application/json;charset=UTF-8",
+                        url: "/enroll/index.php/Form/page/<?php echo $form_spec_array[0]['identifier']; ?>",
+                        data: {
+                            num: row.num,
+                            status: -1,
+                        },
+                        success: function (result) {
+                            console.log("success:" + result);
+                            refreshContent();
+                        },
+                        error: function (e) {
+                            console.log("fail:" + e.status);
+                            console.log(e.responseText);
+                        },
+                    });
+                },
+            };
+
+            //二维码
+
+            var qrcode = new QRCode(document.getElementById("qrcode"), {
+                width: 200,
+                height: 200,
+            });
+            var qrcode2 = new QRCode(document.getElementById("qrcode-big"), {
+                width: 500,
+                height: 500,
+            });
+            function makeCode() {
+                var loc = document.location.href;
+                loc = loc.substr(loc.lastIndexOf("/") + 1);
+                var url = "https://www.dutbit.com/enroll/index.php/form/signup?id=" + loc;
+                $("#enrollLink").attr("href", url);
+                qrcode.makeCode("<?php echo $short_link;?>");
+                qrcode2.makeCode("<?php echo $short_link;?>");
+            }
+            $(document).ready(function () {
+                makeCode();
+            });
+        </script>
+    </body>
+</html>

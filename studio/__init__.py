@@ -51,6 +51,7 @@ from .apps.staticfile.app import app as staticfileapp
 from .apps.vote import vote as voteapp
 from .apps.users import users as usersapp
 from .apps.enroll import enroll as enrollapp
+from .apps.h5 import h5 as h5app
 subdomains = {
     'DEVELOPMENT':{
         'www':'',
@@ -128,6 +129,7 @@ def create_app():
         app.register_blueprint(vol_timeapp,url_prefix="/vol_time",subdomain=app.config['SUBDOMAINS']['www'])
         app.register_blueprint(usersapp,url_prefix="/user",subdomain=app.config['SUBDOMAINS']['www'])
         app.register_blueprint(enrollapp,url_prefix = "/enroll",subdomain=app.config['SUBDOMAINS']['www'])
+        app.register_blueprint(h5app,url_prefix = "/h5",subdomain=app.config['SUBDOMAINS']['www'])
         #app.config['SERVER_NAME'] = 'dutbit.com'
         app.config['SECRET_KEY'] = 'Do not go gentle into that good night'
         app.config['FILESERVICE_UPLOAD_FOLDER'] = join_upload_dir('data/fileservice')
