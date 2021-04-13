@@ -41,17 +41,21 @@
         dlLink.click();
         document.body.removeChild(dlLink);
     }
+    function buildSvgImageUrl(svg) {
+        b64 = window.btoa(unescape(encodeURIComponent(svg)));
+        return "data:image/svg+xml;base64," + b64;
+    }
     $("#reload").click(() => {
-        location.reload();
+        window.location.href = "{{url_for('h5.celeb_72_form')}}"
     });
-    $("#share").click(() => {});
+    $("#share").click(() => { });
     $("#save").click(() => {
         exportCanvasAsPNG(document.getElementById("main__cvs"), `dut72years_card_${Date.parse(new Date())}.png`);
     });
 
     let cvs = document.getElementById("main__cvs");
     let img = new Image();
-    img.setAttribute("crossOrigin", "Anonymous");
+    img.setAttribute('crossorigin', 'anonymous');
     img.src = "{{url_for('h5.static',filename='72years/'+image[0])}}";
     img.onload = function () {
         let ctx = cvs.getContext("2d");
@@ -68,27 +72,26 @@
             `<foreignObject width='${cvs.width * 0.6}' height='${cvs.height * 0.45}'>` +
             "<div xmlns='http://www.w3.org/1999/xhtml' style='padding:20px;font-size:70px;'>" +
             `<p style='margin-top: 0px'>亲爱的大工：</p>` +
-            `<p style='text-indent: 2em;'>${text}</p><br/><br/>` +
+            `<p style='text-indent: 2em;'>${text}</p>` +
             `<p style='text-align:right'>你的DUTER</p>` +
             "</div>" +
             "</foreignObject>" +
             "</svg>";
-        let DOMURL = window.URL || window.webkitURL || window;
-        let svg = new Blob([text], { type: "image/svg+xml" });
-        let url = DOMURL.createObjectURL(svg);
+        let url = buildSvgImageUrl(text)
         let imgText = new Image();
-        imgText.setAttribute("crossOrigin", "Anonymous");
+        imgText.setAttribute('crossorigin', 'anonymous');
         imgText.onload = function () {
             ctx.drawImage(this, 0.2 * cvs.width, 0.27 * cvs.height);
-            DOMURL.revokeObjectURL(url);
         };
+
         imgText.src = url;
 
         let imgQR = new Image()
-        imgQR.setAttribute('crossOrigin','Anonymous')
-        imgQR.src ="{{url_for('h5.static',filename='72years/qr.jpg')}}"
-        imgQR.onload = function(){
-            ctx.drawImage(this,0.2*cvs.width,0.62*cvs.height,0.17*cvs.width,0.17*cvs.width)
+        imgQR.setAttribute('crossorigin', 'anonymous');
+
+        imgQR.src = "{{url_for('h5.static',filename='72years/qr.jpg')}}"
+        imgQR.onload = function () {
+            ctx.drawImage(this, 0.2 * cvs.width, 0.62 * cvs.height, 0.17 * cvs.width, 0.17 * cvs.width)
         }
 
         document.querySelector(".main_svg-test").innerHTML = text;
