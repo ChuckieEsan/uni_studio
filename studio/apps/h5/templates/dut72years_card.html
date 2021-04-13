@@ -1,33 +1,83 @@
 {% extends 'common_base.html'%}
 {% block content %}
+<link href="{{url_for('h5.static',filename='css/72years.css')}}" rel="stylesheet" type="text/css">
 <style>
 </style>
-<div class="container" style="padding: 0;text-align: center; ">
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">分享此贺卡生成页面</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <img src="{{url_for('h5.static',filename='72years/button.png')}}" width="50%" height="50%">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
 
-    <canvas id="cvs" style="width:100%;height:fit-content">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container" style="padding: 0;text-align: center; display:inline-block;vertical-align: middle;height: 100%;">
+    
+    <canvas id="cvs" style="width:100%;height:fit-content;margin-top: 25%;">
 
     </canvas>
     <div class="btn-group" role="group">
-        <button type="button" class="btn btn-secondary">保存</button>
-        <button type="button" class="btn btn-secondary">分享</button>
-        <button type="button" class="btn btn-secondary">重新生成</button>
+        <button type="button" class="btn btn-primary" id="save">
+            保存</button>
+            <button type="button" class="btn btn-info" id="reload">
+                重新生成</button>
+        <button type="button" class="btn btn-success" id="share" data-toggle="modal" data-target="#exampleModal">
+            分享</button>
     </div>
 </div>
 <script>
+    function exportCanvasAsPNG(id, fileName) {
+
+        var canvasElement = document.getElementById(id);
+
+        var MIME_TYPE = "image/png";
+
+        var imgURL = canvasElement.toDataURL(MIME_TYPE);
+
+        var dlLink = document.createElement('a');
+        dlLink.download = fileName;
+        dlLink.href = imgURL;
+        dlLink.dataset.downloadurl = [MIME_TYPE, dlLink.download, dlLink.href].join(':');
+
+        document.body.appendChild(dlLink);
+        dlLink.click();
+        document.body.removeChild(dlLink);
+    }
+</script>
+<script>
+    $("#reload").click(() => { location.reload() })
+    $("#share").click(() => { })
+    $("#save").click(() => {
+        exportCanvasAsPNG("cvs",`dut72years_card_${Date.parse( new Date())}.png`)
+    })
+</script>
+<script>
     let cvs = document.getElementById("cvs")
-    let text = `亲爱的大工：<br/>\t我是${"{{data.name}}"}，
+    let text = `亲爱的大工：<br/>我是${"{{data.name}}"}，
     是一名${"{{data.identity}}"}，
     我在${"{{data.location}}"}祝大工${"{{data.wish}}"}
     <br/><br/>`
     console.log(text)
-    text = `<svg xmlns='http://www.w3.org/2000/svg' width='${cvs.width*0.6}' height='200'>` +
-                "<foreignObject width='100%' height='100%'>" +
-                "<div xmlns='http://www.w3.org/1999/xhtml' style='font-size:14px;'>"+
-                `<p style='margin-top: 0px'>${text}</p>` +`<p style='text-align:right'>你的DUTER</p>`+
-                "</div>" +
-                "</foreignObject>" +
-                "</svg>";
+    text = `<svg xmlns='http://www.w3.org/2000/svg' width='${cvs.width * 0.6}' height='200'>` +
+        "<foreignObject width='100%' height='100%'>" +
+        "<div xmlns='http://www.w3.org/1999/xhtml' style='font-size:14px;'>" +
+        `<p style='margin-top: 0px'>${text}</p>` + `<p style='text-align:right'>你的DUTER</p>` +
+        "</div>" +
+        "</foreignObject>" +
+        "</svg>";
     let img = new Image()
+    img.setAttribute('crossOrigin', 'Anonymous');
     img.src = "{{url_for('h5.static',filename='72years/'+image[0])}}"
     cvs.height = cvs.width * 1.5
     img.onload = function () {
@@ -39,8 +89,9 @@
         let svg = new Blob([text], { type: 'image/svg+xml' })
         let url = DOMURL.createObjectURL(svg)
         let imgText = new Image()
-        imgText.onload = function(){
-            ctx.drawImage(this,0.2*cvs.width,0.4*cvs.width)
+        imgText.setAttribute('crossOrigin', 'Anonymous');
+        imgText.onload = function () {
+            ctx.drawImage(this, 0.2 * cvs.width, 0.4 * cvs.width)
             DOMURL.revokeObjectURL(url)
         }
         imgText.src = url

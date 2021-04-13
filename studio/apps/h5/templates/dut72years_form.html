@@ -2,48 +2,47 @@
 {% block content %}
 <link href="{{url_for('h5.static',filename='css/72years.css')}}" rel="stylesheet" type="text/css">
 <div class="container main">
-    <div style="text-align: center;">
 
-        <form action="{{url_for('h5.celeb_72_card')}}" method="POST" style="margin-top: 50%;width: 50%;margin-left:25%" id="cardform">
-            <button type="submit" style="display: none;" id="submit"></button>
-            <div class="form-group">
-                <a href="#" onclick="handleSubmit()">
-                    <img src="{{url_for('h5.static',filename='72years/button.png')}}" width="50px" height="50px">
-    
-                </a>
-            </div>
-            <div class="form-group" >
-                <input type="text" name="name" class="form-control" placeholder="我的名字：" required>
-            </div>
-            <div class="form-group">
-                
-                <select name="identity" form="cardform" id="identity" class="form-control" required>
-                    <option value="" disabled selected>我的身份：</option>
-                    <option value="学生">学生</option>
-                    <option value="老师">老师</option>
-                    <option value="校友">校友</option>
-                    <option value="窝工粉丝">窝工粉丝</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <input type="text" name="location" class="form-control" placeholder="我的地点：" required>
-            </div>
-            <div class="form-group">
-                <select name="wish" form="cardform" id="wish" onchange="handleChange()" class="form-control" required>
-                    <option value="" disabled selected>我祝大工：</option>
-                    <option value="1">学子越长越帅，越长越靓</option>
-                    <option value="2">妖风越来越温柔，猫猫越来越胖</option>
-                    <option value="3">学子头发多多，早日脱单</option>
-                    <option value="4">玉兰越来越好看</option>
-                    <option value="5">就是好，越来越好</option>
-                    <option value="others">自定义祝福</option>
-                </select>
-            </div>
-            <div class="form-group" style="display:none" id="wish_other">
-                <input type="text" name="wish_other" placeholder="我的祝福："class="form-control" >
-            </div>
-        </form>
-    </div>
+    <form action="{{url_for('h5.celeb_72_card')}}" method="POST"
+        style="position:absolute;top:22%;width: 50%;margin-left:22%" id="cardform">
+        <button type="submit" style="display: none;" id="submit"></button>
+        <div class="form-group">
+            <a href="#" onclick="handleSubmit()">
+                <img src="{{url_for('h5.static',filename='72years/button.png')}}" width="50px" height="50px">
+
+            </a>
+        </div>
+        <div class="form-group">
+            <input type="text" name="name" class="form-control" placeholder="我的名字：" required maxlength="6">
+        </div>
+        <div class="form-group">
+
+            <select name="identity" form="cardform" id="identity" class="form-control" required>
+                <option value="" disabled selected>我的身份：</option>
+                <option value="学生">学生</option>
+                <option value="老师">老师</option>
+                <option value="校友">校友</option>
+                <option value="窝工粉丝">窝工粉丝</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <input type="text" name="location" class="form-control" placeholder="我的地点：" required maxlength="20">
+        </div>
+        <div class="form-group">
+            <select name="wish" form="cardform" id="wish" onchange="handleChange()" class="form-control" required>
+                <option value="" disabled selected>我祝大工：</option>
+                <option value="学子越长越帅，越长越靓">学子越长越帅，越长越靓</option>
+                <option value="妖风越来越温柔，猫猫越来越胖">妖风越来越温柔，猫猫越来越胖</option>
+                <option value="学子头发多多，早日脱单">学子头发多多，早日脱单</option>
+                <option value="玉兰越来越好看">玉兰越来越好看</option>
+                <option value="就是好，越来越好">就是好，越来越好</option>
+                <option value="others">自定义祝福</option>
+            </select>
+        </div>
+        <div class="form-group" style="display:none" id="wish_other">
+            <input type="text" name="wish_other" placeholder="我的祝福：" class="form-control" maxlength="100">
+        </div>
+    </form>
 </div>
 <script>
     let handleChange = () => {
