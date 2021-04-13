@@ -10,7 +10,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <img src="{{url_for('h5.static',filename='72years/qr.jpg')}}" width="50%" height="50%" />
+                <a href="{{url_for('h5.celeb_72_form')}}">{{url_for('h5.celeb_72_form')}}</a>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
@@ -61,12 +61,12 @@
         console.log(cvs.height, cvs.width);
         ctx.drawImage(this, 0, 0, cvs.width, cvs.height);
 
-        let text = `我是${"{{data.name}}"}，是一名${"{{data.identity}}"}，我在${"{{data.location}}"}祝大工${"{{data.wish}}"}`;
+        let text = `我是${"{{data.name}}"}，是一名${"{{data.identity}}"}。72周年校庆之际，我在${"{{data.location}}"}祝大工${"{{data.wish}}"}`;
         console.log(text);
         text =
             `<svg xmlns='http://www.w3.org/2000/svg' width='${cvs.width * 0.6}' height='${cvs.height * 0.45}'>` +
             `<foreignObject width='${cvs.width * 0.6}' height='${cvs.height * 0.45}'>` +
-            "<div xmlns='http://www.w3.org/1999/xhtml' style='padding:20px;font-size:70px;border:5px solid blue'>" +
+            "<div xmlns='http://www.w3.org/1999/xhtml' style='padding:20px;font-size:70px;'>" +
             `<p style='margin-top: 0px'>亲爱的大工：</p>` +
             `<p style='text-indent: 2em;'>${text}</p><br/><br/>` +
             `<p style='text-align:right'>你的DUTER</p>` +
@@ -83,6 +83,13 @@
             DOMURL.revokeObjectURL(url);
         };
         imgText.src = url;
+
+        let imgQR = new Image()
+        imgQR.setAttribute('crossOrigin','Anonymous')
+        imgQR.src ="{{url_for('h5.static',filename='72years/qr.jpg')}}"
+        imgQR.onload = function(){
+            ctx.drawImage(this,0.2*cvs.width,0.62*cvs.height,0.17*cvs.width,0.17*cvs.width)
+        }
 
         document.querySelector(".main_svg-test").innerHTML = text;
     };
