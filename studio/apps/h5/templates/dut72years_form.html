@@ -1,22 +1,23 @@
-{% extends 'common_base.html'%}
-{% block content %}
-<link href="{{url_for('h5.static',filename='css/72years.css')}}" rel="stylesheet" type="text/css">
-<div class="container main">
-
-    <form action="{{url_for('h5.celeb_72_card')}}" method="POST"
-        style="position:absolute;top:22%;width: 50%;margin-left:22%" id="cardform">
-        <button type="submit" style="display: none;" id="submit"></button>
+{% extends 'common_base.html'%} {% block content %}
+<link href="{{url_for('h5.static',filename='css/72years.css')}}" rel="stylesheet" type="text/css" />
+<div class="main__bg"><img src="{{url_for('h5.static',filename='72years/form.jpg')}}" alt=""></div>
+<div class="main__form-box container">
+    <form
+        action="{{url_for('h5.celeb_72_card')}}"
+        method="POST"
+        style="position: absolute; top: 22%; width: 50%; margin-left: 22%"
+        id="cardform"
+    >
+        <button type="submit" style="display: none" id="submit"></button>
         <div class="form-group">
             <a href="#" onclick="handleSubmit()">
-                <img src="{{url_for('h5.static',filename='72years/button.png')}}" width="50px" height="50px">
-
+                <img src="{{url_for('h5.static',filename='72years/button.png')}}" width="50px" height="50px" />
             </a>
         </div>
         <div class="form-group">
-            <input type="text" name="name" class="form-control" placeholder="我的名字：" required maxlength="6">
+            <input type="text" name="name" class="form-control" placeholder="我的名字：" required maxlength="6" />
         </div>
         <div class="form-group">
-
             <select name="identity" form="cardform" id="identity" class="form-control" required>
                 <option value="" disabled selected>我的身份：</option>
                 <option value="学生">学生</option>
@@ -26,7 +27,7 @@
             </select>
         </div>
         <div class="form-group">
-            <input type="text" name="location" class="form-control" placeholder="我的地点：" required maxlength="20">
+            <input type="text" name="location" class="form-control" placeholder="我的地点：" required maxlength="20" />
         </div>
         <div class="form-group">
             <select name="wish" form="cardform" id="wish" onchange="handleChange()" class="form-control" required>
@@ -39,23 +40,23 @@
                 <option value="others">自定义祝福</option>
             </select>
         </div>
-        <div class="form-group" style="display:none" id="wish_other">
-            <input type="text" name="wish_other" placeholder="我的祝福：" class="form-control" maxlength="100">
+        <div class="form-group" style="display: none" id="wish_other">
+            <input type="text" name="wish_other" placeholder="我的祝福：" class="form-control" maxlength="100" />
         </div>
     </form>
 </div>
 <script>
     let handleChange = () => {
-        let v = $("#wish").val()
-        if (v === 'others') {
-            $("#wish_other").show()
+        let v = $("#wish").val();
+        if (v === "others") {
+            $("#wish_other").show();
         } else {
-            $("#wish_other").hide()
+            $("#wish_other").hide();
         }
-    }
+    };
     let handleSubmit = () => {
-        $("#submit").click()
-    }
+        $("#submit").click();
+    };
 </script>
 <!--
     文案方面我们有一些调整，我们目前是三个空，现在想改成四个空：

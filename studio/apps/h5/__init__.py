@@ -8,7 +8,7 @@ def celeb_72_form():
 
 @h5.route('/72years/card',methods=['GET','POST'])
 def celeb_72_card():
-    data = dict(request.values)
+    data = request.values.to_dict()
     back_images = ['orange.png','blue.png','gold.png','green.png','purple.png','red.png','silver.png']
     if data['wish'] =='others':
         data['wish'] = data['wish_other']
