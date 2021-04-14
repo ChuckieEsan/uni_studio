@@ -10,7 +10,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <a href="{{url_for('h5.celeb_72_form')}}">{{url_for('h5.celeb_72_form')}}</a>
+                <a href="https://www.dutbit.com{{url_for('h5.celeb_72_form')}}">https://www.dutbit.com{{url_for('h5.celeb_72_form')}}</a>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
@@ -22,7 +22,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">浏览器中长按图片以保存</h5>
+                <h5 class="modal-title" id="exampleModalLabel">长按图片以保存</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -48,23 +48,6 @@
 </div>
 <div class="main_svg-test" style="display: none"></div>
 <script>
-    function exportCanvasAsPNG(canvasElement, fileName) {
-        var MIME_TYPE = "image/png";
-        var imgURL = canvasElement.toDataURL(MIME_TYPE);
-        var dlLink = document.createElement("a");
-        dlLink.download = fileName;
-        dlLink.href = imgURL;
-        dlLink.dataset.downloadurl = [MIME_TYPE, dlLink.download, dlLink.href].join(":");
-        document.body.appendChild(dlLink);
-        dlLink.click();
-        document.body.removeChild(dlLink);
-    }
-    let exportCanvasAsB64 = (canvasElement) =>{
-        var MIME_TYPE = "image/png";
-        var imgURL = canvasElement.toDataURL(MIME_TYPE);
-        var dlLink = document.createElement("a");
-         
-    }
     function buildSvgImageUrl(svg) {
         b64 = window.btoa(unescape(encodeURIComponent(svg)));
         return "data:image/svg+xml;base64," + b64;
@@ -72,9 +55,7 @@
     $("#reload").click(() => {
         window.location.href = "{{url_for('h5.celeb_72_form')}}"
     });
-    $("#share").click(() => { });
     $("#save").click(() => {
-        //exportCanvasAsPNG(document.getElementById("main__cvs"), `dut72years_card_${Date.parse(new Date())}.png`);
         let data = "123"
         var MIME_TYPE = "image/png";
         cvs = document.getElementById("main__cvs")
@@ -95,12 +76,16 @@
         console.log(cvs.height, cvs.width);
         ctx.drawImage(this, 0, 0, cvs.width, cvs.height);
 
-        let text = `我是${"{{data.name}}"}，是一名${"{{data.identity}}"}。在您72岁生日到来之际，我在${"{{data.location}}"}祝大工${"{{data.wish}}"}`;
+        let text =
+            `我是${"{{data.name}}"}，是一名${"{{data.identity}}"}。在您72岁生日到来之际，我在${"{{data.location}}"}祝大工${"{{data.wish}}"}`;
         console.log(text);
         text =
             `<svg xmlns='http://www.w3.org/2000/svg' width='${cvs.width * 0.6}' height='${cvs.height * 0.45}'>` +
             `<foreignObject width='${cvs.width * 0.6}' height='${cvs.height * 0.45}'>` +
-            "<div xmlns='http://www.w3.org/1999/xhtml' style='padding:20px;font-size:70px;'>" +
+            `<div xmlns='http://www.w3.org/1999/xhtml' 
+            style="padding:20px;font-size:70px;
+            font-family: Baskerville, Georgia,  
+            STKaiti, KaiTi, KaiTi_GB2312, DFKai-SB, serif;">` +
             `<p style='margin-top: 0px'>亲爱的大工：</p>` +
             `<p style='text-indent: 2em;'>${text}</p>` +
             `<p style='text-align:right'>你的DUTer</p>` +
