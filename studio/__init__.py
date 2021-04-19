@@ -57,7 +57,7 @@ def create_app():
         if (not DEBUG) and 'mysql+pymysql' not in app.config['SQLALCHEMY_DATABASE_URI']:
             raise EnvironmentError("No db connection uri provided")
             exit(-1)
-        app.config['SERVER_NAME'] = '127.0.0.1:5000' if DEBUG else 'dutbit.com'
+        app.config['SERVER_NAME'] = '127.0.0.1:5000' if DEBUG else 'www.dutbit.com'
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         app.add_template_global(get_ver)
         db.init_app(app)
