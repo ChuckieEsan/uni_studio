@@ -1,6 +1,5 @@
 from flask import Blueprint,render_template,request,session,jsonify,current_app,flash,g
 from studio.models import db,VolTime
-from studio.decorators import memo,memoize
 import os
 import heapq
 from sqlalchemy import func
@@ -32,7 +31,7 @@ def vol_time_search():
     return jsonify(r)
 
 @vol_time.route('/top')
-@memo(3000)
+#@memo(3000)
 def get_top():
     #r = db.session.query(VolTime,func.sum(VolTime.time)).group_by(VolTime.stu_id).order_by(VolTime.time.desc())
     #cursor = db.session.execute("select name,faculty,stu_id,sum(time) from vol_time group by stu_id,name,time,faculty order by time desc limit 50")

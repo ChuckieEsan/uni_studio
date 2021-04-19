@@ -199,8 +199,7 @@
                 let target = getUrlParam('target')
                 if (target) {
                     setTimeout(() => {
-
-                        window.location.href = "https://www.dutbit.com" + target
+                        window.location.href = window.location.host + target
 
                         $("#loginText").removeClass("sr-only")
                         $("#loginSpinner").removeClass("spinner-grow spinner-grow-md")

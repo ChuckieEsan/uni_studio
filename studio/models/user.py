@@ -8,7 +8,7 @@ class UserUsers(db.Model,TimestampMixin,DeleteMixin):
     email = db.Column(db.String(100),nullable=False,unique=True)
     phone = db.Column(db.String(100),nullable=True,unique=True)
     password = db.Column(db.String(100),nullable=False)
-    role_bits = db.Column(db.Integer,default=0)
+    role_bits = db.Column(db.Integer,default=2)
     current_ip = db.Column(db.String(100),nullable=True)
     last_login_ip = db.Column(db.String(100),nullable=True)
     last_login_time = db.Column(db.DateTime(True), default=db.func.now(), nullable=True)

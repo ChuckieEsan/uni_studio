@@ -4,7 +4,7 @@
     <div class="row">
         <span style="font-size:30px;margin-left: 10px;">Console</span>
         <span class="badge badge-dark" style="float:right;margin-top:13px;margin-right: 10px;">
-            {{session['email']}}
+            {{g.user.email}}
         </span>
         {% for r in roles %}
         <span class="badge badge-dark" style="float:right;margin-top:13px;margin-right: 10px;">

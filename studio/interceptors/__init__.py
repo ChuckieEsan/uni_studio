@@ -1,48 +1,31 @@
-
 from functools import wraps
 from flask import request,redirect,current_app,abort,g,session,jsonify,url_for,flash,g
-from studio import r,DEBUG#redis_conn
 import json
-import redis
 import time
-from studio.utils.captcha_helper import getcaptcha
-from studio.utils.rules_helper import get_rules
-from studio.models import db,UserRoles,RouteInterceptors
+from studio.models import db,UserRoles,RouteInterceptors,UserUsers
 def global_interceptor():
     token = request.cookies.get('token')
     try:
         data = current_app.tjwss.loads(token)
-        g.id = data.get('id')
-        current_app.logger.info("id=",g.id)
+        user = UserUsers.query.filter(UserUsers.id==data.get('id')).first()
+        g.user = user
+        current_app.logger.info("user=",g.user)
     except Exception as e:
-        current_app.logger.warn(e)
-        g.id = None
+        g.user = None
+    if request.path.startswith('/console') and not g.user:
+        return redirect(url_for('users.users_entrypoint')+'?target={}'.format(request.path))
     rules = RouteInterceptors.query.filter(RouteInterceptors.delete==False).all()
     for r in rules:
-        if request.path.startswith(r.startswith):#这里很有可能有问题，应该尝试匹配最长路径。
-            rb = r.role_bits
-            try:
-                u_rb = int(session.get('role_bits'))
-            except Exception as e:
-                current_app.logger.error(e)
-                return redirect(url_for('users.users_entrypoint')+'?target={}'.format(request.path))
-            if rb == 0:
-                if not u_rb & 1:#super_admin
-                    abort(503)
-            else:
-                if not (u_rb & 1 or u_rb & rb):
-                    flash(r.description)
-                    return abort(403)
+        if not request.path.startswith(r.startswith):#这里很有可能有问题，应该尝试匹配最长路径。
+            continue
+        if not user:
+            return redirect(url_for('users.users_entrypoint')+'?target={}'.format(request.path))
+        if r.role_bits == 0 and not (user.role_bits & 1): # only root can view this page
+            return abort(503)
+        if not (user.role_bits & 1 or user.role_bits & r.role_bits):
+            flash(r.description)
+            return abort(403)
             
-
-def set_captcha(func):
-    @wraps(func)
-    def func_wrapper(*args,**kwargs):
-        session['captcha_text'] = getcaptcha(current_app.config['CAPTCHA_LEN'])
-        session['captcha_time'] = int(time.time())
-
-        return func(*args,**kwargs)
-    return func_wrapper
 
 def validate_captcha(func):
     @wraps(func)
