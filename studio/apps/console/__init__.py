@@ -1,4 +1,4 @@
-from flask import Blueprint,current_app,render_template,jsonify,request
+from flask import Blueprint,current_app,render_template,jsonify,request,g
 import docker
 import re
 import time
