@@ -23,7 +23,7 @@ def users_login():
         info = {'id':user.id}
         resp:Response = jsonify({"success":True})
         token = current_app.tjwss.dumps(info).decode()
-        resp.set_cookie('token',token,max_age=current_app.config['EXPIRES_IN'],
+        resp.set_cookie('token',token,max_age=current_app.config['TOKEN_EXPIRES_IN'],
             domain=current_app.config['SERVER_NAME'],secure=True,httponly=True)
         return resp
     return jsonify({"success":False,"details":"用户名或密码错误"})  
