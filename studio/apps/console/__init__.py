@@ -45,4 +45,4 @@ def get_livelog():
 def show_livelog():
     return render_template('console_livelog.html')
 
-from studio.apps.console import issues,vote,user,vol_time
+from studio.apps.console import issues,vote,user,vol_time,crud
