@@ -1,13 +1,12 @@
 {% extends 'common_base.html'%}
 {% block content %}
-<div class="container">
     <div class="row">
         <table class="table">
             <thead>
                 <tr>
                     {% for c in _class.__dict__.keys() %}
                     {% if c[0]!="_" %}
-                    <th scope="col">{{c}}:{{type(getattr(_class,c))}}</th>
+                    <th scope="col">{{c}}<!--:{{type(getattr(_class,c))}}--></th>
                     {% endif %}
                     {% endfor %}
                     <th scope="col">Form</th>
@@ -26,7 +25,7 @@
                     {% endif %}
                     {% endfor %}
                     <td>
-                        <form method="POST" action="{{url_for('console.user_crud')}}" id="updateForm{{loop.index}}">
+                        <form method="POST" action="{{url_for('console.crud_post',table=_class.__tablename__)}}" id="updateForm{{loop.index}}">
                             <select name="key" form="updateForm{{loop.index}}">
                                 {% for c in _class.__dict__.keys() %}
                                 {% if c[0] != '_' %}
@@ -43,5 +42,4 @@
                 {% endfor %}
             </tbody>
     </div>
-</div>
 {% endblock %}

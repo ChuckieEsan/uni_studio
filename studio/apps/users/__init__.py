@@ -1,4 +1,4 @@
-from flask import Blueprint,render_template,request,jsonify,session,redirect
+from flask import Blueprint,render_template,request,jsonify,g,redirect,Response,current_app
 from flask.helpers import url_for
 from studio.models import db,UserUsers
 users = Blueprint("users",__name__,template_folder="templates",static_folder="static")
@@ -20,13 +20,14 @@ def users_login():
     user = UserUsers.query.filter(UserUsers.email==str(data.get('email')).strip())\
     .filter(UserUsers.password==str(data.get('password')).strip()).first()
     if user:
-        session['id'] = user.id
-        session['email'] = user.email
-        session['role_bits'] = user.role_bits
-        return jsonify({"success":True})
+        info = {'id':user.id}
+        resp:Response = jsonify({"success":True})
+        token = current_app.tjwss.dumps(info).decode()
+        resp.set_cookie('token',token,max_age=current_app.config['EXPIRES_IN'],
+            domain=current_app.config['SERVER_NAME'],secure=True,httponly=True)
+        return resp
     return jsonify({"success":False,"details":"用户名或密码错误"})  
 
 @users.route('/logout')
 def users_logout():
-    session.clear()
     return redirect(url_for('users.users_entrypoint'))

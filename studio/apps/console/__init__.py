@@ -1,4 +1,4 @@
-from flask import Blueprint,current_app,render_template,jsonify,request,session
+from flask import Blueprint,current_app,render_template,jsonify,request,g
 import docker
 import re
 import time
@@ -10,14 +10,14 @@ console = Blueprint("console",__name__,template_folder='templates',static_folder
 def console_root():
     roles = UserRoles.query.filter(UserRoles.delete==False).all()
     routes = RouteInterceptors.query.filter(RouteInterceptors.delete==False).all()
-    user_role = int(session.get('role_bits') or 2)
+    user_role = g.user.role_bits or 2
 
     valid_routes = [r for r in routes if user_role & r.role_bits or user_role==1]
 
     valid_roles = [r for r in roles if user_role & r.role_bit or user_role==1]
 
     return render_template('console_index.html',\
-        title='Console',session=session,roles=valid_roles,routes=valid_routes)
+        title='Console',roles=valid_roles,routes=valid_routes)
 
 
 @console.route('/tskey',methods=['GET'])
@@ -45,4 +45,4 @@ def get_livelog():
 def show_livelog():
     return render_template('console_livelog.html')
 
-from studio.apps.console import issues,vote,user,vol_time
+from studio.apps.console import issues,vote,user,vol_time,crud

@@ -1,5 +1,5 @@
 from studio.apps.console import console
-from flask import url_for, redirect, render_template, request, jsonify,session
+from flask import url_for, redirect, render_template, request, jsonify,session,g
 from studio.models import db, IssuesIssues, IssueTypes
 
 @console.route('/issues/data/<int:page_id>')
@@ -40,7 +40,7 @@ def issues_types_handler():
     _t = IssueTypes(
             typename=request.form.get('name'),
             typevalue=request.form.get('value'),
-            created_by=session['id']
+            created_by=g.user.id
         )
     try:
         db.session.add(_t)
