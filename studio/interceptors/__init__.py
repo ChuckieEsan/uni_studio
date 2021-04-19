@@ -1,9 +1,7 @@
 
 from functools import wraps
-from flask import request,redirect,current_app,abort,g,session,jsonify,url_for,flash
+from flask import request,redirect,current_app,abort,g,session,jsonify,url_for,flash,g
 from studio import r,DEBUG#redis_conn
-if DEBUG:
-    from studio import fake_id,fake_sessionid
 import json
 import redis
 import time
@@ -11,9 +9,17 @@ from studio.utils.captcha_helper import getcaptcha
 from studio.utils.rules_helper import get_rules
 from studio.models import db,UserRoles,RouteInterceptors
 def global_interceptor():
+    token = request.cookies.get('token')
+    try:
+        data = current_app.tjwss.loads(token)
+        g.id = data.get('id')
+        current_app.logger.info("id=",g.id)
+    except Exception as e:
+        current_app.logger.warn(e)
+        g.id = None
     rules = RouteInterceptors.query.filter(RouteInterceptors.delete==False).all()
     for r in rules:
-        if request.path.startswith(r.startswith):
+        if request.path.startswith(r.startswith):#这里很有可能有问题，应该尝试匹配最长路径。
             rb = r.role_bits
             try:
                 u_rb = int(session.get('role_bits'))

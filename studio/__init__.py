@@ -31,6 +31,7 @@ except Exception as e:
     print(e)
     exit()
 
+from itsdangerous import TimedJSONWebSignatureSerializer as TJWSS
 from flask import Flask, Request, session, render_template
 from flask_session import Session
 from flask_bootstrap import Bootstrap  # for flask-file-uploader | fileservice
@@ -71,10 +72,10 @@ def create_app():
     except:
         pass
     handler = logging.FileHandler('log/service.log')
+    handler.setLevel(logging.DEBUG)
     logging_format = logging.Formatter('%(levelname)s - %(asctime)s - %(filename)s - %(funcName)s - %(lineno)s - %(message)s')
     handler.setFormatter(logging_format)
     app.logger.addHandler(handler)
-
     #set up global interceptor
     app.before_request(global_interceptor)
 
@@ -131,8 +132,10 @@ def create_app():
         app.register_blueprint(enrollapp,url_prefix = "/enroll",subdomain=app.config['SUBDOMAINS']['www'])
         app.register_blueprint(h5app,url_prefix = "/h5",subdomain=app.config['SUBDOMAINS']['www'])
         #app.config['SERVER_NAME'] = 'dutbit.com'
+        app.config['EXPIRES_IN'] = 3600
         app.config['SECRET_KEY'] = 'Do not go gentle into that good night'
         app.config['FILESERVICE_UPLOAD_FOLDER'] = join_upload_dir('data/fileservice')
         app.config['FILESERVICE_THUMBNAIL_FOLDER'] = join_upload_dir('data/fileservice/thumbnail')
         app.config['FILESERVICE_MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024
+        app.tjwss = TJWSS(app.config['SECRET_KEY'],expires_in=app.config['EXPIRES_IN'])
         return app
