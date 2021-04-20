@@ -37,9 +37,11 @@ def issues_root():
 
 @console.route('/issues/types', methods=['POST'])
 def issues_types_handler():
+    priority = str(request.form.get('priority'))
     _t = IssueTypes(
             typename=request.form.get('name'),
             typevalue=request.form.get('value'),
+            priority=int(priority) if priority.isdigit() else 1,
             created_by=g.user.id
         )
     try:

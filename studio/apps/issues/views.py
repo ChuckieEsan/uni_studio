@@ -6,7 +6,7 @@ def root():
     if request.method=='GET':
         timeout = bool(request.values.get('timeout'))
         referer = request.referrer if request.referrer is not None else ''
-        issuetypes = IssueTypes.query.all()
+        issuetypes = IssueTypes.query.order_by(IssueTypes.priority.desc()).all()
         return render_template(
             "issues_index.html",
             referer=referer,
