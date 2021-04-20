@@ -24,6 +24,7 @@ class IssueTypes(TimestampMixin, db.Model):
     typename = db.Column(db.String(255),nullable=False)
     typevalue = db.Column(db.String(255),nullable=False)
     created_by = db.Column(db.String(255),nullable=False)# creator object_id
+    priority = db.Column(db.Integer, default=1)
     def __init__(self,*args,**kwargs):
         super(IssueTypes, self).__init__(**kwargs)
     def __str__(self):

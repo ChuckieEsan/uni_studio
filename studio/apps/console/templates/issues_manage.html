@@ -22,12 +22,17 @@
                         <span>
                             {{t.typevalue}}
                         </span>
+                        <label>优先级</label>
+                        <span>
+                            {{t.priority}}
+                        </span>
                         <br>
                         {% endfor %}
                     </div>
 
                     <input type="text" placeholder="类别名称" required name="name">
                     <input type="text" placeholder="类别值" required name="value">
+                    <input type="text" placeholder="优先级" required name="priority" value="1">
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
