@@ -2,6 +2,7 @@ from studio.apps.vote import vote
 from studio.models import VoteInfo,VoteCandidates,VoteVotes,db
 from studio.utils.captcha_helper import get_captcha_and_img
 from studio.interceptors import validate_captcha
+from studio.cache import cache
 from flask import url_for,redirect,render_template,request,flash,session,jsonify,Markup,send_file
 from flask import current_app
 from faker import Faker
@@ -23,6 +24,7 @@ def root():
         title="投票列表"
         )
 #@memoize(20)
+@cache.memoize(20)
 def get_vote_and_candidate(vote_id:int):
     candidate_all = VoteCandidates.query.filter(VoteCandidates.vote_id==vote_id).all()
     candidate_all_sorted = sorted(candidate_all,key=lambda x:x.votes,reverse=True)

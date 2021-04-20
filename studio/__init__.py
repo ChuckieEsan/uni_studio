@@ -11,6 +11,7 @@ from itsdangerous import TimedJSONWebSignatureSerializer as TJWSS
 from flask import Flask, Request, render_template
 from flask_bootstrap import Bootstrap  # for flask-file-uploader | fileservice
 from flask_migrate import Migrate
+from .cache import cache
 from .test import tests
 from .apps.fileservice.app import app as fileserviceapp
 from .api import postcardapp
@@ -61,6 +62,7 @@ def create_app():
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
         app.add_template_global(get_ver)
         db.init_app(app)
+        cache.init_app(app)
         Bootstrap(app)
         migrate = Migrate(app,db)
         # db.drop_all()
