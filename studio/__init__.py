@@ -65,7 +65,7 @@ def create_app():
         cache.init_app(app)
         Bootstrap(app)
         # db.drop_all()
-        db.create_all()
+        # db.create_all()
         migrate = Migrate(app,db)
         app.register_blueprint(tests)
         app.register_blueprint(fileserviceapp,url_prefix='/fileservice')

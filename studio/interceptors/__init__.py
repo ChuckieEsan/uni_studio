@@ -1,8 +1,15 @@
 from functools import wraps
-from flask import request,redirect,current_app,abort,g,session,jsonify,url_for,flash,g
+from flask import request,redirect,current_app,abort,g,session,jsonify,url_for,flash,g,Request,Response
 import json
 import time
 from studio.models import db,UserRoles,RouteInterceptors,UserUsers
+from studio.cache import cache
+
+CAPTCHA_TIMEOUT = 600
+CAPTCHA_NAMESPACE = 'captcha'
+CAPTCHA_COOKIE_KEY = '_c'
+CAPTCHA_VALID_FIELD = 'is_valid'
+
 def global_interceptor():
     token = request.cookies.get('token')
     try:
@@ -26,16 +33,34 @@ def global_interceptor():
             flash(r.description)
             return abort(403)
             
+def generate_response(success:bool,details:str)->Response:
+    print(details)
+    acc = request.headers.get('accept') or request.headers.get('Accept')
+    if 'text/html' in acc:
+        flash(details)
+        abort(401)
+    elif 'application/json' in acc:
+        return jsonify({"success":success,"details":details})
+    else:
+        return jsonify({"success":success,"details":details})
 
 def validate_captcha(func):
     @wraps(func)
     def func_wrapper(*args,**kwargs):
-        if not request.values.get('captcha'):
-            return jsonify({'success':False,'details':'验证码缺失'})
-        if request.values.get('captcha') != session['captcha_text']:
-            return jsonify({'success':False,'details':'验证码错误'})
-        if int(time.time()) > (session['captcha_time']+current_app.config['CAPTCHA_TTL']):
-            return jsonify({'success':False,'details':'验证码超时'})
+        uuid = request.cookies.get(CAPTCHA_COOKIE_KEY)
+        if not uuid:
+            return generate_response(False,'验证码已过期')
+
+        captcha_text = cache.get('{}:{}'.format(CAPTCHA_NAMESPACE,uuid))
+        if not captcha_text:
+            return generate_response(False,'验证码已失效')
+
+        if 'captcha' not in request.values:
+            return generate_response(False,'验证码缺失')
+        
+        if request.values.get('captcha') != captcha_text:
+            return generate_response(False,'验证码错误')
+    
         return func(*args,**kwargs)
     return func_wrapper
 

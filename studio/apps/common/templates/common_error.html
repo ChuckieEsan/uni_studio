@@ -6,9 +6,12 @@
 	<div class="row">
 		<div class="col-md-12">
 			<div class="pt-5 mt-5 text-center">
-				<h1>{{code}}</h1>
+				<h1>{{code}}:{{msg}}</h1>
 				<hr class="w-50">
-                <h2>{{msg}}</h2>
+				{% for m in get_flashed_messages()%}
+				<h2>{{m}}</h2>
+				{% endfor %}
+				<hr class="w-50">
 				<h2>Sorry about that</h2>
 				{% if code == 404 %}
 				<iframe src="https://baike.baidu.com/item/%E5%82%85%E9%87%8C%E5%8F%B6%E5%8F%98%E6%8D%A2/7119029?fromtitle=%E5%82%85%E7%AB%8B%E5%8F%B6%E5%8F%98%E6%8D%A2&fromid=3472079#1_1"

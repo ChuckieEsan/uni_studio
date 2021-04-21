@@ -10,15 +10,15 @@ def do_vol_time_update():
     old_rows = get_rows()
     fname = request.values.get('fileIndex')
     coverall = request.values.get('coverall') !=None
-    files = [f for f in os.listdir(os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],str(session['id'])))\
-        if os.path.isfile(os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],str(session['id']),f))]
+    files = [f for f in os.listdir(os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],str(g.user.id)))\
+        if os.path.isfile(os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],str(g.user.id),f))]
     if fname not in fname:
         flash('无效的文件')
         return render_template("vol_time_update.html",count=old_rows)
     if fname[-4:] != '.csv':
         flash('文件格式错误')
         return render_template("vol_time_update.html",count=old_rows)
-    fpath = os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],str(session['id']),fname)
+    fpath = os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],str(g.user.id),fname)
     with open(fpath,'rb') as f:
         data = f.read(512)
         code_type = chardet.detect(data)['encoding']
