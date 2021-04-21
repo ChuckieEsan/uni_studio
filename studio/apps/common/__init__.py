@@ -1,4 +1,4 @@
-from flask import Blueprint,current_app,session,send_file,Response
+from flask import Blueprint,current_app,send_file,Response
 from studio.utils.captcha_helper import _get_captcha_img,getcaptcha
 from studio.interceptors import validate_captcha,CAPTCHA_COOKIE_KEY,CAPTCHA_NAMESPACE,CAPTCHA_TIMEOUT,CAPTCHA_VALID_FIELD
 from studio.cache import cache

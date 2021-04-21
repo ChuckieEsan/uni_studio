@@ -39,7 +39,7 @@ def get_tslog():
 
 @console.route('/livelog',methods=['GET'])
 def get_livelog():
-    return current_app.config['LIVE_LOG'].read()
+    return current_app.live_log.read()
 
 @console.route('/log',methods=['GET'])
 def show_livelog():
