@@ -3,6 +3,9 @@ from flask import Flask, Request, render_template
 from flask_bootstrap import Bootstrap  # for flask-file-uploader | fileservice
 from flask_migrate import Migrate
 import logging
+import os
+
+
 from .cache import cache
 from .test import tests
 from .apps.fileservice.app import app as fileserviceapp
@@ -22,23 +25,25 @@ from .apps.users import users as usersapp
 from .apps.enroll import enroll as enrollapp
 from .apps.h5 import h5 as h5app
 
+
 def create_app():
     app = Flask(__name__)
 
-    #set up logger
+    # set up logger
     try:
         os.mkdir('log')
     except:
         pass
     handler = logging.FileHandler('log/service.log')
     handler.setLevel(logging.DEBUG)
-    logging_format = logging.Formatter('%(levelname)s - %(asctime)s - %(filename)s - %(funcName)s - %(lineno)s - %(message)s')
+    logging_format = logging.Formatter(
+        '%(levelname)s - %(asctime)s - %(filename)s - %(funcName)s - %(lineno)s - %(message)s')
     handler.setFormatter(logging_format)
     app.logger.addHandler(handler)
-    #set up global interceptor
+    # set up global interceptor
     app.before_request(global_interceptor)
-    for i in (400,401,404,403,500,503):
-        app.register_error_handler(i,error_handler)
+    for i in (400, 401, 404, 403, 500, 503):
+        app.register_error_handler(i, error_handler)
     with app.app_context():
         from studio.models import db
         from config import Config
@@ -51,19 +56,20 @@ def create_app():
         Bootstrap(app)
         # db.drop_all()
         # db.create_all()
-        migrate = Migrate(app,db)
+        migrate = Migrate(app, db)
         app.register_blueprint(tests)
-        app.register_blueprint(fileserviceapp,url_prefix='/fileservice')
-        app.register_blueprint(staticfileapp,url_prefix='/staticfile')
-        app.register_blueprint(voteapp,url_prefix='/vote')
-        app.register_blueprint(postcardapp,url_prefix='/postcard')
-        app.register_blueprint(issuesapp,url_prefix="/issues")
-        app.register_blueprint(commonfileapp,url_prefix="/common")
-        app.register_blueprint(consoleapp,url_prefix="/console")
-        app.register_blueprint(vol_timeapp,url_prefix="/vol_time")
-        app.register_blueprint(usersapp,url_prefix="/user")
-        app.register_blueprint(enrollapp,url_prefix = "/enroll")
-        app.register_blueprint(h5app,url_prefix = "/h5")
+        app.register_blueprint(fileserviceapp, url_prefix='/fileservice')
+        app.register_blueprint(staticfileapp, url_prefix='/staticfile')
+        app.register_blueprint(voteapp, url_prefix='/vote')
+        app.register_blueprint(postcardapp, url_prefix='/postcard')
+        app.register_blueprint(issuesapp, url_prefix="/issues")
+        app.register_blueprint(commonfileapp, url_prefix="/common")
+        app.register_blueprint(consoleapp, url_prefix="/console")
+        app.register_blueprint(vol_timeapp, url_prefix="/vol_time")
+        app.register_blueprint(usersapp, url_prefix="/user")
+        app.register_blueprint(enrollapp, url_prefix="/enroll")
+        app.register_blueprint(h5app, url_prefix="/h5")
 
-        app.tjwss = TJWSS(app.config['SECRET_KEY'],expires_in=app.config['TOKEN_EXPIRES_IN'])
+        app.tjwss = TJWSS(app.config['SECRET_KEY'],
+                          expires_in=app.config['TOKEN_EXPIRES_IN'])
         return app

@@ -14,7 +14,7 @@ class Config():
     # DB Config
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_DATABASE_URI = 'sqlite:///dev.db' if DEBUG else os.environ['SQLALCHEMY_DATABASE_URI']
-    if (not DEBUG) and 'mysql+pymysql' not in app.config['SQLALCHEMY_DATABASE_URI']:
+    if (not DEBUG) and 'mysql+pymysql' not in SQLALCHEMY_DATABASE_URI:
         raise EnvironmentError("No db connection uri provided")
         exit(-1)
 
