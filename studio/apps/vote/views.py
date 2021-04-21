@@ -47,14 +47,11 @@ def vote_page(vote_id):
         c.description = c.description.replace('<br>','\n')
         c.description = c.description.replace('\r','').replace('\n','<br/>').replace('<br>','<br/>').strip()
         c.description = Markup(c.description)
-    session['captcha_time'] = int(time.time())+10*60#10分钟
-    session['captcha_str'],captcha_b64 = get_captcha_and_img()
     current_app.logger.debug('timing-of-vote_page:'+str(time.time()-t1))
     return render_template(
         'vote_vote_page.html',
         candidate_all=candidate_all,
         vote_info=vote_info,
-        captcha_b64 =captcha_b64,
         voted = voted,
         candidate_all_sorted=candidate_all_sorted,
         echarts = True
