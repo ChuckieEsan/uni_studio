@@ -21,14 +21,15 @@ def global_interceptor():
         g.user = None
     if request.path.startswith('/console') and not g.user:
         return redirect(url_for('users.users_entrypoint')+'?target={}'.format(request.path))
-    rules = RouteInterceptors.query.filter(RouteInterceptors.delete==False).all()
+    rules = RouteInterceptors.query.filter(RouteInterceptors.delete==False).order_by(RouteInterceptors.startswith.desc()).all()
     for r in rules:
-        if not request.path.startswith(r.startswith):#这里很有可能有问题，应该尝试匹配最长路径。
+        if not request.path.startswith(r.startswith):
             continue
+        if r.role_bits == 0 and not (g.user and g.user.role_bits & 1): # only root can view this page
+            flash(r.description)
+            return abort(503)
         if not g.user:
             return redirect(url_for('users.users_entrypoint')+'?target={}'.format(request.path))
-        if r.role_bits == 0 and not (user.role_bits & 1): # only root can view this page
-            return abort(503)
         if not (user.role_bits & 1 or user.role_bits & r.role_bits):
             flash(r.description)
             return abort(403)
