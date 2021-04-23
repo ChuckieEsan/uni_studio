@@ -1,5 +1,5 @@
 from functools import wraps
-from flask import request,redirect,current_app,abort,g,session,jsonify,url_for,flash,g,Request,Response
+from flask import request,redirect,current_app,abort,g,jsonify,url_for,flash,g,Request,Response
 import json
 import time
 from studio.models import db,UserRoles,RouteInterceptors,UserUsers
@@ -25,7 +25,7 @@ def global_interceptor():
     for r in rules:
         if not request.path.startswith(r.startswith):#这里很有可能有问题，应该尝试匹配最长路径。
             continue
-        if not user:
+        if not g.user:
             return redirect(url_for('users.users_entrypoint')+'?target={}'.format(request.path))
         if r.role_bits == 0 and not (user.role_bits & 1): # only root can view this page
             return abort(503)
