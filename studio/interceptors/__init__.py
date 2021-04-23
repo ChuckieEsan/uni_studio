@@ -25,7 +25,7 @@ def global_interceptor():
     for r in rules:
         if not request.path.startswith(r.startswith):#这里很有可能有问题，应该尝试匹配最长路径。
             continue
-        if not user:
+        if not g.user:
             return redirect(url_for('users.users_entrypoint')+'?target={}'.format(request.path))
         if r.role_bits == 0 and not (user.role_bits & 1): # only root can view this page
             return abort(503)
