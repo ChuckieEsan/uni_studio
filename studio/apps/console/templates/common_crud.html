@@ -25,7 +25,7 @@
                     {% endif %}
                     {% endfor %}
                     <td>
-                        <form method="POST" action="{{url_for('console.crud_post',table=_class.__tablename__)}}" id="updateForm{{loop.index}}">
+                        <form method="POST" action="{{url_for('console.crud_put',table=_class.__tablename__)}}" id="updateForm{{loop.index}}">
                             <select name="key" form="updateForm{{loop.index}}">
                                 {% for c in _class.__dict__.keys() %}
                                 {% if c[0] != '_' %}
