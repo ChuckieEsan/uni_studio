@@ -15,6 +15,7 @@ def get_class(table_name:str):
             break
     return target_class
 
+
 @console.route(URL_PATTERN_RU,methods=['GET'])
 def crud_get(table):
     target_class = get_class(table)
@@ -44,9 +45,19 @@ def crud_put(table):
     return redirect(url_for('console.crud_get',table=table))
 
 @console.route(URL_PATTERN_CD,methods=['GET'])#删除
-def crud_delete():
-    return '2'
+def crud_delete(table):
+    _id = request.values.get('id')
+    target_class = get_class(table)
+    if not target_class:
+        return redirect(url_for('console.console_root'))
+    item = target_class.query.filter(getattr(target_class,'id')==_id).first()
+    if hasattr(target_class,'delete'):
+        item.delete = True
+    else:
+        models.db.session.delete(item)
+    models.db.session.commit()
+    return redirect(url_for('console.crud_get',table=table))
 
 @console.route(URL_PATTERN_CD,methods=['POST'])#添加
-def crud_create():
+def crud_create(table):
     return '1'

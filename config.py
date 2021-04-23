@@ -25,7 +25,7 @@ class Config():
     TOKEN_EXPIRES_IN = 3600
     SECRET_KEY = 'Do not go gentle into that good night'
     
-
+    HOMEPAGE_URL = "https://wp.dutbit.com/wp20/"
 
     # Fileservice Config
     FILESERVICE_UPLOAD_FOLDER = join_upload_dir('data/fileservice')

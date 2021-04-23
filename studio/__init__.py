@@ -1,5 +1,5 @@
 from itsdangerous import TimedJSONWebSignatureSerializer as TJWSS
-from flask import Flask, Request, render_template
+from flask import Flask,redirect
 from flask_bootstrap import Bootstrap  # for flask-file-uploader | fileservice
 from flask_migrate import Migrate
 import logging
@@ -57,6 +57,8 @@ def create_app():
         # db.drop_all()
         # db.create_all()
         migrate = Migrate(app, db)
+
+        app.add_url_rule('/',view_func=lambda:redirect(app.config["HOMEPAGE_URL"]))
         app.register_blueprint(tests)
         app.register_blueprint(fileserviceapp, url_prefix='/fileservice')
         app.register_blueprint(staticfileapp, url_prefix='/staticfile')
