@@ -2,7 +2,8 @@ from studio.apps.console import console
 from flask import render_template,redirect,request,abort,g,url_for,current_app
 from studio import models
 
-URL_PATTERN = '/crud/<string:table>'
+URL_PATTERN_RU = '/crud/<string:table>'
+URL_PATTERN_CD = '/crud/cd/<string:table>'
 
 def get_class(table_name:str):
     if not table_name:
@@ -14,7 +15,7 @@ def get_class(table_name:str):
             break
     return target_class
 
-@console.route(URL_PATTERN,methods=['GET'])
+@console.route(URL_PATTERN_RU,methods=['GET'])
 def crud_get(table):
     target_class = get_class(table)
     if not target_class:
@@ -25,8 +26,8 @@ def crud_get(table):
         _class=target_class,type=type,
         getattr=getattr,title="crud")
 
-@console.route(URL_PATTERN,methods=['POST'])
-def crud_post(table):
+@console.route(URL_PATTERN_RU,methods=['POST'])
+def crud_put(table):
     target_class = get_class(table)
     if not target_class:
         return redirect(url_for('console.console_root'))
@@ -40,4 +41,12 @@ def crud_post(table):
     if data:
         setattr(data,key,value)
         models.db.session.commit()
-    return redirect(url_for('console.console_root'))
+    return redirect(url_for('console.crud_get',table=table))
+
+@console.route(URL_PATTERN_CD,methods=['GET'])#删除
+def crud_delete():
+    return '2'
+
+@console.route(URL_PATTERN_CD,methods=['POST'])#添加
+def crud_create():
+    return '1'
