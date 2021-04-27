@@ -20,7 +20,9 @@ class VoteCandidates(TimestampMixin, db.Model):
     __tablename__ = "vote_candidates"
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
+    title_label = db.Column(db.String(255))
     subtitle = db.Column(db.Text, nullable=True)
+    subtitle_label = db.Column(db.Text)
     description = db.Column(db.Text, nullable=True)
     action_at = db.Column(db.Text, nullable=True)
     votes = db.Column(db.Integer, default=0, nullable=False)
@@ -52,7 +54,7 @@ class VoteInfo(TimestampMixin, db.Model):
     admin = db.Column(db.Text, nullable=False)
     shuffle = db.Column(db.Boolean, default=False, nullable=False)
     is_poll = db.Column(db.Boolean, default=False, nullable=False)
-
+    show_stats = db.Column(db.Boolean,default=False)
     def __init__(self, *args, **kwargs):
         super(VoteInfo, self).__init__(**kwargs)
 
