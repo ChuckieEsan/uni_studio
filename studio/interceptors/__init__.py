@@ -61,7 +61,7 @@ def validate_captcha(func):
         
         if request.values.get('captcha') != captcha_text:
             return generate_response(False,'验证码错误')
-    
+        cache.delete('{}:{}'.format(CAPTCHA_NAMESPACE,uuid))
         return func(*args,**kwargs)
     return func_wrapper
 

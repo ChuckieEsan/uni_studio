@@ -83,18 +83,18 @@
             enctype="multipart/form-data">
             <div class="row">
                 <div class="col-md-3">
-                    <label>姓名</label><br><input type="text" placeholder="title" name="title" required>
+                    <label>{{vote_info.title_label}}</label><br><input type="text" placeholder="title" name="title" required>
                 </div>
                 <div class="col-md-3">
-                    <label>所在社区</label><br><input type="text" placeholder="subtitle" name="subtitle">
+                    <label>{{vote_info.subtitle_label}}</label><br><input type="text" placeholder="subtitle" name="subtitle">
                 </div>
                 <div class="col-md-3">
-                    <label>周记</label><br>
+                    <label>详细描述</label><br>
                     <textarea name="description"></textarea>
                     <!-- <input type="text" placeholder="description" name="description"> -->
                 </div>
                 <div class="col-md-3">
-                    <label>时间</label><br><input type="text" placeholder="action at" name="action_at">
+                    <label>备注</label><br><input type="text" placeholder="action at" name="action_at">
                 </div>
                 <div class="col-md-12">
                     <hr>

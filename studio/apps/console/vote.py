@@ -38,16 +38,13 @@ def admin_votes_add():
         end_at=timestamp_to_datetime(new_vote.get("end_at")),
         vote_min=new_vote.get("vote_min"),
         vote_max=new_vote.get("vote_max"),
+        title_label = new_vote.get('title_label'),
+        subtitle_label = new_vote.get('subtitle_label'),
         admin=g.user.id
     )
-    #VoteInfo.add(v)
     db.session.add(v)
-    try:
-        db.session.commit()
-    except Exception as e:
-        db.session.rollback()
-        print(e)
-    return redirect(url_for('vote.admin_votes_show'))
+    db.session.commit()
+    return redirect(url_for('console.admin_votes_show'))
 
 @vote.route('/vote/<int:vote_id>',methods=["GET"])
 def admin_vote_page(vote_id):
