@@ -68,7 +68,7 @@ def crud_put(table):
     if data:
         setattr(data,key,value)
         models.db.session.commit()
-    return redirect(url_for('console.crud_get',table=table))
+    return redirect(url_for('console.crud_get',table=table,id=_id))
 
 @console.route(URL_PATTERN_CD,methods=['GET'])#删除
 def crud_delete(table):
