@@ -12,18 +12,16 @@ def admin_votes_show():
     voteinfo_all = VoteInfo.query.filter().all()
     return render_template(
         'vote_admin_index.html',
-        info_list=voteinfo_all
+        info_list=voteinfo_all,
+        title="Vote Admin"
         )
         
 @vote.route('/vote/shuffle/<int:vote_id>')
 def toggle_shuffle(vote_id):
     vote_info = VoteInfo.query.filter(VoteInfo.id==vote_id).first_or_404()
     vote_info.shuffle = not vote_info.shuffle
-    try:
-        db.session.commit()
-    except Exception as e:
-        print(e)
-    return redirect(url_for('vote.admin_vote_page',vote_id=vote_id))
+    db.session.commit()
+    return redirect(url_for('console.admin_vote_page',vote_id=vote_id))
 
 @vote.route('/vote',methods=["POST"])#新建投票接口
 def admin_votes_add():
@@ -38,16 +36,13 @@ def admin_votes_add():
         end_at=timestamp_to_datetime(new_vote.get("end_at")),
         vote_min=new_vote.get("vote_min"),
         vote_max=new_vote.get("vote_max"),
+        title_label = new_vote.get('title_label'),
+        subtitle_label = new_vote.get('subtitle_label'),
         admin=g.user.id
     )
-    #VoteInfo.add(v)
     db.session.add(v)
-    try:
-        db.session.commit()
-    except Exception as e:
-        db.session.rollback()
-        print(e)
-    return redirect(url_for('vote.admin_votes_show'))
+    db.session.commit()
+    return redirect(url_for('console.admin_votes_show'))
 
 @vote.route('/vote/<int:vote_id>',methods=["GET"])
 def admin_vote_page(vote_id):
@@ -59,6 +54,7 @@ def admin_vote_page(vote_id):
         'vote_admin_vote_page.html',
         candidate_all=candidate_all,
         vote_info=vote_info,
+        title=vote_info.title
     )
 
 
@@ -120,12 +116,6 @@ def votes_del(vote_id):
         db.session.rollback()
         print(e)
     return redirect(url_for('console.admin_votes_show'))
-
-@vote.route('/vote/ballots/<vote_id>',methods=["GET"])
-def votes_details_show(vote_id):
-    all = VoteVotes.query.filter(VoteVotes.id==vote_id).all()
-    return render_template('vote_admin_votes.html',votes_all=all)
-
 
 @vote.route('/vote/populate/<vote_id>')
 def populate_id(vote_id):

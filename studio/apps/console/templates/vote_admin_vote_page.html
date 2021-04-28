@@ -1,0 +1,132 @@
+{% extends 'common_base.html' %}
+{% block content %}
+<!-- 选项详情 -->
+<div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="_myModalLabel">候选人详情</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body" id="detailDisplay">
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end 选项详情 -->
+
+<!-- 批量添加 -->
+<!-- end 批量添加 -->
+
+<!-- 单个添加 -->
+<!-- Modal -->
+<div class="modal fade" id="singleAdd" tabindex="-1" aria-labelledby="singleAddModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">单个选项添加</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="{{url_for('console.candidate_add',vote_id=vote_info.id)}}" method="POST"
+                    enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>{{vote_info.title_label}}</label><br><input type="text" placeholder="title"
+                                name="title" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label>{{vote_info.subtitle_label}}</label><br><input type="text" placeholder="subtitle"
+                                name="subtitle">
+                        </div>
+                        <div class="col-md-3">
+                            <label>详细描述</label><br>
+                            <textarea name="description"></textarea>
+                            <!-- <input type="text" placeholder="description" name="description"> -->
+                        </div>
+                        <div class="col-md-3">
+                            <label>备注</label><br><input type="text" placeholder="action at" name="action_at">
+                        </div>
+                        <div class="col-md-12">
+                            <hr>
+                        </div>
+                        <div class="col-md-3">
+                            <label>选择描述图片</label>
+                            <input type="file" name="image" required>
+                        </div>
+                    </div>
+                    <hr>
+                    <input type="submit">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end 单个添加 -->
+
+<div class="container">
+    <!-- title start -->
+    {% if vote_info.image %}
+    <img src="{{vote_info.image}}" />
+    {% endif %}
+    <h3>{{vote_info.title}}: {{vote_info.subtitle}}</h3>
+    <p>{{vote_info.description}}</p>
+    <p>
+        {% if vote_info.start_at!=vote_info.end_at%}
+        {{vote_info.start_at}}~{{vote_info.end_at}}
+        {% else %}
+        {{vote_info.start_at}}~无截止日期
+        {% endif %}
+        <a href="{{url_for('console.toggle_shuffle',vote_id=vote_info.id)}}">{% if vote_info.shuffle %}关闭{% else
+            %}打开{%endif%}乱序排列</a>
+
+        <a href="{{url_for('console.admin_votes_show')}}" style="margin-left: 30px;">返回管理列表</a>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#singleAdd">
+            单个添加
+          </button>
+    </p>
+    <!-- title end -->
+    {% for v in candidate_all %}
+    <div class="col-md-2 col-lg-2 col-sm-3 col-xs-4">
+        <span>序号:{{loop.index}}&nbsp;&nbsp;&nbsp;&nbsp;姓名：{{v.title}}</span><br>
+        <a href="{{url_for('console.candidate_del',vote_id=vote_info.id,candidate_id=v.id)}}">删除此候选人</a>
+        <button onclick="showDetail('{{loop.index}}')">查看详情</button>
+    </div>
+    <div style="display:none" id="detail_{{loop.index}}">
+        <div class="p-info">
+            {% if v.image %}
+            <img src="{{v.image}}" />
+            {% endif %}
+            <div style="width:55%">
+                <p>序号：{{loop.index}}&nbsp;&nbsp;&nbsp;&nbsp;姓名：{{v.title}}</p>
+                <p>所在社区：{{v.subtitle}}</p>
+                <p>时间：{{v.action_at}}</p>
+                <p>已获：{{v.votes}}票</p>
+                <div style="word-break:break-all">
+                    周记内容：{{v.description}}
+                </div>
+                <a href="{{url_for('console.candidate_del',vote_id=vote_info.id,candidate_id=v.id)}}">删除此候选人</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+<script>
+    let showDetail = (loopindex) => {
+        console.log(loopindex)
+        $("#detailDisplay").html($(`#detail_${loopindex}`).html())
+        $("#detailModal").modal('show')
+    }
+</script>
+{% endblock %}

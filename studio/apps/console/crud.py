@@ -1,7 +1,7 @@
 from studio.apps.console import console
 from flask import render_template,redirect,request,abort,g,url_for,current_app
 from studio import models
-
+from sqlalchemy import inspect
 URL_PATTERN_RU = '/crud/<string:table>'
 URL_PATTERN_CD = '/crud/cd/<string:table>'
 
@@ -22,9 +22,25 @@ def crud_get(table):
     if not target_class:
         return redirect(url_for('console.console_root'))
     current_app.logger.info(target_class)
-    all = target_class.query.all()
+    _id = request.values.get('id')
+    if _id:
+        all = target_class.query.filter(getattr(target_class,'id')==_id).all()
+    else:
+        all = target_class.query.all()
+    
+    insp = inspect(models.db.engine)
+    columns = insp.get_columns(table)
+    constraints = {}
+    for c in columns:
+        constraints[c['name']] = None
+        _type = str(c['type']).lower()
+        if _type in ['integer','text'] or 'varchar' in _type:
+            constraints[c['name']] = 'text'
+        elif _type == 'boolean':
+            constraints[c['name']] = 'bool'
     return render_template('common_crud.html',data=all,
-        _class=target_class,type=type,
+        _class=target_class,
+        constraints=constraints,
         getattr=getattr,title="crud")
 
 @console.route(URL_PATTERN_RU,methods=['POST'])
@@ -33,8 +49,18 @@ def crud_put(table):
     if not target_class:
         return redirect(url_for('console.console_root'))
     
+    insp = inspect(models.db.engine)
+    columns = insp.get_columns(table)
+    constraints = {}
+    for c in columns:
+        constraints[c['name']] = str(c['type']).lower()
     key = request.values.get('key')
+    key_constraint= constraints[key]
     value = request.values.get('value')
+    if key_constraint == 'boolean':
+        value = False if value!='1' else True
+    elif key_constraint == "integer":
+        value = int(value)
     _id = request.values.get('id')
     if not key or not value:
         abort(500)
