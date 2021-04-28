@@ -39,7 +39,7 @@
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
     <div style="padding-bottom: 35px;margin-top:0%;height:100%">
-
+        <div id="notification"></div>
         {% block content%}
         {% endblock %}
     </div>
@@ -56,7 +56,11 @@
             <a href="{{root}}">返回主页</a>
             {% endif %}
         </div>
-      </nav>
+    </nav>
+    <script>
+        fetch("{{url_for('common.get_global_notification')}}").
+        then(res=>res.text()).then(res=>{$("#notification").html(res)})
+    </script>
     {% block script %}
     {% endblock %}
 </body>

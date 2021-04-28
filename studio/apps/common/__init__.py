@@ -21,3 +21,16 @@ def get_captcha_img():
 @validate_captcha
 def v_captcha():
     return 'ok'
+
+@common.route('/notification/global')
+def get_global_notification():
+    text = "计划2021年4月28日晚23：00进行维护，期间可能出现服务响应缓慢等问题"
+    html = """
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+  {}
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+    """.format(text)
+    return html
