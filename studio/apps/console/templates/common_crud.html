@@ -1,45 +1,71 @@
 {% extends 'common_base.html'%}
 {% block content %}
-    <div class="row">
-        <table class="table">
-            <thead>
-                <tr>
-                    {% for c in _class.__dict__.keys() %}
-                    {% if c[0]!="_" %}
-                    <th scope="col">{{c}}<!--:{{type(getattr(_class,c))}}--></th>
-                    {% endif %}
-                    {% endfor %}
-                    <th scope="col">Form</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for d in data %}
-                <tr>
-                    {% for c in _class.__dict__.keys() %}
-                    {% if c[0] != '_' %}
-                    {% if loop.index0 == 1 %}
-                    <th scope="row">{{d.__dict__[c]}}</th>
-                    {% else %}
-                    <td>{{d.__dict__[c]}}</td>
-                    {% endif %}
-                    {% endif %}
-                    {% endfor %}
-                    <td>
-                        <form method="POST" action="{{url_for('console.crud_put',table=_class.__tablename__)}}" id="updateForm{{loop.index}}">
-                            <select name="key" form="updateForm{{loop.index}}">
-                                {% for c in _class.__dict__.keys() %}
-                                {% if c[0] != '_' %}
-                                <option value="{{c}}">{{c}}</option>
-                                {% endif %}
-                                {% endfor %}
-                            </select>
-                            <input type="text" hidden name="id" value="{{d.id}}">
-                            <input type="text" name="value">
-                            <input type="submit">
-                        </form>
-                    </td>
-                </tr>
+<div class="row">
+    <table class="table">
+        <thead>
+            <tr>
+                {% for c in _class.__dict__.keys() %}
+                {% if c[0]!="_" %}
+                <th scope="col">{{c}}</th>
+                {% endif %}
                 {% endfor %}
-            </tbody>
-    </div>
+                <th scope="col">Form</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d in data %}
+            <tr>
+                {% for c in _class.__dict__.keys() %}
+                {% if c[0] != '_' %}
+                {% if loop.index0 == 1 %}
+                <th scope="row">{{d.__dict__[c]}}</th>
+                {% else %}
+                <td>{{d.__dict__[c]}}</td>
+                {% endif %}
+                {% endif %}
+                {% endfor %}
+                <td>
+                    <form method="POST" action="{{url_for('console.crud_put',table=_class.__tablename__)}}"
+                        id="updateForm{{loop.index}}">
+                        <select class="selector" name="key" form="updateForm{{loop.index}}">
+                            <option value="" disabled selected>choose:</option>
+                            {% for c in _class.__dict__.keys() %}
+                            {% if c[0] != '_' and c != 'id' and constraints[c] %}
+                            <option value="{{c}}" dtype="{{constraints[c]}}">{{c}}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                        <input type="text" hidden name="id" value="{{d.id}}">
+                        <div id="boolInput" style="display: none;">
+                            <input id="trueInput" type="radio" name="value" value="1">
+                            <label for="trueInput">True</label>
+                            <input id="falseInput" type="radio" name="value" value="0">
+                            <label for="falseInput">False</label>
+                        </div>
+                        <input id="textInput" type="text" name="value" style="display: none;">
+                        <input type="submit">
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+</div>
+<script>
+    $(".selector").change(function () {
+        let dtype = this.options[this.selectedIndex].getAttribute("dtype")
+        if(dtype==="text"){
+            $("#boolInput").hide()
+            $("#textInput").show()
+            $("#trueInput").attr("name","_v")
+            $("#falseInput").attr("name","_v")
+            $("#textInput").attr("name","value")
+        } else if(dtype==="bool"){
+            $("#boolInput").show()
+            $("#textInput").hide()
+            $("#trueInput").attr("name","value")
+            $("#falseInput").attr("name","value")
+            $("#textInput").attr("name","_v")
+        }
+    })
+</script>
 {% endblock %}

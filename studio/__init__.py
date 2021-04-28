@@ -4,13 +4,10 @@ from flask_bootstrap import Bootstrap  # for flask-file-uploader | fileservice
 from flask_migrate import Migrate
 import logging
 import os
-
-
 from .cache import cache
 from .test import tests
 from .apps.fileservice.app import app as fileserviceapp
 from .api import postcardapp
-from .utils.dir_helper import join_upload_dir
 from .utils.ver_helper import get_ver
 from .utils.error_helper import error_handler
 from .utils.log import LiveLog
@@ -57,7 +54,6 @@ def create_app():
         # db.drop_all()
         # db.create_all()
         migrate = Migrate(app, db)
-
         app.add_url_rule('/',view_func=lambda:redirect(app.config["HOMEPAGE_URL"]))
         app.register_blueprint(tests)
         app.register_blueprint(fileserviceapp, url_prefix='/fileservice')
