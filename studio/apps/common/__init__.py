@@ -34,7 +34,8 @@ def v_captcha():
 def get_global_notification():
     noti = GlobalNotifications.query.filter(
         GlobalNotifications.valid_until > datetime.datetime.now()).order_by(GlobalNotifications.valid_until.desc()).first()
-    html = """
+    if noti:
+        html = """
     <div class="alert alert-warning alert-dismissible fade show" role="alert">
       {}
     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -42,5 +43,6 @@ def get_global_notification():
     </button>
     </div>
     """.format(noti.text)
-    result = "" if not noti else html
-    return result
+    else:
+        html = ""
+    return html
