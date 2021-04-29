@@ -1,14 +1,18 @@
 from functools import wraps
-from flask import request,redirect,current_app,abort,g,jsonify,url_for,flash,g,Request,Response
-import json
-import time
-from studio.models import db,UserRoles,RouteInterceptors,UserUsers
+from typing import List
+from flask import request,redirect,current_app,abort,g,jsonify,url_for,flash,g,Response
+from studio.models import RouteInterceptors,UserUsers
 from studio.cache import cache
 
 CAPTCHA_TIMEOUT = 600
 CAPTCHA_NAMESPACE = 'captcha'
 CAPTCHA_COOKIE_KEY = '_c'
 CAPTCHA_VALID_FIELD = 'is_valid'
+
+@cache.memoize(300)
+def get_all_rules()->List[RouteInterceptors]:
+    print('cache not hit')
+    return RouteInterceptors.query.filter(RouteInterceptors.delete==False).order_by(RouteInterceptors.startswith.desc()).all()
 
 def global_interceptor():
     token = request.cookies.get('token')
@@ -21,7 +25,7 @@ def global_interceptor():
         g.user = None
     if request.path.startswith('/console') and not g.user:
         return redirect(url_for('users.users_entrypoint')+'?target={}'.format(request.path))
-    rules = RouteInterceptors.query.filter(RouteInterceptors.delete==False).order_by(RouteInterceptors.startswith.desc()).all()
+    rules = get_all_rules() 
     for r in rules:
         if not request.path.startswith(r.startswith):
             continue
