@@ -11,16 +11,19 @@ CAPTCHA_VALID_FIELD = 'is_valid'
 
 @cache.memoize(300)
 def get_all_rules()->List[RouteInterceptors]:
-    print('cache not hit')
     return RouteInterceptors.query.filter(RouteInterceptors.delete==False).order_by(RouteInterceptors.startswith.desc()).all()
 
+@cache.memoize(300)
+def get_user(_id):
+    return UserUsers.query.filter(UserUsers.id==_id).first()
+
 def global_interceptor():
-    token = request.cookies.get('token')
     try:
+        token = request.cookies['token']
         data = current_app.tjwss.loads(token)
-        user = UserUsers.query.filter(UserUsers.id==data.get('id')).first()
+        user = get_user(data['id'])
         g.user = user
-        current_app.logger.info("user=",g.user)
+        current_app.logger.info("user=",g.user.id)
     except Exception as e:
         g.user = None
     if request.path.startswith('/console') and not g.user:
