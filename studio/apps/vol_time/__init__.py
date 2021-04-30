@@ -12,6 +12,11 @@ def vol_time_home():
 
 @vol_time.route('/',methods=['POST'])
 def vol_time_search():
+    """ 约200ms，暂时还不work，会选出重复的stu_id
+    select v1.name,v1.faculty,v1.stu_id,v2.STIME from `vol_time`  as v1  INNER JOIN (
+	SELECT  SUM(time) as STIME,`stu_id`  from `vol_time` GROUP BY `stu_id` ORDER BY STIME DESC LIMIT 1,51
+) AS v2 on v1.stu_id = v2.stu_id GROUP BY v1.stu_id,v1.name,v1.faculty ORDER BY v2.STIME DESC;
+    """
     r = {"name":"","data":"","all_time":0}
     name = request.values.get('name')
     number = request.values.get('number')
