@@ -12,11 +12,6 @@ def vol_time_home():
 
 @vol_time.route('/',methods=['POST'])
 def vol_time_search():
-    """ 约200ms，暂时还不work，会选出重复的stu_id
-    select v1.name,v1.faculty,v1.stu_id,v2.STIME from `vol_time`  as v1  INNER JOIN (
-	SELECT  SUM(time) as STIME,`stu_id`  from `vol_time` GROUP BY `stu_id` ORDER BY STIME DESC LIMIT 1,51
-) AS v2 on v1.stu_id = v2.stu_id GROUP BY v1.stu_id,v1.name,v1.faculty ORDER BY v2.STIME DESC;
-    """
     r = {"name":"","data":"","all_time":0}
     name = request.values.get('name')
     number = request.values.get('number')
@@ -39,22 +34,22 @@ def vol_time_search():
 @vol_time.route('/top')
 @cache.memoize(2000)
 def get_top():
-    #r = db.session.query(VolTime,func.sum(VolTime.time)).group_by(VolTime.stu_id).order_by(VolTime.time.desc())
-    #cursor = db.session.execute("select name,faculty,stu_id,sum(time) from vol_time group by stu_id,name,time,faculty order by time desc limit 50")
-    #res = cursor.fetchall()
-    #data = [dict(zip(result.keys(),result)) for result in res]
-    tr = {}#time result
-    vlist = VolTime.query.filter(VolTime.stu_id!="0").all()
-    for v in vlist:
-        if v.stu_id not in tr:
-            tr[v.stu_id] = {'time':0.0,'name':v.name,'faculty':v.faculty}
-        try:
-            tr[v.stu_id]['time'] += float(v.time)
-        except:
-            pass
-            #current_app.logger.warn(v.time)
-    topk = heapq.nlargest(50,tr,key=lambda x:tr[x]['time'])
-    return render_template('vol_time_top.html',data=topk,tr=tr)
+    #约200ms，会选出重复的stu_id!!!
+    sql = """ 
+    select v1.name,v1.faculty,v1.stu_id,v2.STIME from `vol_time`  as v1  INNER JOIN (
+	SELECT  SUM(time) as STIME,`stu_id`  from `vol_time` GROUP BY `stu_id` ORDER BY STIME DESC LIMIT 1,51
+) AS v2 on v1.stu_id = v2.stu_id GROUP BY v1.stu_id,v1.name,v1.faculty ORDER BY v2.STIME DESC;
+    """
+    cursor = db.session.execute(sql)
+    res = cursor.fetchall()
+    data = [dict(zip(result.keys(),result)) for result in res]
+    stu_id_map = set([])
+    result = []
+    for d in data:
+        if d['stu_id'] not in stu_id_map:
+            stu_id_map.add(d['stu_id'])
+            result.append(d)
+    return render_template('vol_time_top.html',data=result)
  
 
 
