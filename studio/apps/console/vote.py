@@ -2,7 +2,7 @@ from studio.apps.console import console as vote
 from studio.utils.time_helper import timestamp_to_datetime
 from studio.utils.hash_helper import md5
 from studio.models import VoteInfo,VoteCandidates,VoteVotes,db
-from flask import url_for,redirect,abort,render_template,request,Markup,g
+from flask import url_for,redirect,abort,render_template,request,Markup,g,current_app
 from faker import Faker
 import time
 import os
@@ -15,13 +15,7 @@ def admin_votes_show():
         info_list=voteinfo_all,
         title="Vote Admin"
         )
-        
-@vote.route('/vote/shuffle/<int:vote_id>')
-def toggle_shuffle(vote_id):
-    vote_info = VoteInfo.query.filter(VoteInfo.id==vote_id).first_or_404()
-    vote_info.shuffle = not vote_info.shuffle
-    db.session.commit()
-    return redirect(url_for('console.admin_vote_page',vote_id=vote_id))
+
 
 @vote.route('/vote',methods=["POST"])#新建投票接口
 def admin_votes_add():
@@ -61,19 +55,19 @@ def admin_vote_page(vote_id):
 @vote.route('/vote/<int:vote_id>/candidates',methods=["POST"])
 def candidate_add(vote_id):
     new_candidate = request.form
-    #print(request.form)
     _file = request.files.get('image')
-    file_suffix = _file.filename.split('.')[-1]
-    if file_suffix not in ['png','PNG','jpg','JPG','JPEG','jpeg','mp3']:
-        return abort(500)
-    print(os.getcwd())
-    access_dir = '/vote/static/uploads/'+md5(str(time.time())+str(_file.filename))+'.'+file_suffix
-    path = os.getcwd()+'/studio'+access_dir
-    try:
-        _file.save(path)
-    except Exception as e:
-        print(e)
-        return abort(500)
+    access_dir = None
+    if _file:
+        file_suffix = _file.filename.split('.')[-1]
+        if file_suffix not in ['png','PNG','jpg','JPG','JPEG','jpeg','mp3']:
+            return abort(500)
+        access_dir = '/vote/static/uploads/'+md5(str(time.time())+str(_file.filename))+'.'+file_suffix
+        path = os.getcwd()+'/studio'+access_dir
+        try:
+            _file.save(path)
+        except Exception as e:
+            current_app.logger.info(e)
+            return abort(500)
     _des = new_candidate.get('description').strip()#.replace('\n','<br>')
     c = VoteCandidates(
         title=new_candidate.get("title"),#姓名
@@ -84,14 +78,12 @@ def candidate_add(vote_id):
         image=access_dir
     )
     db.session.add(c)
-    try:
-        db.session.commit()
-    except Exception as e:
-        print(e)
-        db.session.rollback()
-    return redirect(url_for('vote.admin_vote_page',vote_id=vote_id))
+    db.session.commit()
+    return redirect(url_for('console.admin_vote_page',vote_id=vote_id))
 
-
+@vote.route('/vote/<int:vote_id>/batchimport',methods=['POST'])
+def do_vote_batch_import(vote_id):
+    return redirect(url_for('console.admin_vote_page',vote_id=vote_id))
 
 @vote.route('/vote/<int:vote_id>/candidates/drop/<int:candidate_id>',methods=["GET"])
 @vote.route('/vote/candidates/<candidate_id>',methods=["DELETE"])
