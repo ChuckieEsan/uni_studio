@@ -1,6 +1,7 @@
 from studio.apps.console import console
 from flask import render_template,redirect,request,abort,g,url_for,current_app
 from studio import models
+import datetime
 from sqlalchemy import inspect
 URL_PATTERN_RU = '/crud/<string:table>'
 URL_PATTERN_CD = '/crud/cd/<string:table>'
@@ -38,6 +39,8 @@ def crud_get(table):
             constraints[c['name']] = 'text'
         elif _type == 'boolean':
             constraints[c['name']] = 'bool'
+        elif _type == "datetime":
+            constraints[c['name']] = 'datetime'
     return render_template('common_crud.html',data=all,
         _class=target_class,
         constraints=constraints,
@@ -48,19 +51,23 @@ def crud_put(table):
     target_class = get_class(table)
     if not target_class:
         return redirect(url_for('console.console_root'))
-    
     insp = inspect(models.db.engine)
     columns = insp.get_columns(table)
     constraints = {}
     for c in columns:
         constraints[c['name']] = str(c['type']).lower()
-    key = request.values.get('key')
+    key = request.values['key']
+    dkey = request.values['dtype']
+    if not dkey:
+        abort(500)
+    value = request.values[dkey]
     key_constraint= constraints[key]
-    value = request.values.get('value')
     if key_constraint == 'boolean':
         value = False if value!='1' else True
     elif key_constraint == "integer":
         value = int(value)
+    elif key_constraint == "datetime":
+        value = datetime.datetime.strptime(value,r"%H:%M %m/%d/%Y")
     _id = request.values.get('id')
     if not key or not value:
         abort(500)
