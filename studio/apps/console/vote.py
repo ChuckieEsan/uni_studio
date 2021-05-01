@@ -4,6 +4,7 @@ from studio.utils.hash_helper import md5
 from studio.models import VoteInfo,VoteCandidates,VoteVotes,db
 from flask import url_for,redirect,abort,render_template,request,Markup,g,current_app
 from faker import Faker
+import pandas as pd
 import time
 import os
 f=Faker(locale='zh_CN')
@@ -69,6 +70,30 @@ def candidate_add(vote_id):
 
 @vote.route('/vote/<int:vote_id>/batchimport',methods=['POST'])
 def do_vote_batch_import(vote_id):
+    fname = request.values.get('fileIndex')
+    coverall = request.values.get('coverall') !=None
+    files = [f for f in os.listdir(os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],str(g.user.id)))\
+        if os.path.isfile(os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],str(g.user.id),f))]
+    if fname not in files:
+        abort(400)
+    fpath = os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],str(g.user.id),fname)
+    df = pd.read_excel(fpath,engine='openpyxl',header=None)
+    candidates = []
+    for i in range(1,df.shape[0]):
+        c = VoteCandidates(
+            title=df.iloc[i][0],
+            subtitle=df.iloc[i][1],
+            description=df.iloc[i][2],
+            action_at=df.iloc[i][3],
+            vote_id=vote_id
+        )
+        candidates.append(c)
+    if coverall:
+        old_candidates = VoteCandidates.query.filter(VoteCandidates.vote_id==vote_id).all()
+        for o in old_candidates:
+            db.session.delete(o)
+    db.session.add_all(candidates)
+    db.session.commit()
     return redirect(url_for('console.admin_vote_page',vote_id=vote_id))
 
 @vote.route('/vote/<int:vote_id>/candidates/drop/<int:candidate_id>',methods=["GET"])
