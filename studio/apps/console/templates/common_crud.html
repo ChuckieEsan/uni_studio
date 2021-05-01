@@ -17,6 +17,8 @@
         </div>
     </div>
 </div>
+<script src="https://unpkg.com/gijgo@1.9.13/js/gijgo.min.js" type="text/javascript"></script>
+<link href="https://unpkg.com/gijgo@1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css" />
 <div class="row">
     <table class="table">
         <thead>
@@ -58,15 +60,23 @@
                             {% endif %}
                             {% endfor %}
                         </select>
-                        <input type="text" hidden name="id" value="{{d.id}}">
-                        <div id="boolInput" style="display: none;">
-                            <input id="trueInput" type="radio" name="value" value="1">
+                        <input type="text" hidden name="dtype" id="dtypeInput">
+                        <input type="text" hidden  name="id" value="{{d.id}}">
+                        <div id="boolDiv" style="display: none;">
+                            <input id="trueInput" type="radio" name="bool" value="1">
                             <label for="trueInput">True</label>
-                            <input id="falseInput" type="radio" name="value" value="0">
+                            <input id="falseInput" type="radio" name="bool" value="0">
                             <label for="falseInput">False</label>
                         </div>
-                        <input id="fileInput" type="file" name="value" style="display:none">
-                        <input id="textInput" type="text" name="value" style="display: none;">
+                        <div id="textDiv" style="display:none">
+                            <input type="text" name="text">
+                        </div>
+                        <div id="datetimeDiv" style="display:none">
+                            <input type="text" id="datetimeInput" name="datetime" width="234">
+                        </div>
+                        <div id="fileDiv" style="display: none;">
+                            <input id="fileInput" type="file" name="file">
+                        </div>
                         <input type="submit">
                     </form>
                 </td>
@@ -80,32 +90,18 @@
         $("#imageShow").attr('src',url)
     }
     $(".selector").change(function () {
+        let dtypes = ["datetime","text","bool"]
         let dtype = this.options[this.selectedIndex].getAttribute("dtype")
-        if(dtype==="text"){
-            $("#boolInput").hide()
-            $("#textInput").show()
-            $("#fileInput").hide()
-            $("#trueInput").attr("name","_v")
-            $("#falseInput").attr("name","_v")
-            $("#textInput").attr("name","value")
-            $("#fileInput").attr('name','_v')
-        } else if(dtype==="bool"){
-            $("#boolInput").show()
-            $("#textInput").hide()
-            $("#fileInput").hide()
-            $("#trueInput").attr("name","value")
-            $("#falseInput").attr("name","value")
-            $("#textInput").attr("name","_v")
-            $("#fileInput").attr('name','_v')
-        } else if(dtype==="image"){
-            $("#boolInput").hide()
-            $("#textInput").hide()
-            $("#fileInput").show()
-            $("#trueInput").attr("name","_v")
-            $("#falseInput").attr("name","_v")
-            $("#textInput").attr("name","_v")
-            $("#fileInput").attr("name","value")
-        }
+        dtypes.map((v)=>{
+            let node = $(`#${v}Div`)
+            v===dtype?node.show():node.hide()
+        })
+        $("#dtypeInput").prop('value',dtype)
     })
+    $('#datetimeInput').datetimepicker({
+            uiLibrary: 'bootstrap4',
+            modal: true,
+            footer: true
+        });
 </script>
 {% endblock %}
