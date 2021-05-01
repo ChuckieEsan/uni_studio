@@ -111,7 +111,7 @@
     <div class="row">
         {% for v in candidate_all %}
         <div class="col-md-4 col-lg-3 col-sm-3 col-xs-4">
-            <span>序号:{{loop.index}}&nbsp;&nbsp;&nbsp;&nbsp;{{vote_info.title}}：{{v.title}}</span><br>
+            <span>序号:{{loop.index}}&nbsp;&nbsp;&nbsp;&nbsp;{{vote_info.title_label}}：{{v.title}}</span><br>
             <a href="{{url_for('console.crud_get',table='vote_candidates')}}?id={{v.id}}"
                 style="color:orange">查看/修改详情</a>
             <br>
