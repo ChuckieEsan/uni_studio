@@ -1,5 +1,22 @@
 {% extends 'common_base.html'%}
 {% block content %}
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="importModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" >图片预览</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" >
+                <img src="" id="imageShow" width="400px">
+            </div>
+            
+
+        </div>
+    </div>
+</div>
 <div class="row">
     <table class="table">
         <thead>
@@ -20,13 +37,19 @@
                 {% if loop.index0 == 1 %}
                 <th scope="row">{{d.__dict__[c]}}</th>
                 {% else %}
-                <td>{{d.__dict__[c]}}</td>
+                <td>
+                    {% if 'image' in c and d.__dict__[c] %}
+                    <button type="button" onclick="showImage('{{d.__dict__[c]}}')">查看图片</button>
+                    {% else %}
+                    {{d.__dict__[c]}}
+                    {% endif %}
+                </td>
                 {% endif %}
                 {% endif %}
                 {% endfor %}
                 <td>
                     <form method="POST" action="{{url_for('console.crud_put',table=_class.__tablename__)}}"
-                        id="updateForm{{loop.index}}">
+                        id="updateForm{{loop.index}}" enctype="multipart/form-data">
                         <select class="selector" name="key" form="updateForm{{loop.index}}">
                             <option value="" disabled selected>choose:</option>
                             {% for c in _class.__dict__.keys() %}
@@ -42,6 +65,7 @@
                             <input id="falseInput" type="radio" name="value" value="0">
                             <label for="falseInput">False</label>
                         </div>
+                        <input id="fileInput" type="file" name="value" style="display:none">
                         <input id="textInput" type="text" name="value" style="display: none;">
                         <input type="submit">
                     </form>
@@ -51,20 +75,36 @@
         </tbody>
 </div>
 <script>
+    let showImage = (url)=>{
+        $("#imageModal").modal('show')
+        $("#imageShow").attr('src',url)
+    }
     $(".selector").change(function () {
         let dtype = this.options[this.selectedIndex].getAttribute("dtype")
         if(dtype==="text"){
             $("#boolInput").hide()
             $("#textInput").show()
+            $("#fileInput").hide()
             $("#trueInput").attr("name","_v")
             $("#falseInput").attr("name","_v")
             $("#textInput").attr("name","value")
+            $("#fileInput").attr('name','_v')
         } else if(dtype==="bool"){
             $("#boolInput").show()
             $("#textInput").hide()
+            $("#fileInput").hide()
             $("#trueInput").attr("name","value")
             $("#falseInput").attr("name","value")
             $("#textInput").attr("name","_v")
+            $("#fileInput").attr('name','_v')
+        } else if(dtype==="image"){
+            $("#boolInput").hide()
+            $("#textInput").hide()
+            $("#fileInput").show()
+            $("#trueInput").attr("name","_v")
+            $("#falseInput").attr("name","_v")
+            $("#textInput").attr("name","_v")
+            $("#fileInput").attr("name","value")
         }
     })
 </script>

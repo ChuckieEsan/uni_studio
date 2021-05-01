@@ -55,19 +55,6 @@ def admin_vote_page(vote_id):
 @vote.route('/vote/<int:vote_id>/candidates',methods=["POST"])
 def candidate_add(vote_id):
     new_candidate = request.form
-    _file = request.files.get('image')
-    access_dir = None
-    if _file:
-        file_suffix = _file.filename.split('.')[-1]
-        if file_suffix not in ['png','PNG','jpg','JPG','JPEG','jpeg','mp3']:
-            return abort(500)
-        access_dir = '/vote/static/uploads/'+md5(str(time.time())+str(_file.filename))+'.'+file_suffix
-        path = os.getcwd()+'/studio'+access_dir
-        try:
-            _file.save(path)
-        except Exception as e:
-            current_app.logger.info(e)
-            return abort(500)
     _des = new_candidate.get('description').strip()#.replace('\n','<br>')
     c = VoteCandidates(
         title=new_candidate.get("title"),#姓名
@@ -75,7 +62,6 @@ def candidate_add(vote_id):
         description=_des,#new_candidate.get("description"),#周记
         vote_id=vote_id,
         action_at = new_candidate.get('action_at'),#时间
-        image=access_dir
     )
     db.session.add(c)
     db.session.commit()

@@ -32,8 +32,6 @@ class VoteCandidates(TimestampMixin, db.Model):
 
     def __str__(self):
         return str(self.todict())#"<Candidate NO {}>".format(self.id)
-    def todict(self):
-        return self.__dict__
 
 
 class VoteInfo(TimestampMixin, db.Model):

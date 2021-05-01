@@ -1,7 +1,10 @@
+import os
+from studio.utils.hash_helper import md5
 from studio.apps.console import console
 from flask import render_template,redirect,request,abort,g,url_for,current_app
 from studio import models
 from sqlalchemy import inspect
+import time
 URL_PATTERN_RU = '/crud/<string:table>'
 URL_PATTERN_CD = '/crud/cd/<string:table>'
 
@@ -35,7 +38,7 @@ def crud_get(table):
         constraints[c['name']] = None
         _type = str(c['type']).lower()
         if _type in ['integer','text'] or 'varchar' in _type:
-            constraints[c['name']] = 'text'
+            constraints[c['name']] = 'image' if 'image' in c['name'] else 'text'
         elif _type == 'boolean':
             constraints[c['name']] = 'bool'
     return render_template('common_crud.html',data=all,
@@ -54,9 +57,22 @@ def crud_put(table):
     constraints = {}
     for c in columns:
         constraints[c['name']] = str(c['type']).lower()
+
+    _file = request.files.get('value')
+    access_dir = None
+    if _file:
+        print('111')
+        file_suffix = _file.filename.split('.')[-1]
+        if file_suffix not in ['png','PNG','jpg','JPG','JPEG','jpeg','mp3']:
+            abort(500)
+        access_dir = '/common/static/uploads/'+md5(str(time.time())+str(_file.filename))+'.'+file_suffix
+        path = os.getcwd()+'/studio/apps'+access_dir
+        _file.save(path)
     key = request.values.get('key')
     key_constraint= constraints[key]
     value = request.values.get('value')
+    if _file:
+        value = access_dir
     if key_constraint == 'boolean':
         value = False if value!='1' else True
     elif key_constraint == "integer":
