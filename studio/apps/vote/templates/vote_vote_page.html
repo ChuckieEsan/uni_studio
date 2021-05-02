@@ -58,48 +58,11 @@
         </div>
 
     </form>
-    <a href="#" class="scrollToTop">Scroll To Top</a>
-    <div id="backtop">
-        <a href="#1F">
-            <button class="btn btn-default">
-                ↑
-            </button>
-        </a>
-        <br>
-        <a href="#2F">
-            <button class="btn btn-default">
-                ↓
-            </button>
-        </a>
-    </div>
-
 </div>
 
 {% endblock %}
 {% block script %}
 <script src="https://cdn.jsdelivr.net/npm/jquery-lazyload@1.9.7/jquery.lazyload.min.js"></script>
-<script>
-    $(document).ready(function () {
-
-        //Check to see if the window is top if not then display button
-        $(window).scroll(function () {
-            if ($(this).scrollTop() > 100) {
-                $('.scrollToTop').fadeIn();
-            } else {
-                $('.scrollToTop').fadeOut();
-            }
-        });
-
-        //Click event to scroll to top
-        $('.scrollToTop').click(function () {
-            $('html, body').animate({
-                scrollTop: 0
-            }, 800);
-            return false;
-        });
-
-    });
-</script>
 <script>
     // let VOTE_MIN = {
     //     {
