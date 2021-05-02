@@ -62,6 +62,14 @@ def vote_page(vote_id):
             or not vote_info.show_raw_vote_on_voted) else True
     )
 
+@vote.route('/candidate')
+def show_candidate():
+    cid = request.values.get('cid')
+    if not cid:
+        return ""
+    c = VoteCandidates.query.filter(VoteCandidates.id==cid).first()
+    vote_info = VoteInfo.query.filter(VoteInfo.id==c.id).first()
+    return render_template("vote_candidate.html",candidate=c,vote_info=vote_info)
 
 def get_tickets_and_candidates(vote_id: int, lim=5):
     candidate_info = VoteCandidates.query.filter(VoteCandidates.vote_id == vote_id).order_by(

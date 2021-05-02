@@ -3,7 +3,19 @@
 <link rel="stylesheet" href="{{url_for('vote.static',filename='css/vote.css')}}" />
 {% endblock %}
 {% block content %}
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body" id="modal-body">
 
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="container">
     <div class="jumbotron">
         <h2 class="display-6">{{vote_info.title}}</h2>
@@ -31,7 +43,9 @@
                             {% endif %}
                         </p>
                         <p class="card-text" style="font-size: smaller;">{{c.action_at}}</p>
-                        <button class="btn btn-primary">查看详情</button>
+                        <a class="btn btn-primary" onclick="showDetails('{{c.id}}')" data-toggle="modal"
+                            data-target="#exampleModal" style="color: white;">
+                            查看详情</a>
                         <input type="checkbox" name="candidates" id="vote_{{c.id}}" value="{{c.id}}"
                             style="display: none;">
                         <label for="vote_{{c.id}}" class="check-btn" id="label_{{c.id}}"
@@ -68,6 +82,12 @@
     let VOTE_MIN = Number("{{vote_info.vote_min}}")
     let VOTE_MAX = Number("{{vote_info.vote_max}}")
     let STATS_URL = "{{url_for('vote.get_vote_stats',vote_id=vote_info.id)}}"
-    let SUBMIT_URL = "{{url_for('vote.vote_handler',vote_id=vote_info.id)}}" 
+    let SUBMIT_URL = "{{url_for('vote.vote_handler',vote_id=vote_info.id)}}"
+    let showDetails = (cid) => {
+        fetch(`{{url_for('vote.show_candidate')}}?cid=${cid}`).then(res => res.text())
+            .then(res => {
+                $("#modal-body").html(res)
+            })
+    }
 </script>
 {% endblock %}

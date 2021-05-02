@@ -1,0 +1,14 @@
+<div class="card" style="width: 18rem;">
+    {% if candidate.image %}
+    <img src="{{candidate.image}}" class="card-img-top" alt="...">
+    {% endif %}
+    <div class="card-body">
+        <h5 class="card-title">{{vote_info.title_label}}:{{candidate.title}}</h5>
+        <h6>{{vote_info.subtitle_label}}:{{candidate.subtitle}}</h6>
+        <h6>已获：{{candidate.votes}}票</h6>
+        <p class="card-text" style="word-break:break-all">
+            {{candidate.description}}
+        </p>
+        <p style="font-size: smaller;">{{candidate.action_at}}</p>
+    </div>
+</div>

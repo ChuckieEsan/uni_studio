@@ -12,10 +12,6 @@ let toggleCheckedStyle = (loopid) => {
         //$(`#label_${loopid}`).removeClass('check-btn')
     }
 }
-let showDesc = (loopid) => {
-    $("#diaryText").text($(`#Desc_long_${loopid}`).text())
-    $("#diaryModal").modal('show')
-}
 $("#submitVote").click((e) => {
     e.preventDefault()
     let minVote = VOTE_MIN
