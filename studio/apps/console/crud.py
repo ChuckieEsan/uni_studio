@@ -39,7 +39,7 @@ def crud_get(table):
         constraints[c['name']] = None
         _type = str(c['type']).lower()
         if _type in ['integer','text'] or 'varchar' in _type:
-            constraints[c['name']] = 'image' if 'image' in c['name'] else 'text'
+            constraints[c['name']] = 'file' if 'image' in c['name'] else 'text'
         elif _type == 'boolean':
             constraints[c['name']] = 'bool'
         elif _type == "datetime":
@@ -59,12 +59,12 @@ def crud_put(table):
     constraints = {}
     for c in columns:
         constraints[c['name']] = str(c['type']).lower()
-
+        
     key = request.values['key']
     dkey = request.values['dtype']
     if not dkey:
         abort(500)
-    value = request.values[dkey]
+    value = request.files[dkey] if dkey=="file" else request.values[dkey]
     key_constraint= constraints[key]
     if key_constraint == 'boolean':
         value = False if value!='1' else True
