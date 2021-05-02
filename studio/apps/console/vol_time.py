@@ -12,7 +12,7 @@ def do_vol_time_update():
     coverall = request.values.get('coverall') !=None
     files = [f for f in os.listdir(os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],str(g.user.id)))\
         if os.path.isfile(os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],str(g.user.id),f))]
-    if fname not in fname:
+    if fname not in files:
         flash('无效的文件')
         return render_template("vol_time_update.html",count=old_rows)
     if fname[-4:] != '.csv':

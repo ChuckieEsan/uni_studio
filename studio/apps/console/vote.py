@@ -2,8 +2,9 @@ from studio.apps.console import console as vote
 from studio.utils.time_helper import timestamp_to_datetime
 from studio.utils.hash_helper import md5
 from studio.models import VoteInfo,VoteCandidates,VoteVotes,db
-from flask import url_for,redirect,abort,render_template,request,Markup,g
+from flask import url_for,redirect,abort,render_template,request,Markup,g,current_app
 from faker import Faker
+import pandas as pd
 import time
 import os
 f=Faker(locale='zh_CN')
@@ -15,13 +16,7 @@ def admin_votes_show():
         info_list=voteinfo_all,
         title="Vote Admin"
         )
-        
-@vote.route('/vote/shuffle/<int:vote_id>')
-def toggle_shuffle(vote_id):
-    vote_info = VoteInfo.query.filter(VoteInfo.id==vote_id).first_or_404()
-    vote_info.shuffle = not vote_info.shuffle
-    db.session.commit()
-    return redirect(url_for('console.admin_vote_page',vote_id=vote_id))
+
 
 @vote.route('/vote',methods=["POST"])#新建投票接口
 def admin_votes_add():
@@ -61,19 +56,6 @@ def admin_vote_page(vote_id):
 @vote.route('/vote/<int:vote_id>/candidates',methods=["POST"])
 def candidate_add(vote_id):
     new_candidate = request.form
-    #print(request.form)
-    _file = request.files.get('image')
-    file_suffix = _file.filename.split('.')[-1]
-    if file_suffix not in ['png','PNG','jpg','JPG','JPEG','jpeg','mp3']:
-        return abort(500)
-    print(os.getcwd())
-    access_dir = '/vote/static/uploads/'+md5(str(time.time())+str(_file.filename))+'.'+file_suffix
-    path = os.getcwd()+'/studio'+access_dir
-    try:
-        _file.save(path)
-    except Exception as e:
-        print(e)
-        return abort(500)
     _des = new_candidate.get('description').strip()#.replace('\n','<br>')
     c = VoteCandidates(
         title=new_candidate.get("title"),#姓名
@@ -81,17 +63,38 @@ def candidate_add(vote_id):
         description=_des,#new_candidate.get("description"),#周记
         vote_id=vote_id,
         action_at = new_candidate.get('action_at'),#时间
-        image=access_dir
     )
     db.session.add(c)
-    try:
-        db.session.commit()
-    except Exception as e:
-        print(e)
-        db.session.rollback()
-    return redirect(url_for('vote.admin_vote_page',vote_id=vote_id))
+    db.session.commit()
+    return redirect(url_for('console.admin_vote_page',vote_id=vote_id))
 
-
+@vote.route('/vote/<int:vote_id>/batchimport',methods=['POST'])
+def do_vote_batch_import(vote_id):
+    fname = request.values.get('fileIndex')
+    coverall = request.values.get('coverall') !=None
+    files = [f for f in os.listdir(os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],str(g.user.id)))\
+        if os.path.isfile(os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],str(g.user.id),f))]
+    if fname not in files:
+        abort(400)
+    fpath = os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'],str(g.user.id),fname)
+    df = pd.read_excel(fpath,engine='openpyxl',header=None)
+    candidates = []
+    for i in range(1,df.shape[0]):
+        c = VoteCandidates(
+            title=df.iloc[i][0],
+            subtitle=df.iloc[i][1],
+            description=df.iloc[i][2],
+            action_at=df.iloc[i][3],
+            vote_id=vote_id
+        )
+        candidates.append(c)
+    if coverall:
+        old_candidates = VoteCandidates.query.filter(VoteCandidates.vote_id==vote_id).all()
+        for o in old_candidates:
+            db.session.delete(o)
+    db.session.add_all(candidates)
+    db.session.commit()
+    return redirect(url_for('console.admin_vote_page',vote_id=vote_id))
 
 @vote.route('/vote/<int:vote_id>/candidates/drop/<int:candidate_id>',methods=["GET"])
 @vote.route('/vote/candidates/<candidate_id>',methods=["DELETE"])
