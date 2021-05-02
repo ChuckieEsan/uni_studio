@@ -90,7 +90,7 @@
         $("#imageShow").attr('src',url)
     }
     $(".selector").change(function () {
-        let dtypes = ["datetime","text","bool"]
+        let dtypes = ["datetime","text","bool","file"]
         let dtype = this.options[this.selectedIndex].getAttribute("dtype")
         dtypes.map((v)=>{
             let node = $(`#${v}Div`)

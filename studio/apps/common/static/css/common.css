@@ -21,3 +21,30 @@ body{min-height:100%}
 .title {
     font-size:30px;margin-left: 20px;
 }
+
+
+
+.scrollTo{
+    width:100px; 
+    height:130px;
+    text-align:center; 
+    /* background: whiteSmoke; */
+    font-weight: bold;
+    font-size: xx-large;
+    color: #444;
+    text-decoration: none;
+    position:fixed;
+    display:none;
+}
+.scrollTo:hover{
+    text-decoration: none;
+}
+
+.toTop{
+    bottom:85px;
+    right:0px;
+}
+.toBottom{
+    bottom:35px;
+    right:0px;
+}

@@ -3,134 +3,67 @@
 <link rel="stylesheet" href="{{url_for('vote.static',filename='css/vote.css')}}" />
 {% endblock %}
 {% block content %}
-<div class="modal fade" id="diaryModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="_myModalLabel">周记全文</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <div class="modal-body" id="modal-body">
+
             </div>
-            <div class="modal-body">
-                <p id="diaryText" style="word-break:break-all">
-                </p>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>
-    </div><!-- /.modal -->
-</div>
-<div id="header">
-    <a name="1F"></a>
-    {% if vote_info.image %}
-    <img src="{{vote_info.image}}" />
-    {% endif %}
-    <h2>{{vote_info.title}}</h2>
-    <h3>{{vote_info.subtitle}}</h3>
-    <h4>{{vote_info.description}}</h4>
-    <h4>{% if vote_info.start_at!=vote_info.end_at%}
-        {{vote_info.start_at}}~{{vote_info.end_at}}
-        {% else %}
-        {{vote_info.start_at}}~无截止日期
-        {% endif %}
-    </h4>
-</div>
-<div id="root"></div>
-<div class="container" style="margin-bottom: 50px;">
-
-    {% if voted %}
-    <div class="row">
-        <div class="col-md-6 col-sm-12 col-xs-12">
-            <table class="table table-condensed table-hover">
-                <thead>
-                    <tr>
-                        <th>排行榜</th>
-                        <th>姓名</th>
-                        <th>票数</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for c in candidate_all_sorted%}
-                    {% if loop.index <6 %} <tr>
-                        <th scope="row">{{loop.index}}</th>
-                        <td>{{c.title}}</td>
-                        <td>{{c.votes}}</td>
-                        </tr>
-                        {% else %}
-                        <tr class="hiddenLeaderboard" style="display:none">
-                            <th scope="row">{{loop.index}}</th>
-                            <td>{{c.title}}</td>
-                            <td>{{c.votes}}</td>
-                        </tr>
-                        {% endif %}
-                        {% endfor %}
-                </tbody>
-            </table>
-            <button class="btn btn-info" id="leaderboardToggle">开/关完整排行榜</button>
-        </div>
-        <div class="col-md-6 col-sm-12 col-xs-12" id="timeline" style="min-height: 300px;">
-        </div>
-
     </div>
-    {% endif %}
+</div>
+<div class="container">
+    <div class="jumbotron">
+        <h2 class="display-6">{{vote_info.title}}</h2>
+        <p class="lead">{{vote_info.subtitle}}</p>
+        <hr class="my-4">
+        <p>{{vote_info.vote_min}}~{{vote_info.vote_max}}票<br>{{vote_info.description}}</p>
+    </div>
     <form action="{{url_for('vote.vote_handler',vote_id=vote_info.id)}}" method="POST" id="voteForm">
+        <div class="row">
+            {% for c in candidate_all %}
 
-        {% for c in candidate_all %}
-        <div class="col-md-6 col-sm-12 col-xs-12 person">
-            <div class="p-info" style="word-break:break-all">
-                <div class="row">
-                    <div class="col-md-5 col-sm-5 col-xs-12">
-                        {% if c.image %}
-                        <img class="lazy personimg" src="{{url_for('common.static',filename='img/loading.gif')}}"
-                            data-original="{{c.image}}" />
-                        {% endif %}
-                    </div>
-                    <div class="col-md-7 col-sm-7 col-xs-12">
-                        <div style="word-break:break-all" class="article">
-                            <p>
-                                <!--序号：{{loop.index}}-->姓名：{{c.title}}&nbsp;&nbsp;&nbsp;&nbsp;所在社区：{{c.subtitle}}
-                            </p>
-                            <p></p>
-                            <p>时间：{{c.action_at}}</p>
-                            {% if voted %}
-                            <p>已获：{{c.votes}}票</p>
+            <div class="col-md-4 col-sm-12 col-xs-12">
+                <div class="card" style="width: 18rem;">
+                    <img src="https://wp.dutbit.com/wp20/wp-content/uploads/2020/09/cropped-%E5%B7%A5%E4%BD%9C%E5%AE%A4in-1.jpg"
+                        class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            {{vote_info.title_label}}:{{c.title}}-
+                            {{vote_info.subtitle_label}}:{{c.subtitle}}
+                        </h5>
+                        <p class="card-text">
+                            {{c.description[0:40]}}
+                            {% if c.description|length>40 %}
+                            ...
                             {% endif %}
-                            <div>
-                                {% if c.description|length > 80 %}
-                                <div>
-                                    <div id="Desc_short_{{loop.index}}">
-                                        <p style="word-break:break-all">
-                                            周记内容：{{c.description[0:80]}}
-                                            <a id="toggleDesc_{{loop.index}}" onclick="showDesc('{{loop.index}}')"
-                                                class="showmore">...查看更多</a>
-                                        </p>
-                                    </div>
-                                    <div id="Desc_long_{{loop.index}}" style="display:none">
-                                        {{c.description}}
-                                    </div>
-
-
-                                </div>
-                                {% else %}
-                                <div style="word-break:break-all">周记内容：{{c.description}}</div>
-                                {% endif %}
-                            </div>
-                            <!--<input type="checkbox" name="candidates" value="{{c.id}}"/> -->
-                            <input type="checkbox" name="candidates" id="vote_{{c.id}}" value="{{c.id}}"
-                                style="display: none;">
-                            <label for="vote_{{c.id}}" class="check-btn" id="label_{{c.id}}"
-                                onclick="toggleCheckedStyle('{{c.id}}')">投票</label>
-                        </div>
+                        </p>
+                        <p class="card-text" style="font-size: smaller;">{{c.action_at}}</p>
+                        <a class="btn btn-primary" onclick="showDetails('{{c.id}}')" data-toggle="modal"
+                            data-target="#exampleModal" style="color: white;">
+                            查看详情</a>
+                        <input type="checkbox" name="candidates" id="vote_{{c.id}}" value="{{c.id}}"
+                            style="display: none;">
+                        <label for="vote_{{c.id}}" class="check-btn" id="label_{{c.id}}"
+                            onclick="toggleCheckedStyle('{{c.id}}')">投票</label>
                     </div>
                 </div>
 
             </div>
+            {% endfor %}
+
         </div>
-        {% endfor %}
         <div class="col-md-12 col-xs-12 col-sm-12 col-lg-12">
             <hr>
 
             <a name="2F"></a>
             <input type="text" name="captcha" id="captchaInput" required placeholder="验证码">
             <img class="lazy" src="{{url_for('common.static',filename='img/loading.gif')}}"
-            data-original="{{url_for('common.get_captcha_img')}}" width="200px" height="50px" id="captchaImg">
+                data-original="{{url_for('common.get_captcha_img')}}" width="200px" height="50px" id="captchaImg">
             {% if voted %}
             <button type="button" class="btn btn-danger" disabled>您已投过票</button>
             {% else %}
@@ -139,39 +72,22 @@
         </div>
 
     </form>
-    <div id="backtop">
-        <a href="#1F">
-            <button class="btn btn-default">
-                ↑
-            </button>
-        </a>
-        <br>
-        <a href="#2F">
-            <button class="btn btn-default">
-                ↓
-            </button>
-        </a>
-    </div>
-
 </div>
 
 {% endblock %}
 {% block script %}
+<script src="https://cdn.jsdelivr.net/npm/jquery-lazyload@1.9.7/jquery.lazyload.min.js"></script>
+<script src="{{url_for('vote.static',filename='js/vote.js')}}"></script>
 <script>
-    let VOTE_MIN = {{ vote_info.vote_min }}
-    let VOTE_MAX = {{ vote_info.vote_max }}
+    let VOTE_MIN = Number("{{vote_info.vote_min}}")
+    let VOTE_MAX = Number("{{vote_info.vote_max}}")
     let STATS_URL = "{{url_for('vote.get_vote_stats',vote_id=vote_info.id)}}"
     let SUBMIT_URL = "{{url_for('vote.vote_handler',vote_id=vote_info.id)}}"
-    {% if voted %}
-    msgFail("您已投过票！")
-    {% endif %}
-    $(function () {
-        $("img.lazy").lazyload({ threshold: 200 });
-        $("#leaderboardToggle").click(() => {
-            $(".hiddenLeaderboard").toggle()
-        })
-
-    });
+    let showDetails = (cid) => {
+        fetch(`{{url_for('vote.show_candidate')}}?cid=${cid}`).then(res => res.text())
+            .then(res => {
+                $("#modal-body").html(res)
+            })
+    }
 </script>
-<script type="text/javascript" src="{{url_for('vote.static',filename='js/vote_page.js')}}"></script>
 {% endblock %}

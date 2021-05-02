@@ -1,0 +1,17 @@
+.check-btn{ 
+    width: 70px;
+    padding:8px 16px;
+    border-radius:5px;
+    background-color:#fff;
+    text-align: center;
+    /* vertical-align: middle; */
+    line-height: 22px;
+    border: 1px solid #eee;
+    cursor: pointer;
+    font-weight:normal;
+}
+
+.check-btn-checked{
+    background-color:#5cb85c;
+    color:white;
+}
