@@ -72,7 +72,6 @@ def crud_put(table):
         value = int(value)
     elif key_constraint == "datetime":
         value = datetime.datetime.strptime(value,r"%H:%M %m/%d/%Y")
-
     if dkey == "file":
         _file = value
         file_suffix = _file.filename.split('.')[-1]
@@ -83,9 +82,8 @@ def crud_put(table):
         _file.save(path)
         value = access_dir
 
-    
     _id = request.values['id']
-    if not key or not value:
+    if key is None or value is None:
         abort(500)
     data = target_class.query.filter(getattr(target_class,'id')==_id).first()
     if data:
