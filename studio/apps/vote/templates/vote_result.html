@@ -6,18 +6,19 @@
         <h2 style="color:chocolate">{{m}}</h2>
         {% endfor %}
         <h2>您还可以：</h2>
+        <hr>
+        {% if vote_info %}
+        {% if vote_info.show_stats %}
         <h3>
-            <a href="/vote/getcsv/{{vote_id}}">下载投票结果公示</a>
+            <a href="{{url_for('vote.show_stats',vote_id=vote_info.id)}}">查看结果</a>
         </h3>
-        <h3>
-            <a href="/vote_stats.html">查看投票结果公示</a>
-        </h3>
-        <h3>
-            <a href="/vote/{{vote_id}}">返回查看投票结果</a>
-        </h3>
+        <hr>
+        {% endif %}
+        {% endif %}
         <h3>
             <a href="{{url_for('vote.root')}}">返回投票列表</a>
         </h3>
+        <hr>
     </div>
 </div>
 {% endblock %}

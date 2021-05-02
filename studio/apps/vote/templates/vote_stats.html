@@ -165,3 +165,87 @@
     </script>
     </body>
 </html>
+{% if voted %}
+    <div class="row">
+        <div class="col-md-6 col-sm-12 col-xs-12">
+            <table class="table table-condensed table-hover">
+                <thead>
+                    <tr>
+                        <th>排行榜</th>
+                        <th>姓名</th>
+                        <th>票数</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in candidate_all_sorted%}
+                    {% if loop.index <6 %} <tr>
+                        <th scope="row">{{loop.index}}</th>
+                        <td>{{c.title}}</td>
+                        <td>{{c.votes}}</td>
+                    </tr>
+                    {% else %}
+                    <tr class="hiddenLeaderboard" style="display:none">
+                        <th scope="row">{{loop.index}}</th>
+                        <td>{{c.title}}</td>
+                        <td>{{c.votes}}</td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button class="btn btn-info" id="leaderboardToggle">开/关完整排行榜</button>
+        </div>
+        <div class="col-md-6 col-sm-12 col-xs-12" id="timeline" style="min-height: 300px;">
+        </div>
+
+    </div>
+    {% endif %}
+
+    <div class="p-info" style="word-break:break-all">
+        <div class="row">
+            <div class="col-md-5 col-sm-5 col-xs-12">
+                {% if c.image %}
+                <img class="lazy personimg" src="{{url_for('common.static',filename='img/loading.gif')}}"
+                    data-original="{{c.image}}" />
+                {% endif %}
+            </div>
+            <div class="col-md-7 col-sm-7 col-xs-12">
+                <div style="word-break:break-all" class="article">
+                    <p>
+                        <!--序号：{{loop.index}}-->姓名：{{c.title}}&nbsp;&nbsp;&nbsp;&nbsp;所在社区：{{c.subtitle}}
+                    </p>
+                    <p></p>
+                    <p>时间：{{c.action_at}}</p>
+                    {% if voted %}
+                    <p>已获：{{c.votes}}票</p>
+                    {% endif %}
+                    <div>
+                        {% if c.description|length > 80 %}
+                        <div>
+                            <div id="Desc_short_{{loop.index}}">
+                                <p style="word-break:break-all">
+                                    周记内容：{{c.description[0:80]}}
+                                    <a id="toggleDesc_{{loop.index}}" onclick="showDesc('{{loop.index}}')"
+                                        class="showmore">...查看更多</a>
+                                </p>
+                            </div>
+                            <div id="Desc_long_{{loop.index}}" style="display:none">
+                                {{c.description}}
+                            </div>
+
+
+                        </div>
+                        {% else %}
+                        <div style="word-break:break-all">周记内容：{{c.description}}</div>
+                        {% endif %}
+                    </div>
+                    <!--<input type="checkbox" name="candidates" value="{{c.id}}"/> -->
+                    <input type="checkbox" name="candidates" id="vote_{{c.id}}" value="{{c.id}}"
+                        style="display: none;">
+                    <label for="vote_{{c.id}}" class="check-btn" id="label_{{c.id}}"
+                        onclick="toggleCheckedStyle('{{c.id}}')">投票</label>
+                </div>
+            </div>
+        </div>
+
+    </div>

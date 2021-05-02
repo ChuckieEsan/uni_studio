@@ -52,6 +52,7 @@ class VoteInfo(TimestampMixin, db.Model):
     is_poll = db.Column(db.Boolean, default=False, nullable=False)
     show_stats = db.Column(db.Boolean,default=False)
     show_raw_vote_on_expire = db.Column(db.Boolean,default=False)
+    show_raw_vote_on_voted = db.Column(db.Boolean,default=False)
     title_label = db.Column(db.String(255))#每一个选项的大标题的label
     subtitle_label = db.Column(db.Text)#每一个选项的副标题的label
     def __init__(self, *args, **kwargs):
