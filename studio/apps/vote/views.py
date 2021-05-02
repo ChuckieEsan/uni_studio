@@ -25,20 +25,25 @@ def root():
 
 
 @vote.route('/<int:vote_id>', methods=["GET"])
-@cache.memoize(20)
+# @cache.memoize(20)
 def vote_page(vote_id):
-    candidate_all = VoteCandidates.query.filter(
-        VoteCandidates.vote_id == vote_id).all()
-    vote_info = VoteInfo.query.filter(VoteInfo.id == vote_id).first_or_404()
-    voted = VoteVotes.query.filter(VoteVotes.ip == request.remote_addr).filter(
-        VoteVotes.vote_id == vote_id).first()
-    db.session.commit()
     datetime_now = datetime.datetime.now()
+    vote_info = VoteInfo.query.filter(VoteInfo.id == vote_id).first_or_404()
     if (vote_info.start_at > datetime_now or
             (vote_info.start_at != vote_info.end_at and vote_info.end_at < datetime_now))\
             and not vote_info.show_raw_vote_on_expire:
         flash('不在有效的投票时间段内')
-        return render_template('vote_result.html', vote_id=vote_id, title="投票结果")
+        return render_template('vote_result.html', vote_info=vote_info, title="投票结果")
+
+    voted = VoteVotes.query.filter(VoteVotes.ip == request.remote_addr).filter(
+        VoteVotes.vote_id == vote_id).first()
+    if voted and not vote_info.show_raw_vote_on_voted:
+        flash("您已投过票")
+        return render_template('vote_result.html', vote_info=vote_info, title="投票结果")
+
+    candidate_all = VoteCandidates.query.filter(
+        VoteCandidates.vote_id == vote_id).all()
+
     if vote_info.shuffle:
         random.shuffle(candidate_all)
 
@@ -46,16 +51,25 @@ def vote_page(vote_id):
         c.description = c.description.replace('<br>', '\n')
         c.description = c.description.replace('\r', '').replace(
             '\n', '<br/>').replace('<br>', '<br/>').strip()
-        c.description = Markup(c.description)
+        #c.description = Markup(c.description)
+
     return render_template(
         'vote_vote_page.html',
         candidate_all=candidate_all,
         vote_info=vote_info,
-        voted=voted,
         can_vote=False if (
-            voted or not vote_info.show_raw_vote_on_expire) else True
+            voted or not vote_info.show_raw_vote_on_expire
+            or not vote_info.show_raw_vote_on_voted) else True
     )
 
+@vote.route('/candidate')
+def show_candidate():
+    cid = request.values.get('cid')
+    if not cid:
+        return ""
+    c = VoteCandidates.query.filter(VoteCandidates.id==cid).first()
+    vote_info = VoteInfo.query.filter(VoteInfo.id==c.id).first()
+    return render_template("vote_candidate.html",candidate=c,vote_info=vote_info)
 
 def get_tickets_and_candidates(vote_id: int, lim=5):
     candidate_info = VoteCandidates.query.filter(VoteCandidates.vote_id == vote_id).order_by(
