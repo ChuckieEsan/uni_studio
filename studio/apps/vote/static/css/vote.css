@@ -1,11 +1,11 @@
 .check-btn{ 
     width: 70px;
-    padding:8px 15px;
+    padding:8px 16px;
     border-radius:5px;
     background-color:#fff;
     text-align: center;
     /* vertical-align: middle; */
-    line-height: 24px;
+    line-height: 22px;
     border: 1px solid #eee;
     cursor: pointer;
     font-weight:normal;

@@ -9,7 +9,7 @@
         <h2 class="display-6">{{vote_info.title}}</h2>
         <p class="lead">{{vote_info.subtitle}}</p>
         <hr class="my-4">
-        <p>{{vote_info.description}}</p>
+        <p>{{vote_info.vote_min}}~{{vote_info.vote_max}}票<br>{{vote_info.description}}</p>
     </div>
     <form action="{{url_for('vote.vote_handler',vote_id=vote_info.id)}}" method="POST" id="voteForm">
         <div class="row">
@@ -63,30 +63,11 @@
 {% endblock %}
 {% block script %}
 <script src="https://cdn.jsdelivr.net/npm/jquery-lazyload@1.9.7/jquery.lazyload.min.js"></script>
+<script src="{{url_for('vote.static',filename='js/vote.js')}}"></script>
 <script>
-    // let VOTE_MIN = {
-    //     {
-    //         vote_info.vote_min
-    //     }
-    // }
-    // let VOTE_MAX = {
-    //     {
-    //         vote_info.vote_max
-    //     }
-    // }
-    // let STATS_URL = "{{url_for('vote.get_vote_stats',vote_id=vote_info.id)}}"
-    // let SUBMIT_URL = "{{url_for('vote.vote_handler',vote_id=vote_info.id)}}" {
-    //     %
-    //     if voted %
-    // }
-    // msgFail("您已投过票！") {
-    //     %
-    //     endif %
-    // }
-    $(function () {
-        $("img.lazy").lazyload({
-            threshold: 200
-        });
-    });
+    let VOTE_MIN = Number("{{vote_info.vote_min}}")
+    let VOTE_MAX = Number("{{vote_info.vote_max}}")
+    let STATS_URL = "{{url_for('vote.get_vote_stats',vote_id=vote_info.id)}}"
+    let SUBMIT_URL = "{{url_for('vote.vote_handler',vote_id=vote_info.id)}}" 
 </script>
 {% endblock %}

@@ -13,7 +13,6 @@ let msgFail = (s) => {
     }).showToast();
 }
 $(document).ready(function () {
-    console.log(123)
     //Check to see if the window is top if not then display button
     $(window).scroll(function () {
         let st = $(this).scrollTop()
