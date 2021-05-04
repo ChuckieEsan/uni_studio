@@ -21,10 +21,10 @@
             {% for k in data %}
             <tr>
                 <th scope="row">{{loop.index}}</th>
-                <td>{{tr[k].name}}</td>
-                <td>{{tr[k].faculty}}</td>
-                <td>{{k}}</td>
-                <td>{{tr[k].time}}</td> 
+                <td>{{k.name}}</td>
+                <td>{{k.faculty}}</td>
+                <td>{{k.stu_id}}</td>
+                <td>{{k.STIME}}</td> 
             </tr>
  
             {% endfor %}
