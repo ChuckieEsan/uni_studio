@@ -29,8 +29,9 @@
 
             <div class="col-md-4 col-sm-12 col-xs-12">
                 <div class="card" style="width: 18rem;">
-                    <img src="https://wp.dutbit.com/wp20/wp-content/uploads/2020/09/cropped-%E5%B7%A5%E4%BD%9C%E5%AE%A4in-1.jpg"
-                        class="card-img-top" alt="...">
+                    {% if c.image %}
+                    <img src="{{c.image}}" class="card-img-top" alt="...">
+                    {% endif %}
                     <div class="card-body">
                         <h5 class="card-title">
                             {{vote_info.title_label}}:{{c.title}}-
