@@ -2,6 +2,7 @@ from studio.apps.vote import vote
 from studio.models import VoteInfo, VoteCandidates, VoteVotes, db
 from studio.interceptors import validate_captcha
 from studio.cache import cache
+from studio.apps.vote import get_candidate_all_info,get_candidate_info,get_vote_info
 from flask import url_for, redirect, render_template, request, flash, jsonify, Markup, send_file
 from flask import current_app
 from faker import Faker
@@ -15,6 +16,7 @@ f = Faker(locale='zh_CN')
 
 
 @vote.route("/")
+@cache.memoize(20)
 def root():
     voteinfo_all = VoteInfo.query.all()
     return render_template(
@@ -25,10 +27,9 @@ def root():
 
 
 @vote.route('/<int:vote_id>', methods=["GET"])
-# @cache.memoize(20)
 def vote_page(vote_id):
     datetime_now = datetime.datetime.now()
-    vote_info = VoteInfo.query.filter(VoteInfo.id == vote_id).first_or_404()
+    vote_info = get_vote_info(vote_id=vote_id)
     if (vote_info.start_at > datetime_now or
             (vote_info.start_at != vote_info.end_at and vote_info.end_at < datetime_now))\
             and not vote_info.show_raw_vote_on_expire:
@@ -41,17 +42,10 @@ def vote_page(vote_id):
         flash("您已投过票")
         return render_template('vote_result.html', vote_info=vote_info, title="投票结果")
 
-    candidate_all = VoteCandidates.query.filter(
-        VoteCandidates.vote_id == vote_id).all()
+    candidate_all = get_candidate_all_info(vote_id=vote_id)
 
     if vote_info.shuffle:
         random.shuffle(candidate_all)
-
-    for c in candidate_all:
-        c.description = c.description.replace('<br>', '\n')
-        c.description = c.description.replace('\r', '').replace(
-            '\n', '<br/>').replace('<br>', '<br/>').strip()
-        #c.description = Markup(c.description)
 
     return render_template(
         'vote_vote_page.html',
@@ -67,8 +61,8 @@ def show_candidate():
     cid = request.values.get('cid')
     if not cid:
         return ""
-    c = VoteCandidates.query.filter(VoteCandidates.id==cid).first()
-    vote_info = VoteInfo.query.filter(VoteInfo.id==c.id).first()
+    c = get_candidate_info(c_id=cid)
+    vote_info = get_vote_info(vote_id=c.vote_id)
     return render_template("vote_candidate.html",candidate=c,vote_info=vote_info)
 
 def get_tickets_and_candidates(vote_id: int, lim=5):
@@ -174,11 +168,7 @@ def vote_handler(vote_id):
     VoteCandidates.query.filter(VoteCandidates.id.in_(id_list)).update({
         VoteCandidates.votes: VoteCandidates.votes+1
     }, synchronize_session=False)
-    try:
-        db.session.commit()
-    except Exception as e:
-        db.session.rollback()
-        print(e)
+    db.session.commit()
     return redirect(url_for('vote.vote_result_handler', vote_id=vote_id))
 
 
