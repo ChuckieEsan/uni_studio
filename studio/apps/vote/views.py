@@ -2,8 +2,8 @@ from studio.apps.vote import vote
 from studio.models import VoteInfo, VoteCandidates, VoteVotes, db
 from studio.interceptors import validate_captcha
 from studio.cache import cache
-from studio.apps.vote import get_candidate_all_info,get_candidate_info,get_vote_info
-from flask import url_for, redirect, render_template, request, flash, jsonify, Markup, send_file
+from studio.apps.vote import get_candidate_all_info, get_candidate_info, get_vote_info
+from flask import url_for, redirect, render_template, request, flash, jsonify, Markup, send_file,g
 from flask import current_app
 from faker import Faker
 import time
@@ -56,6 +56,7 @@ def vote_page(vote_id):
             or not vote_info.show_raw_vote_on_voted) else True
     )
 
+
 @vote.route('/candidate')
 def show_candidate():
     cid = request.values.get('cid')
@@ -63,7 +64,20 @@ def show_candidate():
         return ""
     c = get_candidate_info(c_id=cid)
     vote_info = get_vote_info(vote_id=c.vote_id)
-    return render_template("vote_candidate.html",candidate=c,vote_info=vote_info)
+    return render_template("vote_candidate.html", candidate=c, vote_info=vote_info)
+
+
+@vote.route('/stats/<int:vote_id>')
+def show_stats(vote_id):
+    vote_info = get_vote_info(vote_id=vote_id)
+    if not vote_info.show_stats:
+        flash("当前投票结果不可见")
+        return render_template("vote_result.html",vote_info=vote_info,title="结果不可见")
+
+    candidates_all = sorted(get_candidate_all_info(
+        vote_id=vote_id), key=lambda x: x.votes, reverse=True)
+    return render_template('vote_stats.html', vote_info=vote_info, candidates_all=candidates_all)
+
 
 def get_tickets_and_candidates(vote_id: int, lim=5):
     candidate_info = VoteCandidates.query.filter(VoteCandidates.vote_id == vote_id).order_by(
@@ -91,11 +105,6 @@ def get_vote_stats(vote_id):
             if v.candidate == c.id:
                 res[key].append(int(tostamp(v.created_at)))
     return jsonify(res)
-
-
-@vote.route('/stats/<int:vote_id>')
-def show_stats(vote_id):
-    return render_template('vote_stats.html', vote_id=vote_id)
 
 
 @vote.route('/getcsv/<int:vote_id>')

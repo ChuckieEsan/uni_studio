@@ -89,6 +89,10 @@
             <a href="{{url_for('console.crud_get',table='vote_info')}}?id={{v.id}}" style="color: orange;" target="_blank">
                 修改投票信息
             </a>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="{{url_for('console.show_vote_stats',vote_id=v.id)}}" style="color: green;" target="_blank">
+                查看投票结果
+            </a>
         </div>
         <div class="panel-body">
             <p>{{ v.description }}</p>
