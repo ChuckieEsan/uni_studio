@@ -40,7 +40,7 @@ def crud_get(table):
         _type = str(c['type']).lower()
         if _type in ['integer','text'] or 'varchar' in _type:
             constraints[c['name']] = 'file' if 'image' in c['name'] else 'text'
-        elif _type == 'boolean':
+        elif _type == 'boolean' or _type=="tinyint(1)":
             constraints[c['name']] = 'bool'
         elif _type == "datetime":
             constraints[c['name']] = 'datetime'
