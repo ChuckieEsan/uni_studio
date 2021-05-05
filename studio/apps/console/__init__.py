@@ -1,8 +1,6 @@
 from flask import Blueprint,current_app,render_template,jsonify,request,g
 import docker
 import re
-import time
-import os
 from studio.models import db,UserRoles,RouteInterceptors
 console = Blueprint("console",__name__,template_folder='templates',static_folder='static')#static folder and template folder are set here to avoid ambiguity
 
@@ -45,4 +43,4 @@ def get_livelog():
 def show_livelog():
     return render_template('console_livelog.html')
 
-from studio.apps.console import issues,vote,user,vol_time,crud
+from studio.apps.console import issues,vote,user,vol_time,crud,auth

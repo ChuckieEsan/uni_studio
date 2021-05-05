@@ -1,6 +1,7 @@
 from flask import render_template,redirect,request,abort,g,url_for,current_app
 from studio.models import db,UserRoles,UserUsers
 from studio.apps.console import console
+from studio.utils import and_op
 from sqlalchemy import func
 import struct
 @console.route('/user')
@@ -9,8 +10,6 @@ def user_show():
     for role in roles:
         role.role_bit_bin = bin(role.role_bit)[2:]
     users = UserUsers.query.filter(UserUsers.delete == False).all()
-    def and_op(a,b):
-        return int(a) & int(b)
     r2 = db.session.query(UserRoles.role_bit,UserRoles.role_text,UserRoles.description,UserUsers.username)\
         .outerjoin(UserUsers,UserRoles.created_by==UserUsers.id).all()
     return render_template("user_manage.html",and_op=and_op,\
