@@ -66,7 +66,7 @@ def crud_put(table):
         abort(500)
     value = request.files[dkey] if dkey=="file" else request.values[dkey]
     key_constraint= constraints[key]
-    if key_constraint == 'boolean':
+    if key_constraint == 'boolean' or 'tinyint(1)':
         value = False if value!='1' else True
     elif key_constraint == "integer":
         value = int(value)
