@@ -19,6 +19,7 @@ class UserUsers(db.Model,TimestampMixin,DeleteMixin):
         for k in kwargs:
             setattr(self, k, kwargs[k])
 
+# 设计缺陷：roles应该有个uuid字段确保并发操作不会出问题
 class UserRoles(db.Model,TimestampMixin,DeleteMixin):
     __tablename__ = "user_roles"
     id = db.Column(db.Integer, primary_key=True)
