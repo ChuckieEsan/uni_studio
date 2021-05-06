@@ -40,6 +40,8 @@ def global_interceptor():
         if not (user.role_bits & 1 or user.role_bits & r.role_bits):
             flash(r.description)
             return abort(403)
+        else:
+            break
             
 def generate_response(success:bool,details:str)->Response:
     print(details)
