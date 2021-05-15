@@ -119,11 +119,14 @@ def do_vote_batch_import(vote_id):
     df = pd.read_excel(fpath, engine='openpyxl', header=None)
     candidates = []
     for i in range(1, df.shape[0]):
+        row = df.iloc[i]
+        if row.isna().values.any():
+            continue
         c = VoteCandidates(
-            title=df.iloc[i][0],
-            subtitle=df.iloc[i][1],
-            description=df.iloc[i][2],
-            action_at=df.iloc[i][3],
+            title=row[0],# if row[0] != pd.Nan,
+            subtitle=row[1],
+            description=row[2],
+            action_at=row[3],
             vote_id=vote_id
         )
         candidates.append(c)
