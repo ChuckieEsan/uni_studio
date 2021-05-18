@@ -1,0 +1,17 @@
+[Unit]
+Description=HTTP Interface Server
+After=syslog.target
+
+[Service]
+KillSignal=SIGQUIT
+ExecStart=/usr/bin/uwsgi3 --ini /data/uni_studio/uwsgi.ini
+Restart=always
+Environment=SQLALCHEMY_DATABASE_URI=mysql+pymysql://*****/uni_studio?charset=utf8mb4&&local_infile=1
+Environment=POSTCARD_APPID=******
+Environment=POSTCARD_APPSECRET=*******
+Type=notify
+NotifyAccess=all
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target
