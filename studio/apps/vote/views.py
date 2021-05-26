@@ -30,13 +30,18 @@ def root():
 def vote_page(vote_id):
     datetime_now = datetime.datetime.now()
     vote_info = get_vote_info(vote_id=vote_id)
+    if vote_info.disabled:
+        flash('投票已暂停')
+        return render_template('vote_result.html', vote_info=vote_info, title="投票结果")
+
+
     if (vote_info.start_at > datetime_now or
             (vote_info.start_at != vote_info.end_at and vote_info.end_at < datetime_now))\
             and not vote_info.show_raw_vote_on_expire:
         flash('不在有效的投票时间段内')
         return render_template('vote_result.html', vote_info=vote_info, title="投票结果")
 
-    voted = VoteVotes.query.filter(VoteVotes.ip == request.remote_addr).filter(
+    voted = VoteVotes.query.filter(VoteVotes.ip == request.headers.get('X-Forwarded-For')).filter(
         VoteVotes.vote_id == vote_id).first()
     if voted and not vote_info.show_raw_vote_on_voted:
         flash("您已投过票")
@@ -152,9 +157,9 @@ def getcsv(vote_id):
 
 
 @vote.route('/<int:vote_id>', methods=["POST"])
-@validate_captcha
+#@validate_captcha
 def vote_handler(vote_id):
-    voted = VoteVotes.query.filter(VoteVotes.ip == request.remote_addr).filter(
+    voted = VoteVotes.query.filter(VoteVotes.ip == request.headers.get('X-Forwarded-For')).filter(
         VoteVotes.vote_id == vote_id).first()
     if voted:
         current_app.logger.warn('vote_attempt:'+request.remote_addr)
@@ -167,7 +172,7 @@ def vote_handler(vote_id):
     id_list = []
     for v in vote_list:
         _v = VoteVotes(
-            ip=request.remote_addr,
+            ip=request.headers.get('X-Forwarded-For') or request.remote_addr,
             candidate=int(v),
             vote_id=vote_id
         )
