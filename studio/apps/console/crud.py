@@ -19,6 +19,9 @@ def get_class(table_name:str):
             break
     return target_class
 
+@console.route('/crud')
+def crud_root():
+    return render_template('crud_index.html',models=models)
 
 @console.route(URL_PATTERN_RU,methods=['GET'])
 def crud_get(table):
@@ -107,4 +110,5 @@ def crud_delete(table):
 
 @console.route(URL_PATTERN_CD,methods=['POST'])#添加
 def crud_create(table):
+    print(request.values)
     return '1'

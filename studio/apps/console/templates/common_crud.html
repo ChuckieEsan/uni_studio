@@ -82,6 +82,29 @@
                 </td>
             </tr>
             {% endfor %}
+            <form action="{{url_for('console.crud_create',table=_class.__tablename__)}}" method="POST">
+                {% for c in _class.__dict__.keys() %}
+                {% if c[0] != '_' and c[0] != 'id' and constraints[c]%}
+                    <td>
+                        {% if constraints[c]=='bool' %}
+                        <input id="trueInput" type="radio" name="{{c}}" value="1">
+                        <label for="trueInput">True</label>
+                        <input id="falseInput" type="radio" name="{{c}}" value="0">
+                        <label for="falseInput">False</label>
+                        {% elif constraints[c]=='file'%}
+                        <input id="fileInput" type="file" name="{{c}}">
+                        {% elif constraints[c]=='text'%}
+                        <input type="text" name="{{c}}">
+                        {% elif constraints[c]=='datetime'%}
+                        <input type="text" id="datetimeInput" name="{{c}}" width="234">
+                        {% endif %}
+                    </td>
+                {% endif %}
+                {% endfor %}
+                <td>
+                    <input type="submit">
+                </td>
+            </form>
         </tbody>
 </div>
 <script>

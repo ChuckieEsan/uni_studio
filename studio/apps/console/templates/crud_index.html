@@ -1,0 +1,10 @@
+{% extends 'common_base.html'%}
+{% block content %}
+<div class="container">
+    {% for m in models.__all__ %}
+    {% if m.__tablename__ %}
+    <a href="{{url_for('console.crud_get',table=m.__tablename__)}}">{{m.__name__}}</a><br>
+    {% endif %}
+    {% endfor %}
+</div>
+{% endblock %}

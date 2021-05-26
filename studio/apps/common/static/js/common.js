@@ -37,4 +37,18 @@ $(document).ready(function () {
         }, 800);
         return false;
     });
+    fetch("/common/notification/global").
+    then(res => res.json()).then(res=>{
+        let node = $("#notification")
+        res.map((v)=>{
+            node.append(`
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            ${v.text}
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="ignoreNoti(${v.id})">
+          <span aria-hidden="true">&times;</span>
+          </button>
+          </div>
+            `)
+        })
+    }).catch(err=>{console.log(err)})
 });

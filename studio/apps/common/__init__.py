@@ -1,4 +1,5 @@
-from flask import Blueprint, current_app, send_file, Response
+from flask import Blueprint, current_app, send_file, Response, request
+from flask.json import jsonify
 from studio.utils.captcha_helper import _get_captcha_img, getcaptcha
 from studio.interceptors import validate_captcha, CAPTCHA_COOKIE_KEY, CAPTCHA_NAMESPACE, CAPTCHA_TIMEOUT, CAPTCHA_VALID_FIELD
 from studio.cache import cache
@@ -33,24 +34,14 @@ def v_captcha():
 @common.route('/notification/global')
 def get_global_notification():
     noti = GlobalNotifications.query.filter(
-        GlobalNotifications.valid_until > datetime.datetime.now()).order_by(GlobalNotifications.valid_until.desc()).first()
-    if noti:
-        html = """
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-      {}
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-    </button>
-    </div>
-    """.format(noti.text)
-    else:
-        html = ""
-    return """
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-      {}
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-    </button>
-    </div>
-    """.format('若提示网络错误而无法提交投票，尝试使用系统浏览器打开本页面。')
-    return html
+        GlobalNotifications.valid_until > datetime.datetime.now())\
+        .filter(GlobalNotifications.path.startswith(request.path))\
+        .filter(GlobalNotifications.id.notin_(request.cookies.get('viewed_noti') or []))\
+        .order_by(GlobalNotifications.valid_until.desc()).all()
+    result = []
+    for n in noti:
+        result.append({'id':n.id,'text':n.text})
+    return jsonify(result)
+
+
+
