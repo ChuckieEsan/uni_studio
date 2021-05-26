@@ -5,6 +5,7 @@
     <thead>
         <tr>
             <th>排行榜</th>
+            <th>候选人ID</th>
             <th>{{vote_info.title_label}}</th>
             <th>票数</th>
         </tr>
@@ -13,6 +14,7 @@
         {% for c in candidates_all %}
         <tr>
             <th scope="row">{{loop.index}}</th>
+            <td><a href="{{url_for('console.crud_get',table='vote_candidates')}}?id={{c.id}}">{{c.id}}</a></td>
             <td>{{c.title}}</td>
             <td>{{c.votes}}</td>
         </tr>

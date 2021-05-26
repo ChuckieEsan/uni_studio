@@ -18,6 +18,8 @@ def get_user(_id):
     return UserUsers.query.filter(UserUsers.id==_id).first()
 
 def global_interceptor():
+    #print(request.headers.get('X-Forwarded-For'))
+    #request.remote_addr = request.headers.get('X-Forwarded-For')
     try:
         token = request.cookies['token']
         data = current_app.tjwss.loads(token)

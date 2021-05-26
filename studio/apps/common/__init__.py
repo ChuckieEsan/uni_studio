@@ -45,4 +45,12 @@ def get_global_notification():
     """.format(noti.text)
     else:
         html = ""
+    return """
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+      {}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+    </button>
+    </div>
+    """.format('若提示网络错误而无法提交投票，尝试使用系统浏览器打开本页面。')
     return html

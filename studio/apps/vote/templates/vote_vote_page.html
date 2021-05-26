@@ -30,7 +30,7 @@
             <div class="col-md-4 col-sm-12 col-xs-12">
                 <div class="card" style="width: 18rem;">
                     {% if c.image %}
-                    <img src="{{c.image}}" class="card-img-top" alt="...">
+                    <img src="{{c.image}}_thumbnail.{{c.image[-3:]}}" class="card-img-top" alt="...">
                     {% endif %}
                     <div class="card-body">
                         <h5 class="card-title">
@@ -64,7 +64,7 @@
             <a name="2F"></a>
             <input type="text" name="captcha" id="captchaInput" required placeholder="验证码">
             <img class="lazy" src="{{url_for('common.static',filename='img/loading.gif')}}"
-                data-original="{{url_for('common.get_captcha_img')}}" width="200px" height="50px" id="captchaImg">
+                data-original="{{url_for('common.get_captcha_img')}}?rand={{range(0,99999999999)|random}}" width="200px" height="50px" id="captchaImg">
             {% if voted %}
             <button type="button" class="btn btn-danger" disabled>您已投过票</button>
             {% else %}
