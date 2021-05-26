@@ -37,7 +37,7 @@
                 {% for c in _class.__dict__.keys() %}
                 {% if c[0] != '_' %}
                 {% if loop.index0 == 1 %}
-                <th scope="row">{{d.__dict__[c]}}</th>
+                <th scope="row">{{d.__dict__[c]}} <a href="{{url_for('crud_delete',table=_class.__tablename__)}}?id={{d['id']}}" onclick="return confirm('是否删除')">delete</a></th>
                 {% else %}
                 <td>
                     {% if 'image' in c and d.__dict__[c] %}
@@ -84,7 +84,7 @@
             {% endfor %}
             <form action="{{url_for('console.crud_create',table=_class.__tablename__)}}" method="POST">
                 {% for c in _class.__dict__.keys() %}
-                {% if c[0] != '_' and c[0] != 'id' and constraints[c]%}
+                {% if c[0] != '_'  and constraints[c]%}
                     <td>
                         {% if constraints[c]=='bool' %}
                         <input id="trueInput" type="radio" name="{{c}}" value="1">
@@ -94,7 +94,8 @@
                         {% elif constraints[c]=='file'%}
                         <input id="fileInput" type="file" name="{{c}}">
                         {% elif constraints[c]=='text'%}
-                        <input type="text" name="{{c}}">
+                        
+                        <input type="text" name="{{c}}" {% if c[0:2] == 'id'%}disabled {% endif %}>
                         {% elif constraints[c]=='datetime'%}
                         <input type="text" id="datetimeInput" name="{{c}}" width="234">
                         {% endif %}
