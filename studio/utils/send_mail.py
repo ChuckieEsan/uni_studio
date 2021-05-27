@@ -11,7 +11,7 @@ mail_user = sender
 
 def send_mail(to='',content='',subject='',dontsend=False):
     receivers = [to]
-    msg = MIMEText(content,'plain','utf-8')
+    msg = MIMEText(content,'html','utf-8')
     msg['From'] = "<{}>".format(sender)#Header('DUTBIT','utf-8')
     msg['To'] = "<{}>".format(to)#Header(to,'utf-8')
     msg['Subject'] = Header(subject,'utf-8')
