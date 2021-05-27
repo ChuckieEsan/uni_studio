@@ -32,3 +32,5 @@ class Config():
     FILESERVICE_THUMBNAIL_FOLDER = join_upload_dir(
         'data/fileservice/thumbnail')
     FILESERVICE_MAX_CONTENT_LENGTH = 50 * 1024 * 1024
+
+    MAIL_PASS = '*'
