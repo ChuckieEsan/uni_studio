@@ -1,6 +1,9 @@
-from flask import Blueprint,current_app,render_template,jsonify,request,g
+from flask import Blueprint,current_app,\
+render_template,redirect,request,g,flash
 import docker
 import re
+from studio.cos import cos_put
+from flask.helpers import url_for
 from studio.models import db,UserRoles,RouteInterceptors
 console = Blueprint("console",__name__,template_folder='templates',static_folder='static')#static folder and template folder are set here to avoid ambiguity
 
@@ -42,5 +45,16 @@ def get_livelog():
 @console.route('/log',methods=['GET'])
 def show_livelog():
     return render_template('console_livelog.html')
+
+@console.route('/cos')
+def cos_index():
+    return render_template('cos_index.html')
+
+@console.route('/cos',methods=['POST'])
+def cos_post():
+    file = request.files['file']
+    fhash,fname = cos_put(file)
+    flash("{}".format(fname))
+    return redirect(url_for('console.cos_index'))
 
 from studio.apps.console import issues,vote,user,vol_time,crud,auth,mail
