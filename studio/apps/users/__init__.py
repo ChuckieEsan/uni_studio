@@ -39,15 +39,16 @@ def users_password_step1():
     email = request.values.get('email')
     user = UserUsers.query\
         .filter(UserUsers.email == str(email).strip()).first()
-    if not user or not email:
+    if not user:
+        if email:
+            flash('无效的邮箱')
         email = None
-        flash('无效的邮箱')
     else:
         info = {'id': user.id}
         token = current_app.tjwss.dumps(info).decode()
         email_html = """<h1>dutbit-密码重置</h1>
-        <a href="{}">重置链接</a>
-        """.format("https://www.dutbit.com/user/iforgot/validate?token="+token)
+        <a href="http://{}{}?token={}">重置链接</a>
+        """.format(current_app.config['SERVER_NAME'],url_for('users.users_password_step2'),token)
         send_mail(to=user.email, content=email_html, subject='dutbit-密码重置')
     if current_app.debug and user:
         return render_template('users_password_step1.html', email=email, email_html=email_html)
