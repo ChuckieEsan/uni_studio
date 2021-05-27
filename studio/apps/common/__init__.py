@@ -6,6 +6,7 @@ from studio.cache import cache
 from studio.models import GlobalNotifications
 import uuid
 import datetime
+import json
 # static folder and template folder are set here to avoid ambiguity
 common = Blueprint("common", __name__,
                    template_folder='templates', static_folder='static')
@@ -33,14 +34,21 @@ def v_captcha():
 
 @common.route('/notification/global')
 def get_global_notification():
+    lim = []
+    try:
+        views = json.decode(request.values.get('viewed_noti'))
+        for v in views:
+            lim.append(int(v))
+    except:
+        pass
     noti = GlobalNotifications.query.filter(
         GlobalNotifications.valid_until > datetime.datetime.now())\
-        .filter(GlobalNotifications.path.startswith(request.path))\
-        .filter(GlobalNotifications.id.notin_(request.cookies.get('viewed_noti') or []))\
+        .filter(GlobalNotifications.id.notin_(lim))\
         .order_by(GlobalNotifications.valid_until.desc()).all()
     result = []
     for n in noti:
-        result.append({'id':n.id,'text':n.text})
+        if request.path.startswith(n.path):
+            result.append({'id':n.id,'text':n.text})
     return jsonify(result)
 
 
