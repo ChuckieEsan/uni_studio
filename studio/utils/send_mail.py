@@ -1,25 +1,37 @@
-from re import sub
 import smtplib
 from email.mime.text import MIMEText
 from email.header import Header
+from flask import current_app
 sender = 'dutbit@163.com'
 
 mail_host = 'smtp.163.com'
-mail_port = 994
+mail_port = 465
 mail_user = sender
-mail_pass = '*'
 
 
 def send_mail(to='',content='',subject=''):
-    receivers = [].append(to)
+    receivers = [to]
     msg = MIMEText(content,'plain','utf-8')
-    msg['From'] = Header('DUTBIT','utf-8')
-    msg['To'] = Header(to,'utf-8')
+    msg['From'] = "<{}>".format(sender)#Header('DUTBIT','utf-8')
+    msg['To'] = "<{}>".format(to)#Header(to,'utf-8')
     msg['Subject'] = Header(subject,'utf-8')
-    smtpObj = smtplib.SMTP()
-    smtpObj.connect(mail_host, mail_port)
-    smtpObj.login(mail_user,mail_pass)
+    #msg['Cc'] = #Header(','.join([to]), 'utf-8')
+    smtpObj = smtplib.SMTP_SSL(mail_host,mail_port)
+    smtpObj.login(mail_user,current_app.config['MAIL_PASS'])
+    return
     smtpObj.sendmail(sender,receivers,msg.as_string())
 
 if __name__ == "__main__":
-    send_mail(to='2889205153@qq.com',content='邮件123123杠杆',subject='leverage ratio=0')
+    content = """Dear Lynn Nat, 
+
+INVOICE  #2021
+STATUS: Unpaid
+AMOUNT DUE: $10.00 USD
+DUE DATE: 2021-06-01
+GENERATE ON: 2021-05-25.
+
+PAYMENT METHOD:
+ AliPay 支付宝
+
+ ​​​​"""
+    send_mail(to='2889205153@qq.com',content=content,subject='Invoice #202105295299: Created')

@@ -7,7 +7,7 @@ from studio.utils.send_mail import send_mail
 def mail_index():
     return render_template('mail_index.html')
 
-@console.route('/mail')
+@console.route('/mail',methods=['POST'])
 def mail_post():
     to = request.values['to']
     content = request.values['content']
