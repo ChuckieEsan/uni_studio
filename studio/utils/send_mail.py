@@ -9,7 +9,7 @@ mail_port = 465
 mail_user = sender
 
 
-def send_mail(to='',content='',subject=''):
+def send_mail(to='',content='',subject='',dontsend=False):
     receivers = [to]
     msg = MIMEText(content,'plain','utf-8')
     msg['From'] = "<{}>".format(sender)#Header('DUTBIT','utf-8')
@@ -17,8 +17,10 @@ def send_mail(to='',content='',subject=''):
     msg['Subject'] = Header(subject,'utf-8')
     #msg['Cc'] = #Header(','.join([to]), 'utf-8')
     smtpObj = smtplib.SMTP_SSL(mail_host,mail_port)
+    if current_app.config['DEBUG']:
+        return
     smtpObj.login(mail_user,current_app.config['MAIL_PASS'])
-    return
+    
     smtpObj.sendmail(sender,receivers,msg.as_string())
 
 if __name__ == "__main__":
