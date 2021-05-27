@@ -16,7 +16,7 @@ $(document).ready(function () {
     //Check to see if the window is top if not then display button
     $(window).scroll(function () {
         let st = $(this).scrollTop()
-        if (st > 100 && st<document.body.scrollHeight-$(window).height()) {
+        if (st > 100 && st < document.body.scrollHeight - $(window).height()) {
             $('.scrollTo').fadeIn();
 
         } else {
@@ -37,18 +37,44 @@ $(document).ready(function () {
         }, 800);
         return false;
     });
+    const notiKey = "viewed_noti"
     fetch("/common/notification/global").
-    then(res => res.json()).then(res=>{
+    then(res => res.json()).then(res => {
         let node = $("#notification")
-        res.map((v)=>{
+        res.map((v) => {
+            let noti = localStorage[notiKey]
+            if(noti){
+                notiArr = JSON.parse(noti)
+                for(let i=0;i<notiArr.length;i++){
+                    if(notiArr[i]===v.id){
+                        return null
+                    }
+                }
+            }
             node.append(`
             <div class="alert alert-warning alert-dismissible fade show" role="alert">
             ${v.text}
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="ignoreNoti(${v.id})">
-          <span aria-hidden="true">&times;</span>
+          <button type="button" class="close noti" data-dismiss="alert" aria-label="Close" nid="${v.id}">
+          <span aria-hidden="true" nid="${v.id}">&times;</span>
           </button>
           </div>
             `)
         })
-    }).catch(err=>{console.log(err)})
+    }).then(()=>{
+        $(".noti").click((e)=>{
+            const nid = e.target.getAttribute("nid")
+            console.log('ignoring notification',nid)
+            let oldNoti = localStorage[notiKey]
+            if (oldNoti) {
+                oldNoti = JSON.parse(oldNoti)
+            } else {
+                oldNoti = []
+            }
+            oldNoti.push(parseInt(nid))
+            localStorage.setItem(notiKey, JSON.stringify(oldNoti))
+            console.log('noti:',localStorage[notiKey])
+        })
+    }).catch(err => {
+        console.log(err)
+    })
 });
