@@ -47,7 +47,7 @@ def users_password_step1():
         token = current_app.tjwss.dumps(info).decode()
         email_html = """<h1>dutbit-密码重置</h1>
         <a href="{}">重置链接</a>
-        """.format("https://www.dutbit.com/iforgot/validate?token="+token)
+        """.format("https://www.dutbit.com/user/iforgot/validate?token="+token)
         send_mail(to=user.email, content=email_html, subject='dutbit-密码重置')
     if current_app.debug and user:
         return render_template('users_password_step1.html', email=email, email_html=email_html)
@@ -62,14 +62,17 @@ def users_password_step2():
     except:
         flash('无效token')
         return redirect(url_for('users.users_password_step1'))
-    return render_template('users_password_step2.html')
+    return render_template('users_password_step2.html',token=token)
 
 
 @users.route('/iforgot/set', methods=['POST'])
 def users_password_set():
-    #token = request.values.get('token')
-    #data = current_app.tjwss.loads(token)
-    print(request.values)
+    token = request.values.get('token')
+    data = current_app.tjwss.loads(token)
+    uid = data['id']
+    new_password = request.values.get('password')
+    UserUsers.query.filter(UserUsers.id==uid).update({UserUsers.password:new_password})
+    db.session.commit()
     return redirect(url_for('users.users_entrypoint'))
 
 
