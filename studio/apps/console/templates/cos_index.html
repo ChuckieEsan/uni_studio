@@ -1,0 +1,12 @@
+{% extends 'common_base.html'%}
+{% block content %}
+<form method="POST" action="{{url_for('console.cos_post')}}" enctype="multipart/form-data">
+    
+    <input id="fileInput" type="file" name="file">
+    <input type="submit">
+</form>
+<hr>
+{% for m in get_flashed_messages() %}
+{{m}}
+{% endfor %}
+{% endblock %}
