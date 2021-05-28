@@ -4,6 +4,7 @@ from flask import request, redirect, current_app, abort, g, jsonify, url_for, fl
 from studio.models import RouteInterceptors, UserUsers, db
 from studio.cache import cache
 from studio.utils.captcha_helper import getcaptcha
+from studio.utils.send_mail import send_validation_code
 CAPTCHA_TIMEOUT = 600
 CAPTCHA_NAMESPACE = 'captcha'
 CAPTCHA_COOKIE_KEY = '_c'
@@ -59,8 +60,10 @@ def global_interceptor():
 
     if rules_hit and not g.user.confirmed:
         if not g.user.validation_code:
+            code = getcaptcha(4)
             UserUsers.query.filter(UserUsers.id == g.user.id).update(
-                {'validation_code': getcaptcha(4)})
+                {'validation_code': code})
+            send_validation_code(to=g.user.email,code=code)
             db.session.commit()
         if current_app.config['DEBUG']:
             print(g.user.validation_code)
