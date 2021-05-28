@@ -22,6 +22,7 @@ from .apps.vote import vote as voteapp
 from .apps.users import users as usersapp
 from .apps.enroll import enroll as enrollapp
 from .apps.h5 import h5 as h5app
+from flask_hcaptcha import hCaptcha
 
 
 def create_app():
@@ -54,6 +55,8 @@ def create_app():
         cache.init_app(app)
         Bootstrap(app)
         Migrate(app, db)
+        app.hcaptcha = hCaptcha()
+        app.hcaptcha.init_app(app)
         app.add_url_rule('/',view_func=lambda:redirect(app.config["HOMEPAGE_URL"]))
         app.register_blueprint(tests)
         app.register_blueprint(fileserviceapp, url_prefix='/fileservice')

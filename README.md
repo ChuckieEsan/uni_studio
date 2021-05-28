@@ -24,3 +24,5 @@ A web based set of tools for operations of studios in universities.
 http://www.ttlsa.com/python/flask-migrate-management-database-upgrade-and-migrate/
  pipreqs --encoding utf8 --force .
 flask db upgrade --sql
+https://blog.csdn.net/White_Idiot/article/details/78533046
+vim /usr/lib/systemd/system/studio.service

@@ -1,3 +1,4 @@
+from flask.globals import current_app
 from studio.apps.issues import issues
 from flask import url_for,redirect,render_template,request,flash
 from studio.models import IssueTypes,IssuesIssues,db
@@ -15,6 +16,7 @@ def root():
             title="反馈",
         )
     if request.method=='POST':
+        print(current_app.hcaptcha.verify())
         _i = IssuesIssues(
             ip=request.remote_addr,
             url=request.form.get('url'),
@@ -24,12 +26,6 @@ def root():
             user_id=None
         )
         db.session.add(_i)
-        try:
-            db.session.commit()
-            print('3:{}'.format(_i.id))
-            flash('提交成功，感谢您的反馈')
-        except Exception as e:
-            print(e)
-            db.session.rollback()
-            flash('提交失败，请直接联系管理员')
+        db.session.commit()
+        flash('提交成功，感谢您的反馈')
         return redirect(url_for('issues.root',timeout=True))

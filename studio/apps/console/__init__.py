@@ -57,4 +57,4 @@ def cos_post():
     flash("{}".format(fname))
     return redirect(url_for('console.cos_index'))
 
-from studio.apps.console import issues,vote,user,vol_time,crud,auth,mail
+from studio.apps.console import issues,vote,user,vol_time,crud,auth,mail,enroll
