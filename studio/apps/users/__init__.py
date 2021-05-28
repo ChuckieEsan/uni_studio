@@ -15,7 +15,6 @@ def users_entrypoint():
 @users.route('/register', methods=['POST'])
 def users_register():
     user = UserUsers(kwargs=request.get_json())
-    user.validation_code = getcaptcha(4)
     db.session.add(user)
     db.session.commit()
     return jsonify({"success": True})
@@ -87,6 +86,7 @@ def users_confirm_index():
     if g.user.confirmed:
         return redirect(url_for('console.console_root'))
     return render_template('users_confirm.html')
+
 
 
 @users.route('/confirm', methods=['POST'])

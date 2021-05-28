@@ -9,7 +9,7 @@ mail_port = 465
 mail_user = sender
 
 
-def send_mail(to='',content='',subject='',dontsend=False):
+def send_mail(to='',content='',subject=''):
     receivers = [to]
     msg = MIMEText(content,'html','utf-8')
     msg['From'] = "<{}>".format(sender)#Header('DUTBIT','utf-8')
@@ -22,6 +22,12 @@ def send_mail(to='',content='',subject='',dontsend=False):
     smtpObj.login(mail_user,current_app.config['MAIL_PASS'])
     
     smtpObj.sendmail(sender,receivers,msg.as_string())
+
+def send_validation_code(to='',code=''):
+    content = """
+        邮箱验证码是：{}
+    """.format(code)
+    send_mail(to=to,subject='dutbit-账户邮箱验证',content=content)
 
 if __name__ == "__main__":
     content = """Dear Lynn Nat, 
