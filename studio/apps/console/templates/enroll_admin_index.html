@@ -1,0 +1,64 @@
+{% extends 'common_base.html'%}
+{% block content %}
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">新建报名表</h4>
+            </div>
+            <form action="{{url_for('console.enroll_form_add')}}" method="POST" name="newVoteForm">
+                <div class="modal-body">
+
+
+                    <span class="required">*&nbsp;&nbsp;</span>
+                    <input class="input" type="text" name="title" placeholder="标题" required><br>
+                    <span class="required">&nbsp;&nbsp;&nbsp;</span>
+                    <input class="input" type="text" name="description" placeholder="描述文字"><br>
+                    <span class="required">&nbsp;&nbsp;&nbsp;</span>
+                    <input class="input" type="text" name="details" placeholder="详细信息"><br>
+                    <span class="required">&nbsp;&nbsp;&nbsp;</span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <input type="submit" value="Submit" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <!--title start-->
+    <div class="title">
+        <span style="font-size:28px">
+            报名表管理
+            <!-- <a href="/vote/populate">populate</a> -->
+        </span>
+        <span style="float:right;margin-top:10px;margin-right:10px;">
+            <a href="{{url_for('console.console_root')}}">
+                返回控制台
+            </a>
+        </span>
+    </div>
+    {% for i in info_list %}
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            {{v.title}}
+        </div>
+        <div class="panel-body">
+            <p>{{v.description}}</p>
+            <p>{{v.details}}</p>
+            {% if v.image %}
+            <img src="{{url_for_cos(v.image)}}" height="300px" width="auto">
+            {% endif %}
+        </div>
+    </div>
+    <hr>
+    {% endfor %}
+    <!--template list iteration end-->
+    <button class="btn btn-default" data-toggle="modal" data-target="#myModal"
+        style="position: fixed;bottom:20%;right:16%;z-index: 1;">
+        <img src="{{url_for('common.static',filename='img/edit.png')}}" width="30px" height="30px" />
+    </button>
+</div>
+{% endblock %}

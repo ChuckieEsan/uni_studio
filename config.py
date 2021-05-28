@@ -34,3 +34,7 @@ class Config():
     FILESERVICE_MAX_CONTENT_LENGTH = 50 * 1024 * 1024
 
     MAIL_PASS = os.environ.get('MAIL_PASS')
+
+    HCAPTCHA_SITE_KEY = os.environ.get('HCAPTCHA_SITE_KEY')
+    HCAPTCHA_SECRET_KEY = os.environ.get('HCAPTCHA_SECRET_KEY')
+    HCAPTCHA_ENABLED = not DEBUG

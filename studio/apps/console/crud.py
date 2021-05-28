@@ -1,5 +1,5 @@
 import os
-from studio.cos import cos_put
+from studio.cos import cos_put, url_for_cos
 from studio.utils.hash_helper import md5
 from studio.apps.console import console
 from flask import render_template,redirect,request,abort,g,url_for,current_app
@@ -78,14 +78,8 @@ def crud_put(table):
     elif key_constraint == "datetime":
         value = datetime.datetime.strptime(value,r"%H:%M %m/%d/%Y")
     if dkey == "file":
-        _file = value
-        file_suffix = _file.filename.split('.')[-1]
-        if file_suffix not in ['png','PNG','jpg','JPG','JPEG','jpeg','mp3']:
-            abort(500)
-        access_dir = '/common/static/uploads/'+md5(str(time.time())+str(_file.filename))+'.'+file_suffix
-        path = os.getcwd()+'/studio/apps'+access_dir
-        _file.save(path)
-        value = access_dir
+        _,fname = cos_put(value)
+        value = url_for_cos(fname)
 
     _id = request.values['id']
     if key is None or value is None:
