@@ -100,6 +100,7 @@ def users_confirm_post():
         UserUsers.confirmed: True,
         UserUsers.validation_code: ''
     })
+    db.session.commit()
     flash('验证完成，3秒后跳转')
     return render_template('users_confirm.html',confirmed=True)
 
