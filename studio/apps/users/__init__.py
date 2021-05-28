@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, jsonify, g, redirect, Res
 from flask.helpers import make_response, url_for, flash
 from studio.models import db, UserUsers
 from studio.utils.send_mail import send_mail
+from studio.utils.captcha_helper import getcaptcha
 users = Blueprint("users", __name__,
                   template_folder="templates", static_folder="static")
 
@@ -14,6 +15,7 @@ def users_entrypoint():
 @users.route('/register', methods=['POST'])
 def users_register():
     user = UserUsers(kwargs=request.get_json())
+    user.validation_code = getcaptcha(4)
     db.session.add(user)
     db.session.commit()
     return jsonify({"success": True})
@@ -48,7 +50,7 @@ def users_password_step1():
         token = current_app.tjwss.dumps(info).decode()
         email_html = """<h1>dutbit-密码重置</h1>
         <a href="http://{}{}?token={}">重置链接</a>
-        """.format(current_app.config['SERVER_NAME'],url_for('users.users_password_step2'),token)
+        """.format(current_app.config['SERVER_NAME'], url_for('users.users_password_step2'), token)
         send_mail(to=user.email, content=email_html, subject='dutbit-密码重置')
     if current_app.debug and user:
         return render_template('users_password_step1.html', email=email, email_html=email_html)
@@ -63,7 +65,7 @@ def users_password_step2():
     except:
         flash('无效token')
         return redirect(url_for('users.users_password_step1'))
-    return render_template('users_password_step2.html',token=token)
+    return render_template('users_password_step2.html', token=token)
 
 
 @users.route('/iforgot/set', methods=['POST'])
@@ -72,9 +74,34 @@ def users_password_set():
     data = current_app.tjwss.loads(token)
     uid = data['id']
     new_password = request.values.get('password')
-    UserUsers.query.filter(UserUsers.id==uid).update({UserUsers.password:new_password})
+    UserUsers.query.filter(UserUsers.id == uid).update(
+        {UserUsers.password: new_password})
     db.session.commit()
     return redirect(url_for('users.users_entrypoint'))
+
+
+@users.route('/confirm')
+def users_confirm_index():
+    if not g.user:
+        return redirect(url_for('users.users_entrypoint')+'?target={}'.format(request.path))
+    if g.user.confirmed:
+        return redirect(url_for('console.console_root'))
+    return render_template('users_confirm.html')
+
+
+@users.route('/confirm', methods=['POST'])
+def users_confirm_post():
+    if not g.user:
+        return redirect(url_for('users.users_entrypoint')+'?target={}'.format(request.path))
+    if request.values['code'] != g.user.validation_code:
+        flash('验证码无效')
+        return redirect(url_for('users.users_confirm_index'))
+    UserUsers.query.filter(UserUsers.id == g.user.id).update({
+        UserUsers.confirmed: True,
+        UserUsers.validation_code: ''
+    })
+    flash('验证完成，3秒后跳转')
+    return render_template('users_confirm.html',confirmed=True)
 
 
 @users.route('/logout')

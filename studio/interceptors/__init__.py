@@ -1,40 +1,51 @@
 from functools import wraps
 from typing import List
-from flask import request,redirect,current_app,abort,g,jsonify,url_for,flash,g,Response
-from studio.models import RouteInterceptors,UserUsers
+from flask import request, redirect, current_app, abort, g, jsonify, url_for, flash, g, Response
+from studio.models import RouteInterceptors, UserUsers, db
 from studio.cache import cache
-
+from studio.utils.captcha_helper import getcaptcha
 CAPTCHA_TIMEOUT = 600
 CAPTCHA_NAMESPACE = 'captcha'
 CAPTCHA_COOKIE_KEY = '_c'
 CAPTCHA_VALID_FIELD = 'is_valid'
+MUST_LOGIN_PATH = ['/console']
 
-@cache.memoize(300)
-def get_all_rules()->List[RouteInterceptors]:
-    return RouteInterceptors.query.filter(RouteInterceptors.delete==False).order_by(RouteInterceptors.startswith.desc()).all()
 
-@cache.memoize(300)
+@cache.memoize(30)
+def get_all_rules() -> List[RouteInterceptors]:
+    return RouteInterceptors.query.filter(RouteInterceptors.delete == False).order_by(RouteInterceptors.startswith.desc()).all()
+
+
+@cache.memoize(3)
 def get_user(_id):
-    return UserUsers.query.filter(UserUsers.id==_id).first()
+    return UserUsers.query.filter(UserUsers.id == _id).first()
+
 
 def global_interceptor():
-    #print(request.headers.get('X-Forwarded-For'))
+    # print(request.headers.get('X-Forwarded-For'))
     #request.remote_addr = request.headers.get('X-Forwarded-For')
     try:
         token = request.cookies['token']
         data = current_app.tjwss.loads(token)
         user = get_user(data['id'])
         g.user = user
-        current_app.logger.info("user=",g.user.id)
+        current_app.logger.info("user=", g.user.id)
     except Exception as e:
         g.user = None
-    if request.path.startswith('/console') and not g.user:
-        return redirect(url_for('users.users_entrypoint')+'?target={}'.format(request.path))
-    rules = get_all_rules() 
+        
+    rules_hit = False
+    for p in MUST_LOGIN_PATH:
+        if request.path.startswith(p): 
+            if not g.user:
+                return redirect(url_for('users.users_entrypoint')+'?target={}'.format(request.path))
+            else:
+                rules_hit = True
+    rules = get_all_rules()
     for r in rules:
         if not request.path.startswith(r.startswith):
             continue
-        if r.role_bits == 0 and not (g.user and g.user.role_bits & 1): # only root can view this page
+        # only root can view this page
+        if r.role_bits == 0 and not (g.user and g.user.role_bits & 1):
             flash(r.description)
             return abort(503)
         if not g.user:
@@ -43,36 +54,47 @@ def global_interceptor():
             flash(r.description)
             return abort(403)
         else:
+            rules_hit = True
             break
-            
-def generate_response(success:bool,details:str)->Response:
+
+    if rules_hit and not g.user.confirmed:
+        if not g.user.validation_code:
+            UserUsers.query.filter(UserUsers.id == g.user.id).update(
+                {'validation_code': getcaptcha(4)})
+            db.session.commit()
+        if current_app.config['DEBUG']:
+            print(g.user.validation_code)
+        return redirect(url_for('users.users_confirm_index'))
+
+
+def generate_response(success: bool, details: str) -> Response:
     print(details)
     acc = request.headers.get('accept') or request.headers.get('Accept')
     if 'text/html' in acc:
         flash(details)
         abort(401)
     elif 'application/json' in acc:
-        return jsonify({"success":success,"details":details})
+        return jsonify({"success": success, "details": details})
     else:
-        return jsonify({"success":success,"details":details})
+        return jsonify({"success": success, "details": details})
+
 
 def validate_captcha(func):
     @wraps(func)
-    def func_wrapper(*args,**kwargs):
+    def func_wrapper(*args, **kwargs):
         uuid = request.cookies.get(CAPTCHA_COOKIE_KEY)
         if not uuid:
-            return generate_response(False,'验证码已过期')
+            return generate_response(False, '验证码已过期')
 
-        captcha_text = cache.get('{}:{}'.format(CAPTCHA_NAMESPACE,uuid))
+        captcha_text = cache.get('{}:{}'.format(CAPTCHA_NAMESPACE, uuid))
         if not captcha_text:
-            return generate_response(False,'验证码已失效')
+            return generate_response(False, '验证码已失效')
 
         if 'captcha' not in request.values:
-            return generate_response(False,'验证码缺失')
-        
-        if request.values.get('captcha') != captcha_text:
-            return generate_response(False,'验证码错误')
-        cache.delete('{}:{}'.format(CAPTCHA_NAMESPACE,uuid))
-        return func(*args,**kwargs)
-    return func_wrapper
+            return generate_response(False, '验证码缺失')
 
+        if request.values.get('captcha') != captcha_text:
+            return generate_response(False, '验证码错误')
+        cache.delete('{}:{}'.format(CAPTCHA_NAMESPACE, uuid))
+        return func(*args, **kwargs)
+    return func_wrapper

@@ -1,0 +1,24 @@
+{% extends 'common_base.html'%}
+{% block content %}
+<div class="container">
+    <h1>
+    邮箱验证       
+    </h1>
+    <hr>
+<form action="{{url_for('users.users_confirm_post')}}" method="POST">
+    <input type="text" maxlength="4" required name="code" placeholder="验证码">
+    <input type="submit">
+</form>
+    <hr>
+{% for m in get_flashed_messages() %}
+<h3>{{m}}</h3>
+{% endfor %}
+</div>
+{% if confirmed %}
+<script>
+    setTimeout(()=>{
+        location.replace("{{url_for('console.console_root')}}")
+    },3000)
+</script>
+{% endif %}
+{% endblock %}

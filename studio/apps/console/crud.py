@@ -67,6 +67,7 @@ def crud_put(table):
     key = request.values['key']
     dkey = request.values['dtype']
     if not dkey:
+        print('not dkey')
         abort(500)
     value = request.files[dkey] if dkey=="file" else request.values[dkey]
     key_constraint= constraints[key]
@@ -93,8 +94,10 @@ def crud_put(table):
     if data:
         setattr(data,key,value)
         models.db.session.commit()
-    return redirect(url_for('console.crud_get',table=table,id=_id))
-
+    if request.args.get('id'):
+        return redirect(url_for('console.crud_get',table=table,id=_id))
+    else:
+        return redirect(url_for('console.crud_get',table=table))
 @console.route(URL_PATTERN_CD,methods=['GET'])#删除
 def crud_delete(table):
     _id = request.values.get('id')

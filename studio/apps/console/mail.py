@@ -11,8 +11,9 @@ def mail_index():
 def mail_post():
     to = request.values['to']
     content = request.values['content']
+    subject = request.values['subject']
     try:
-        send_mail(to=to,content=content)
+        send_mail(to=to,content=content,subject=subject)
         flash('发送成功')
     except Exception as e:
         flash(e)

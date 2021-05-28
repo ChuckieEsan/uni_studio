@@ -10,6 +10,8 @@ from faker import Faker
 import pandas as pd
 import time
 import os
+from io import BytesIO
+from slugify import slugify
 f = Faker(locale='zh_CN')
 
 
@@ -83,9 +85,15 @@ def vote_export(vote_id):
         })
     df = pd.DataFrame(result_list, columns=['id', str(
         vote_info.title_label), str(vote_info.subtitle_label), '票数'])
-    resp = make_response(df.to_csv(encoding='utf_8_sig'))
-    print(vote_info.title)
-    resp.headers["Content-Disposition"] = "attachment; filename={}.csv".format(time.time())
+    
+    out = BytesIO()
+    writer = pd.ExcelWriter(out,engine='xlsxwriter')
+    df.to_excel(excel_writer=writer,index=False)
+    writer.save()
+    writer.close()
+    resp = make_response(out.getvalue())
+    resp.headers["Content-Disposition"] = "attachment; filename={}-{}.xlsx"\
+        .format(slugify(vote_info.title),str(time.time()))
     resp.headers["Content-Type"] = "text/csv"
     return resp
 
@@ -163,43 +171,3 @@ def votes_del(vote_id):
         db.session.rollback()
         print(e)
     return redirect(url_for('console.admin_votes_show'))
-
-
-@vote.route('/vote/populate/<vote_id>')
-def populate_id(vote_id):
-    cs = []
-    for i in range(0, 5):
-        c = VoteCandidates(
-            title=f.name(),
-            subtitle=f.company_prefix(),
-            description=f.paragraph(),
-            vote_id=vote_id
-        )
-        cs.append(c)
-    try:
-        db.session.add_all(cs)
-        db.session.commit()
-    except Exception as e:
-        db.session.rollback()
-        print(e)
-    return redirect(url_for('vote.root'))
-
-
-@vote.route('/vote/populate')
-def populate():
-    vis = []
-    for i in range(5):
-        vi = VoteInfo(
-            title=f.bs(),
-            subtitle=f.company_suffix(),
-            description=f.credit_card_full(),
-            admin="tzy15368@outlook.com"
-        )
-        vis.append(vi)
-    try:
-        db.session.add_all(vis)
-        db.session.commit()
-    except Exception as e:
-        print(e)
-        db.session.rollback()
-    return redirect(url_for('vote.root'))

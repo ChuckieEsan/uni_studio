@@ -1,3 +1,4 @@
+from studio.cos import url_for_cos
 from itsdangerous import TimedJSONWebSignatureSerializer as TJWSS
 from flask import Flask,redirect
 from flask_bootstrap import Bootstrap  # for flask-file-uploader | fileservice
@@ -47,6 +48,7 @@ def create_app():
         app.config.from_object(Config())
         print('---- debug = {} ----'.format(app.config.get('DEBUG')))
         app.add_template_global(get_ver)
+        app.add_template_global(url_for_cos)
         app.live_log = LiveLog()
         db.init_app(app)
         cache.init_app(app)
