@@ -18,3 +18,4 @@ Pillow==8.2.0
 openpyxl==3.0.7
 python-slugify
 xlsxwriter
+flask-hcaptcha==0.5.4
