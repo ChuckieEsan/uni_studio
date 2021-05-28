@@ -16,7 +16,9 @@ def root():
             title="反馈",
         )
     if request.method=='POST':
-        print(current_app.hcaptcha.verify())
+        if not current_app.hcaptcha.verify():
+            flash('验证码无效')
+            return redirect(url_for('issues.root',timeout=True))
         _i = IssuesIssues(
             ip=request.remote_addr,
             url=request.form.get('url'),
