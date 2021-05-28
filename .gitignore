@@ -12,6 +12,7 @@ studio/apps/vote/static/uploads
 .Python
 build/
 data/
+*.xls
 develop-eggs/
 dist/
 downloads/

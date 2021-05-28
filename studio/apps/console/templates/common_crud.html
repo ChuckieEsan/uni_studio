@@ -44,6 +44,10 @@
                     <button type="button" onclick="showImage('{{d.__dict__[c]}}')">查看图片</button>
                     {% else %}
                     {{d.__dict__[c]}}
+                    {% if c[0:2]=='id'%}
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <a href="{{url_for('console.crud_delete',table=_class.__tablename__)}}?id={{d.__dict__[c]}}" onclick="return confirm('确认？')">删除</a>
+                    {% endif %}
                     {% endif %}
                 </td>
                 {% endif %}
@@ -56,25 +60,25 @@
                             <option value="" disabled selected>choose:</option>
                             {% for c in _class.__dict__.keys() %}
                             {% if c[0] != '_' and c != 'id' and constraints[c] %}
-                            <option value="{{c}}" dtype="{{constraints[c]}}">{{c}}</option>
+                            <option value="{{c}}" dtype="{{constraints[c]}}" did="{{d.id}}">{{c}}</option>
                             {% endif %}
                             {% endfor %}
                         </select>
-                        <input type="text" hidden name="dtype" id="dtypeInput">
+                        <input type="text" hidden name="dtype" id="dtypeInput{{d.id}}">
                         <input type="text" hidden  name="id" value="{{d.id}}">
-                        <div id="boolDiv" style="display: none;">
+                        <div id="boolDiv{{d.id}}" style="display: none;">
                             <input id="trueInput" type="radio" name="bool" value="1">
                             <label for="trueInput">True</label>
                             <input id="falseInput" type="radio" name="bool" value="0">
                             <label for="falseInput">False</label>
                         </div>
-                        <div id="textDiv" style="display:none">
+                        <div id="textDiv{{d.id}}" style="display:none">
                             <input type="text" name="text">
                         </div>
-                        <div id="datetimeDiv" style="display:none">
+                        <div id="datetimeDiv{{d.id}}" style="display:none">
                             <input type="text" id="datetimeInput" name="datetime" width="234">
                         </div>
-                        <div id="fileDiv" style="display: none;">
+                        <div id="fileDiv{{d.id}}" style="display: none;">
                             <input id="fileInput" type="file" name="file">
                         </div>
                         <input type="submit">
@@ -116,11 +120,12 @@
     $(".selector").change(function () {
         let dtypes = ["datetime","text","bool","file"]
         let dtype = this.options[this.selectedIndex].getAttribute("dtype")
+        let did = this.options[this.selectedIndex].getAttribute("did")
         dtypes.map((v)=>{
-            let node = $(`#${v}Div`)
+            let node = $(`#${v}Div${did}`)
             v===dtype?node.show():node.hide()
         })
-        $("#dtypeInput").prop('value',dtype)
+        $(`#dtypeInput${did}`).prop('value',dtype)
     })
     $('#datetimeInput').datetimepicker({
             uiLibrary: 'bootstrap4',

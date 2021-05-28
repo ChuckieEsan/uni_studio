@@ -97,63 +97,63 @@ def tostamp(dt1):
     return Unixtime
 
 
-@vote.route('/statistics/<int:vote_id>')
-def get_vote_stats(vote_id):
-    lim = 5 if request.values.get(
-        'lim') is None else int(request.values.get('lim'))
-    res = {}
-    vote_tickets, candidate_info = get_tickets_and_candidates(vote_id, lim=lim)
-    for c in candidate_info:
-        key = str(c.id)+"-"+c.title
-        res[key] = []
-        for v in vote_tickets:
-            if v.candidate == c.id:
-                res[key].append(int(tostamp(v.created_at)))
-    return jsonify(res)
+# @vote.route('/statistics/<int:vote_id>')
+# def get_vote_stats(vote_id):
+#     lim = 5 if request.values.get(
+#         'lim') is None else int(request.values.get('lim'))
+#     res = {}
+#     vote_tickets, candidate_info = get_tickets_and_candidates(vote_id, lim=lim)
+#     for c in candidate_info:
+#         key = str(c.id)+"-"+c.title
+#         res[key] = []
+#         for v in vote_tickets:
+#             if v.candidate == c.id:
+#                 res[key].append(int(tostamp(v.created_at)))
+#     return jsonify(res)
 
 
-@vote.route('/getcsv/<int:vote_id>')
-def getcsv(vote_id):
-    res = {}
-    data = {}
-    head = []
-    vote_tickets, candidate_info = get_tickets_and_candidates(vote_id, lim=80)
-    for c in candidate_info:
-        key = str(c.id)+"-"+c.title
-        res[key] = []
-        for v in vote_tickets:
-            if v.candidate == c.id:
-                res[key].append(int(tostamp(v.created_at)))
-    _start = 1607601600
-    _step = 600 if request.values.get(
-        'step') is None else int(request.values.get('step'))
-    _end = 1608136800
-    head.append('姓名')
-    for i in range(0, int((_end-_start)/600)):
-        timeArray = time.localtime(_start+_step*i)
-        otherStyleTime = time.strftime("%Y-%m-%d %H:%M:%S", timeArray)
-        head.append(otherStyleTime)
-    names = list(res.keys())
-    for i in range(len(names)):
-        data[names[i]] = []
-        now = _start
-        step = _step
-        end = _end
-        while now <= end:
-            count = 0
-            for j in range(len(res[names[i]])):
-                if res[names[i]][j] < now:
-                    count = count + 1
-            data[names[i]].append(count)
-            now = now + step
-    fname = os.path.join(os.getcwd(), 'studio', 'apps', 'vote', 'static', 'csv',
-                         'vote_'+str(vote_id)+'_'+time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime(time.time()))+'.csv')
-    with codecs.open(fname, 'wb', "gbk") as csvfile:
-        csv_writer = csv.writer(csvfile)
-        csv_writer.writerow(head)
-        for k in data:
-            csv_writer.writerow([k]+data[k])
-    return send_file(fname, as_attachment=True, attachment_filename=fname)
+# @vote.route('/getcsv/<int:vote_id>')
+# def getcsv(vote_id):
+#     res = {}
+#     data = {}
+#     head = []
+#     vote_tickets, candidate_info = get_tickets_and_candidates(vote_id, lim=80)
+#     for c in candidate_info:
+#         key = str(c.id)+"-"+c.title
+#         res[key] = []
+#         for v in vote_tickets:
+#             if v.candidate == c.id:
+#                 res[key].append(int(tostamp(v.created_at)))
+#     _start = 1607601600
+#     _step = 600 if request.values.get(
+#         'step') is None else int(request.values.get('step'))
+#     _end = 1608136800
+#     head.append('姓名')
+#     for i in range(0, int((_end-_start)/600)):
+#         timeArray = time.localtime(_start+_step*i)
+#         otherStyleTime = time.strftime("%Y-%m-%d %H:%M:%S", timeArray)
+#         head.append(otherStyleTime)
+#     names = list(res.keys())
+#     for i in range(len(names)):
+#         data[names[i]] = []
+#         now = _start
+#         step = _step
+#         end = _end
+#         while now <= end:
+#             count = 0
+#             for j in range(len(res[names[i]])):
+#                 if res[names[i]][j] < now:
+#                     count = count + 1
+#             data[names[i]].append(count)
+#             now = now + step
+#     fname = os.path.join(os.getcwd(), 'studio', 'apps', 'vote', 'static', 'csv',
+#                          'vote_'+str(vote_id)+'_'+time.strftime("%Y-%m-%d_%H:%M:%S", time.localtime(time.time()))+'.csv')
+#     with codecs.open(fname, 'wb', "gbk") as csvfile:
+#         csv_writer = csv.writer(csvfile)
+#         csv_writer.writerow(head)
+#         for k in data:
+#             csv_writer.writerow([k]+data[k])
+#     return send_file(fname, as_attachment=True, attachment_filename=fname)
 
 
 @vote.route('/<int:vote_id>', methods=["POST"])

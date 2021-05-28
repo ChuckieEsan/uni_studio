@@ -12,8 +12,9 @@ class UserUsers(db.Model,TimestampMixin,DeleteMixin):
     current_ip = db.Column(db.String(100),nullable=True)
     last_login_ip = db.Column(db.String(100),nullable=True)
     last_login_time = db.Column(db.DateTime(True), default=db.func.now(), nullable=True)
-    confirmation = db.Column(db.Text)
+    confirmed = db.Column(db.Boolean)
     objid = db.Column(db.String(100),nullable=True)
+    validation_code = db.Column(db.Text)
      
     def __init__(self,kwargs=dict()):
         for k in kwargs:
