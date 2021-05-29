@@ -2,7 +2,9 @@
 {% block content %}
 <div>
     {% for c in chats %}
-    <p>{{c.id}}</p>
+    <p>
+        <a href="{{url_for('chat.chat_room',head_id=c.id)}}">{{c.first_alias}} ←→ {{c.second_alias}}</a>
+    </p>
     {% endfor %}
 </div>
 <hr>
