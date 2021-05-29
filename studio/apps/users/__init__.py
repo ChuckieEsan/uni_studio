@@ -15,6 +15,7 @@ def users_entrypoint():
 @users.route('/register', methods=['POST'])
 def users_register():
     user = UserUsers(kwargs=request.get_json())
+    user.role_bits = 2
     db.session.add(user)
     db.session.commit()
     return jsonify({"success": True})
