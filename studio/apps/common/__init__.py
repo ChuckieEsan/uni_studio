@@ -22,7 +22,8 @@ def get_global_notification():
         .filter(GlobalNotifications.id.notin_(lim))\
         .order_by(GlobalNotifications.valid_until.desc()).all()
     result = []
+    path = str(request.values.get('path'))
     for n in noti:
-        if request.path.startswith(n.path):
+        if path.startswith(n.path):
             result.append({'id': n.id, 'text': n.text})
     return jsonify(result)
