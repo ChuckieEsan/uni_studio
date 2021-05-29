@@ -8,7 +8,7 @@ class EnrollCandidates(db.Model, TimestampMixin, DeleteMixin):
     number = db.Column(db.String(100), nullable=False)
     gender = db.Column(db.String(5), nullable=False)
     major = db.Column(db.String(100))
-    user_id = db.Column(db.Integer,nullable=False)
+    user_id = db.Column(db.Integer)
     details = db.Column(db.Text)
     status = db.Column(db.Integer, default=0)
     form_id = db.Column(db.Integer)

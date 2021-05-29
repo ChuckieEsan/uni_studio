@@ -31,6 +31,21 @@
                 </select>
             </span>
         </div>
+        {% if not g.user %}
+        <div class="form-group" style="color:orangered;font-weight: 1000;">
+            
+                New：
+                <a href="{{url_for('users.users_entrypoint')}}?target={{url_for('issues.root')}}" >
+                    <button class="btn btn-warning btn-sm">登录</button>
+                </a>
+                以获得可能的
+                <a href="{{url_for('chat.chat_index')}}">
+                    站内信
+                </a>
+                或邮件回复
+            
+        </div>
+        {% endif %}
         <div class="form-group">
             <textarea class="form-control" rows="5" placeholder="遇到的问题或您的建议;  信息更正类请提供同时姓名和学号以便我们核对信息" id="content"
                 name="content"></textarea>
