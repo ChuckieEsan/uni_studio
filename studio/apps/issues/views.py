@@ -1,7 +1,7 @@
 from flask.globals import current_app
 from studio.apps.issues import issues
 from flask import url_for,redirect,render_template,request,flash,g
-from studio.models import IssueTypes,IssuesIssues,db,UserRoles
+from studio.models import IssueTypes,IssuesIssues,db,UserUsers
 from studio.utils.send_chat import send_chat, start_chat
 @issues.route('/',methods=['GET','POST'])
 def root():
@@ -31,7 +31,7 @@ def root():
         db.session.add(_i)
         db.session.commit()
         if g.user:
-            to = UserRoles.query.filter(UserRoles.role_bit==1).first()
+            to = UserUsers.query.filter(UserUsers.role_bits.op('&')(1) == 1).first()
             head = start_chat(g.user.id,to.id,first_alias=g.user.email,second_alias='反馈处理')
             send_chat(from_id=g.user.id,text='查看反馈工单{}'.format(_i.id),to_id=to.id,head=head)
         flash('提交成功，感谢您的反馈')
