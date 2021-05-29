@@ -1,0 +1,26 @@
+{% extends 'common_base.html'%}
+{% block content %}
+<div class="container">
+    <h1>站内信</h1>
+    <div class="list-group" style="display: flex;">
+        {% for c in chats %}
+        <a href="#" class="list-group-item list-group-item-action {% if c.msg_from == g.user.id %} active {% endif %}"
+            {% if c.msg_from == g.user.id %} aria-current="true" {% endif %}
+            style="margin-top: 10px;border-top: 1px solid lightgray ;display: block;{% if c.msg_from == g.user.id %}text-align:right;{% endif %}">
+            {{c.msg_text}}
+        </a>
+        {% endfor %}
+        <!-- <a href="#" class="list-group-item list-group-item-action">A second link item</a> -->
+    </div>
+    <hr>
+    <form action="{{url_for('chat.chat_room_send',head_id=head.id)}}" method="POST">
+        <input type="text" name="to" hidden value="{{to}}">
+        <input type="text" name="text" required placeholder="消息">
+        <input type="submit">
+    </form>
+    <hr>
+    {% for m in get_flashed_messages() %}
+    <p>{{m}}</p>
+    {% endfor %}
+</div>
+{% endblock %}

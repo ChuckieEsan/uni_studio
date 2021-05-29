@@ -1,6 +1,6 @@
 from flask.globals import current_app
 from studio.apps.issues import issues
-from flask import url_for,redirect,render_template,request,flash
+from flask import url_for,redirect,render_template,request,flash,g
 from studio.models import IssueTypes,IssuesIssues,db
 @issues.route('/',methods=['GET','POST'])
 def root():
@@ -25,7 +25,7 @@ def root():
             contact=request.form.get('contact'),
             type=request.form.get('type'),
             content=request.form.get('content'),
-            user_id=None
+            user_id=None if not g.user else g.user.id
         )
         db.session.add(_i)
         db.session.commit()
