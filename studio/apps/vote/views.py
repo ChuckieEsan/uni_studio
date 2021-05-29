@@ -1,6 +1,5 @@
 from studio.apps.vote import vote
 from studio.models import VoteInfo, VoteCandidates, VoteVotes, db
-from studio.interceptors import validate_captcha
 from studio.cache import cache
 from studio.apps.vote import get_candidate_all_info, get_candidate_info, get_vote_info
 from flask import url_for, redirect, render_template, request, flash, jsonify, Markup, send_file,g
@@ -9,9 +8,6 @@ from faker import Faker
 import time
 import random
 import datetime
-import csv
-import codecs
-import os
 f = Faker(locale='zh_CN')
 
 
@@ -157,13 +153,14 @@ def tostamp(dt1):
 
 
 @vote.route('/<int:vote_id>', methods=["POST"])
-#@validate_captcha
 def vote_handler(vote_id):
     voted = VoteVotes.query.filter(VoteVotes.ip == request.headers.get('X-Forwarded-For')).filter(
         VoteVotes.vote_id == vote_id).first()
     if voted:
         current_app.logger.warn('vote_attempt:'+request.remote_addr)
         return jsonify({"success": False, "details": "您已投过票"})
+    if not current_app.hcaptcha.verify():
+        return jsonify({"success":False,"details":"验证码无效"})
     vote_list = request.get_json()
     current_app.logger.debug(
         'candidates:'+str(request.form.getlist('candidates')))

@@ -23,8 +23,6 @@ def get_user(_id):
 
 
 def global_interceptor():
-    # print(request.headers.get('X-Forwarded-For'))
-    #request.remote_addr = request.headers.get('X-Forwarded-For')
     try:
         token = request.cookies['token']
         data = current_app.tjwss.loads(token)
@@ -33,10 +31,10 @@ def global_interceptor():
         current_app.logger.info("user=", g.user.id)
     except Exception as e:
         g.user = None
-        
+
     rules_hit = False
     for p in MUST_LOGIN_PATH:
-        if request.path.startswith(p): 
+        if request.path.startswith(p):
             if not g.user:
                 return redirect(url_for('users.users_entrypoint')+'?target={}'.format(request.path))
             else:
@@ -63,41 +61,8 @@ def global_interceptor():
             code = getcaptcha(4)
             UserUsers.query.filter(UserUsers.id == g.user.id).update(
                 {'validation_code': code})
-            send_validation_code(to=g.user.email,code=code)
+            send_validation_code(to=g.user.email, code=code)
             db.session.commit()
         if current_app.config['DEBUG']:
             print(g.user.validation_code)
         return redirect(url_for('users.users_confirm_index'))
-
-
-def generate_response(success: bool, details: str) -> Response:
-    print(details)
-    acc = request.headers.get('accept') or request.headers.get('Accept')
-    if 'text/html' in acc:
-        flash(details)
-        abort(401)
-    elif 'application/json' in acc:
-        return jsonify({"success": success, "details": details})
-    else:
-        return jsonify({"success": success, "details": details})
-
-
-def validate_captcha(func):
-    @wraps(func)
-    def func_wrapper(*args, **kwargs):
-        uuid = request.cookies.get(CAPTCHA_COOKIE_KEY)
-        if not uuid:
-            return generate_response(False, '验证码已过期')
-
-        captcha_text = cache.get('{}:{}'.format(CAPTCHA_NAMESPACE, uuid))
-        if not captcha_text:
-            return generate_response(False, '验证码已失效')
-
-        if 'captcha' not in request.values:
-            return generate_response(False, '验证码缺失')
-
-        if request.values.get('captcha') != captcha_text:
-            return generate_response(False, '验证码错误')
-        cache.delete('{}:{}'.format(CAPTCHA_NAMESPACE, uuid))
-        return func(*args, **kwargs)
-    return func_wrapper
