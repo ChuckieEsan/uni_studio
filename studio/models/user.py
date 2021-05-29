@@ -29,6 +29,9 @@ class UserRoles(db.Model,TimestampMixin,DeleteMixin):
     role_text = db.Column(db.String(100),nullable=False)
     description = db.Column(db.Text,nullable=True)
 
+    def __init__(self,kwargs=dict()):
+        for k in kwargs:
+            setattr(self, k, kwargs[k])
 class UserGroups(db.Model,TimestampMixin,DeleteMixin):
     __tablename__ = "user_groups"
     id = db.Column(db.Integer, primary_key=True)
