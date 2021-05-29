@@ -79,7 +79,6 @@
 <script>
     let VOTE_MIN = Number("{{vote_info.vote_min}}")
     let VOTE_MAX = Number("{{vote_info.vote_max}}")
-    let STATS_URL = "{{url_for('vote.get_vote_stats',vote_id=vote_info.id)}}"
     let SUBMIT_URL = "{{url_for('vote.vote_handler',vote_id=vote_info.id)}}"
     let showDetails = (cid) => {
         fetch(`{{url_for('vote.show_candidate')}}?cid=${cid}`).then(res => res.text())
