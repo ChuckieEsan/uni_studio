@@ -9,7 +9,7 @@ CAPTCHA_TIMEOUT = 600
 CAPTCHA_NAMESPACE = 'captcha'
 CAPTCHA_COOKIE_KEY = '_c'
 CAPTCHA_VALID_FIELD = 'is_valid'
-MUST_LOGIN_PATH = ['/console']
+MUST_LOGIN_PATH = ['/console','chat']
 
 
 @cache.memoize(30)

@@ -21,6 +21,7 @@ from .apps.staticfile.app import app as staticfileapp
 from .apps.vote import vote as voteapp
 from .apps.users import users as usersapp
 from .apps.enroll import enroll as enrollapp
+from .apps.chat import chat as chatapp
 from .apps.h5 import h5 as h5app
 from flask_hcaptcha import hCaptcha
 
@@ -70,6 +71,7 @@ def create_app():
         app.register_blueprint(usersapp, url_prefix="/user")
         app.register_blueprint(enrollapp, url_prefix="/enroll")
         app.register_blueprint(h5app, url_prefix="/h5")
+        app.register_blueprint(chatapp,url_prefix='/chat')
 
         app.tjwss = TJWSS(app.config['SECRET_KEY'],
                           expires_in=app.config['TOKEN_EXPIRES_IN'])
