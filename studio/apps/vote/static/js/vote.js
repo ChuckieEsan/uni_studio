@@ -22,11 +22,6 @@ $("#submitVote").click((e) => {
         msgFail(`最少${minVote}票，最多${maxVote}票，已投${count}票`)
         return
     }
-    let cptinput = $("#captchaInput").val()
-    if (!cptinput) {
-        msgFail("验证码不可为空")
-        return
-    }
     let form = $("#voteForm")
     let formData = form.serialize()
     $("#submitVote").attr("disabled", "disabled")
