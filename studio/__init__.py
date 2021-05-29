@@ -1,3 +1,4 @@
+from studio.utils import setup_roles
 from studio.cos import url_for_cos
 from itsdangerous import TimedJSONWebSignatureSerializer as TJWSS
 from flask import Flask,redirect
@@ -51,6 +52,7 @@ def create_app():
         print('---- debug = {} ----'.format(app.config.get('DEBUG')))
         app.add_template_global(get_ver)
         app.add_template_global(url_for_cos)
+        app.before_first_request(setup_roles)
         app.live_log = LiveLog()
         db.init_app(app)
         cache.init_app(app)
@@ -72,7 +74,6 @@ def create_app():
         app.register_blueprint(enrollapp, url_prefix="/enroll")
         app.register_blueprint(h5app, url_prefix="/h5")
         app.register_blueprint(chatapp,url_prefix='/chat')
-
         app.tjwss = TJWSS(app.config['SECRET_KEY'],
                           expires_in=app.config['TOKEN_EXPIRES_IN'])
         return app
