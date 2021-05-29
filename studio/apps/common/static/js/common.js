@@ -38,7 +38,7 @@ $(document).ready(function () {
         return false;
     });
     const notiKey = "viewed_noti"
-    fetch("/common/notification/global").
+    fetch(`/common/notification/global?path=${location.pathname}`).
     then(res => res.json()).then(res => {
         let node = $("#notification")
         res.map((v) => {
