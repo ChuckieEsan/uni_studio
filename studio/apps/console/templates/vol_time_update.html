@@ -1,88 +1,186 @@
 {% extends 'common_base.html'%}
+<br />
+
 {% block stylesheet %}
 <style>
+    .needToRead p {
+        color: gray;
+        margin: 5px;
+    }
+    .info-box__count-info {
+        color: orange;
+        font-size: 20px;
+    }
+    .info-box__ajax-info {
+        color: orange;
+        font-size: 20px;
+    }
+    .info-box__csv-info {
+        color: deepskyblue;
+        font-size: 16px;
+    }
     .error {
         color: red;
     }
+    .warning {
+        color: orange;
+    }
 </style>
 {% endblock %}
+<br />
+
 {% block content %}
 <div class="container">
     <div class="title">
-        <span style="font-size:28px">
-            志愿时长查询增量更新
-        </span>
-        <span style="float:right;margin-top:10px;">
+        <span style="font-size: 28px">志愿时长查询增量更新</span>
+        <a href="/static/example.csv" style="font-size: 20px">样表下载</a>
+        <span style="float: right">
             <a href="/vol_time">查询页面</a>
         </span>
     </div>
-    <a href="/static/example.csv" style="font-size:20px">样表下载</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong
-        style="color:orange;font-size:20px;">请上传csv格式的文件&nbsp;&nbsp;&nbsp;&nbsp;<a href="#"
-            onclick="toggleHowTo()">怎么转换</a></strong>
-    <p id="howto" style="display:none">
-        <img src="/static/vol_time/howto1.png" height="300px" width="300px" />
-        <img src="/static/vol_time/howto2.png" height="300px" width="600px" />
-    </p>
+    <div class="needToRead">
+        <p>1.请将表格保存为csv文件，并确保各个数据不含英文逗号</p>
+        <p>2.文件中的所有空白字符会被删除</p>
+        <p>3.格式要求：学号为纯数字，时长为小于1000的小数或整数，时间包含年月日并使用英文左斜杠分隔</p>
+    </div>
 
-    <hr>
-    <form action="{{url_for('console.do_vol_time_update')}}" method="post" enctype="multipart/form-data" accept-charset="utf-8"
-        class="form-horizontal">
-        <!-- <input class="btn btn-default" type="file" name="data" accept=".csv" required/> -->
-        <!-- 
-            <input type="radio" name="fileIndex" value="0"> -->
-        <h3>文件选择</h3>
-        <span><button class="btn btn-info" id="fetchFiles">刷新文件库</button></span>
-        <span><a href="{{url_for('fileservice.index')}}" target="_blank">文件库</a></span>
-        <div id="fileChoices"></div>
-        <br>
-        <span>
+    <hr />
+    <input type="file" id="csvFile" />
+    <button class="btn btn-primary" id="refreshFile">刷新</button>
+    <button class="btn btn-primary" id="uploadFile">上传</button>
 
-            <span><input class="" type="checkbox" aria-label="..." name="coverall"></span>
-            <span style="color:red">全表覆盖</span>
-        </span>
-        <br>
-        <input class="btn btn-primary" style="margin-top:10px;" type="submit" value="提交" />
-    </form>
-    <hr>
-    <div style="color:orange">
-        <p style="font-size:20px">
-            当前行数：{{count}}
-        </p>
-            {% for m in get_flashed_messages() %}
-            <p style="font-size:20px">
-                {{m}}
-            </p>
-            {% endfor %}
+    <hr />
+    <table id="data-table" class="table" style="font-size: 14px">
+        <thead>
+            <tr>
+                <td>姓名</td>
+                <td>性别</td>
+                <td>学院</td>
+                <td>学号</td>
+                <td>时长(h)</td>
+                <td>任务名称</td>
+                <td>组织学院</td>
+                <td>队伍名称</td>
+                <td>时间</td>
+                <td>组织人</td>
+                <td>备注</td>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <hr />
+    <div class="info-box">
+        <p class="info-box__count-info">当前行数：{{count}}</p>
+        <p class="info-box__ajax-info"></p>
+        <p class="info-box__csv-info"></p>
     </div>
     <script>
-        let toggleHowTo = ()=>{
-                    $("#howto").toggle()
-                }
-        $("#fetchFiles").click((e)=>{
-            e.preventDefault()
-            fetchFiles()
-        })
-        let fetchFiles = ()=>{
-            fetch("/fileservice/upload").then(res=>res.json()).then((res)=>{
-                //console.log(res)
-                $("#fileChoices").html('')
-                for(let i=0;i<res.files.length;i++){
-                    let node = $(`<input type="radio" name="fileIndex" value="${res.files[i].name}" required/>`)
-                    let name = $(`<span>${res.files[i].name}</span>`)
-                    let br = $('<br>')
-                    $("#fileChoices").append(br)
-                    $("#fileChoices").append(node)
-                    $("#fileChoices").append(name)
-                }
-                
-                msgOK("文件库列表刷新成功")
-                }).catch(err=>{
-                    console.log(err)
-                    alert(err)
-                    })
+        let toggleHowTo = () => {
+            $("#howto").toggle();
+        };
+
+        /** @type {FileReader} */
+        let reader;
+        if (window.FileReader) {
+            reader = new FileReader();
+        } else {
+            console.log("你的浏览器不支持读取文件");
         }
-        $(document).ready(function(){
-            fetchFiles()
-    });
+        /** @type {File} */
+        let file;
+        /** @type {string} */
+        let csv_text;
+        let encoding = "";
+        let result;
+        $("#refreshFile").click((e) => {
+            $("#data-table tbody").empty();
+            $(".info-box__csv-info").remove();
+            file = $("#csvFile")[0].files[0];
+            if (!file.name.endsWith(".csv")) {
+                appendCSVInfo("ERROR: 文件格式不是CSV", "error");
+                return;
+            }
+            reader.readAsText(file);
+            reader.onload = function () {
+                csv_text = reader.result;
+                if (csv_text.indexOf("�") != -1 || csv_text.indexOf("?") != -1) {
+                    if (encoding == "") {
+                        appendCSVInfo("INFO: 编码不是UTF-8，尝试GBK", "error");
+                        encoding = "GBK";
+                        reader.readAsText(file, "GBK");
+                    } else {
+                        appendCSVInfo("ERROR: 编码不是UTF-8或GBK", "error");
+                    }
+                } else {
+                    encoding = "";
+                    result = csv2array(csv_text);
+                    console.log(result);
+                    Toastify({
+                        text: "数据已加载",
+                        duration: 2000,
+                        gravity: "top",
+                        position: "left",
+                    }).showToast();
+                }
+            };
+            reader.onerror = function () {
+                console.log("ERROR: " + reader.error);
+            };
+        });
+        $("#uploadFile").click((e) => {
+            $.ajax({
+                type: "post",
+                contentType: "application/json",
+                data: JSON.stringify(result),
+                dataType: "text",
+                url: "{{url_for('console.update_by_array')}}",
+                success: function (res) {
+                    $(".info-box__ajax-info").html(res);
+                },
+                error: function (e) {
+                    console.log(e);
+                },
+            });
+        });
+        $("#csvFile").change((e) => {
+            $("#refreshFile").click();
+        });
+        /** @param {string} csvStr */
+        function csv2array(csvStr) {
+            let lines = csvStr.split("\n");
+            let results = [];
+            for (let i = 1; i < lines.length; i++) {
+                if (lines[i]) {
+                    let splits = lines[i].replace(/\s*/g, "").split(",");
+                    if (
+                        splits.length == 11 &&
+                        /^\d+$/.test(splits[3]) &&
+                        /^(\d{1,3}|\d{1,3}\.\d+)$/.test(splits[4]) &&
+                        /^\d{4}\/\d{1,2}\/\d{1,2}$/.test(splits[8])
+                    ) {
+                        $("#data-table tbody").append("<tr><td>" + splits.join("</td><td>") + "</td></tr>");
+                        results.push(splits);
+                    } else {
+                        appendCSVInfo(
+                            "WARN: 以下数据格式错误（学号：" +
+                                /^\d+$/.test(splits[3]) +
+                                "，时长：" +
+                                /^(\d{1,3}|\d{1,3}\.\d+)$/.test(splits[4]) +
+                                "，时间：" +
+                                /^\d{4}\/\d{1,2}\/\d{1,2}$/.test(splits[8]) +
+                                "）",
+                            "warning"
+                        );
+                        appendCSVInfo(splits);
+                    }
+                }
+            }
+            appendCSVInfo("读取到" + results.length + "条有效数据");
+            return results;
+        }
+        function appendCSVInfo(info, type = "") {
+            $(".info-box").append('<p class="info-box__csv-info ' + type + '">' + info + "</p>");
+        }
     </script>
+</div>
 {% endblock %}

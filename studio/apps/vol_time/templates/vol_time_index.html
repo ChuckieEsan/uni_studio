@@ -1,135 +1,243 @@
 {% extends 'common_base.html'%}
+<br />
+
 {% block stylesheet %}
 <style>
-    .error {
-        color:red;
+    @media screen and (max-width: 768px) {
+        .table td,
+        .table th {
+            padding: 0.6rem 0.4rem;
+        }
+        #data-table {
+            min-width: 47em;
+        }
+    }
+    @media screen and (min-width: 768px) {
+        #data-table {
+            min-width: 57em;
+        }
+    }
+    #data-table td,
+    #data-table th {
+        font-size: 14px;
+        text-align: center;
+        vertical-align: middle;
+    }
+    #data-table td:nth-child(1) {
+        max-width: 7em;
+    }
+    #data-table td:nth-child(2) {
+        max-width: 7em;
+    }
+    #data-table td:nth-child(3) {
+        max-width: 6em;
+    }
+    #data-table td:nth-child(4) {
+        max-width: 7em;
+    }
+    #data-table td:nth-child(5) {
+        max-width: 3em;
+    }
+    #data-table td:nth-child(6) {
+        max-width: 5em;
+    }
+    #data-table td:nth-child(7) {
+        max-width: 15em;
+    }
+    #data-table td:nth-child(8) {
+        max-width: 7em;
+    }
+    tr.query-newly {
+        background-color: #edf2ff;
+    }
+    #all-time {
+        color: #f38200;
+        font-size: 20px;
+    }
+    .alert.hidden {
+        display: none;
     }
 </style>
 {% endblock %}
+<br />
+
 {% block content %}
-    <div class="container">
-        <div class="row">   
-            <span class="title">
-                志愿时长查询
-            </span>
-            <span style="float:right">
-                <a href="{{url_for('vol_time.get_top')}}">排行榜</a>
-            </span>
+<div class="container">
+    <div>
+        <span class="title">志愿时长查询</span>
+        <a href="{{url_for('vol_time.get_top')}}" style="font-size: 20px; margin: 0 1em">排行榜</a>
+    </div>
+    <hr />
+    <form id="myform" class="form-horizontal">
+        <div class="form-row">
+            <div class="form-group row col-md-5">
+                <label for="stu_id" class="col-3 col-form-label text-right">学号</label>
+                <div class="col-9">
+                    <input type="text" class="form-control" id="stu_id" name="stu_id" placeholder="学号" />
+                </div>
+            </div>
+            <div class="form-group row col-md-5">
+                <label for="name" class="col-3 col-form-label text-right">姓名</label>
+                <div class="col-9">
+                    <input type="text" class="form-control" id="name" name="Name" placeholder="姓名" />
+                </div>
+            </div>
+            <div class="col-md-2 row flex-row-reverse">
+                <div class="">
+                    <button type="submit" class="btn btn-primary" id="queryButton">查询</button>
+                </div>
+            </div>
         </div>
-        <hr>
-        <form id="myform" class="form-horizontal" style="padding-bottom: 20px;">
-            <div class="form-group">
-                <label for="number" class="col-sm-2 control-label">学号</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="number" name="Number" placeholder="学号">
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">姓名</label>
-                <div class="col-sm-10">
-                    <input type="text" class="form-control" id="name" name="Name" placeholder="姓名">
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="col-sm-offset-2 col-sm-10">
-                    <span>
-                        <button type="submit" class="btn btn-primary" id="queryButton">查询</button>
-                    </span>
-                    <span style="float:right">
-                        <i>数据有缺失？</i><a href="{{url_for('issues.root')}}">联系我们</a>
-                    </span>
-                </div>
-            </div>
-        </form>
-        <h3 id="usr-name"></h3>
-        <table id="data-table" class="table" style="font-size:14px">
+    </form>
+    <hr />
+    <div class="alert alert-info" role="alert">
+        <span>我们清除了学号和姓名中的空格以解决查询不全的问题，新查询出的记录显示为蓝色底色，请检查是否仍有缺失</span>
+    </div>
+    <div class="alert alert-danger alert_dataErr hidden" role="alert">
+        <span>数据异常，您的学号对应</span>
+        <strong class="alert__id2name">0</strong>
+        <span>个姓名，您的姓名对应</span>
+        <strong class="alert__name2id">0</strong>
+        <span>个学号，请</span>
+        <span>
+            <a href="{{url_for('issues.root')}}">反馈错误</a>
+        </span>
+    </div>
+    <div class="alert alert-danger alert_dataLost hidden" role="alert">
+        <span>数据有缺失，请</span>
+        <span>
+            <a href="{{url_for('issues.root')}}">反馈错误</a>
+        </span>
+    </div>
+    <div>
+        <h3 id="usr-name" class="d-inline-block"></h3>
+        <p id="all-time" class="float-right"></p>
+    </div>
+    <div style="width: 100%; overflow-x: auto">
+        <table id="data-table" class="table">
             <thead>
                 <tr>
-                    <td>记录时间</td>
-                    <td>姓名</td>
-                    <td>学院</td>
-                    <td>学号</td>
-                    <td>时长</td>
-                    <td>组织学院</td>
-                    <td>任务名称</td>
-                    <td>组织人</td>
+                    <th>学号</th>
+                    <th>姓名</th>
+                    <th>学院</th>
+                    <th>时间</th>
+                    <th>时长</th>
+                    <th>任务名称</th>
+                    <th>组织学院</th>
+                    <th>组织人</th>
                 </tr>
             </thead>
-            <tbody id="table-con">
-                
-            </tbody> 
+            <tbody></tbody>
         </table>
-        <p id="all-time"></p>   
     </div>
-    <script src="https://static.runoob.com/assets/jquery-validation-1.14.0/lib/jquery.js"></script>
-    <script src="https://static.runoob.com/assets/jquery-validation-1.14.0/dist/jquery.validate.min.js"></script>
-    <script>
-         $.validator.setDefaults({
-                submitHandler: function(form) {
-                    console.log("form check over!");
-                    submit_info();
-                }
-            });
-        $(document).ready(function() {
-            $("#myform").validate({
-                rules: {
-                    Number:{
-                        required:true,
-                        digits:true
-                    },
-                    Name: "required"
+
+    <span style="float: right; font-size: 20px">
+        <i>数据有缺失？</i>
+        <a href="{{url_for('issues.root')}}">联系我们</a>
+    </span>
+</div>
+<script src="https://static.runoob.com/assets/jquery-validation-1.14.0/lib/jquery.js"></script>
+<script src="https://static.runoob.com/assets/jquery-validation-1.14.0/dist/jquery.validate.min.js"></script>
+<script>
+    $.validator.setDefaults({
+        submitHandler: function (form) {
+            console.log("form check over!");
+            submit_info();
+        },
+    });
+    $(document).ready(function () {
+        $("#myform").validate({
+            rules: {
+                stu_id: {
+                    required: true,
+                    digits: true,
                 },
-                messages:{　　　
-                　　Name: {
-                　　　　required: "请输入姓名"
-                　　　　},
-                    Number:{
-                        required: "请输入学号",
-                        digits:"请输入正确的学号",
-                        number:"number"
-                    }
-                }
-            });
+                Name: "required",
+            },
+            messages: {
+                Name: {
+                    required: "请输入姓名",
+                },
+                stu_id: {
+                    required: "请输入学号",
+                    digits: "请输入正确的学号",
+                },
+            },
         });
-        function submit_info(){
-            console.log("hhh");
-            var number = $("#number").val();
-            var name=$("#name").val();
-            $.ajax({
-                type:"post",
-                data:{
-                    name:name,
-                    number:number
-                },
-                url:"{{url_for('vol_time.vol_time_search')}}",
-                success:function(res){
-                    console.log(res)
-                    if(!res){
-                        $("#table-con").html("");
-                        $("#all-time").text("你无志愿时长。");
-                        return;
-                    }
-                    if(res==='NOSPAM'||res.data==='NOSPAM'){
-                        alert("NO SPAM")
-                        $("#queryButton").attr("disabled","disabled")
-                        $("#queryButton").text('请等待')
-                        setTimeout(()=>{$("#queryButton").removeAttr("disabled");
-                        
-                        $("#queryButton").text('查询')},1000)
-                        return;
-                    }
-                    //var res_p = $.parseJSON(res);
-                    var res_p = res
-                    //console.log(res_p.name);
-                    //console.log(res_p.all_time);
-                    $("#usr-name").text("Hi,"+res_p.name);
-                    $("#table-con").html(res_p.data);
-                    $("#all-time").text("总时长:"+res_p.all_time);
-                },
-                error:function(e){
-                    console.log(e);
+    });
+    function submit_info() {
+        $(".alert_dataErr").hide(200);
+        $(".alert_dataLost").hide(200);
+        var stu_id = $("#stu_id").val();
+        var name = $("#name").val();
+        $.ajax({
+            type: "post",
+            data: {
+                name: name,
+                stu_id: stu_id,
+            },
+            url: "{{url_for('vol_time.vol_time_search')}}",
+            success: function (res) {
+                console.log(res);
+                $("#data-table tbody").empty();
+                if (!res) {
+                    $("#all-time").text("没有找到记录");
+                    return;
                 }
-            })
-        }
-    </script>
-    {% endblock %}
+                if (res === "NOSPAM" || res.data === "NOSPAM") {
+                    alert("NO SPAM");
+                    $("#queryButton").attr("disabled", "disabled");
+                    $("#queryButton").text("请等待");
+                    setTimeout(() => {
+                        $("#queryButton").removeAttr("disabled");
+                        $("#queryButton").text("查询");
+                    }, 1000);
+                    return;
+                }
+                let totalDuration = 0;
+                for (let index = 0; index < res.dataSheet.length; index++) {
+                    const data = res.dataSheet[index];
+                    totalDuration += data["duration"];
+                    let elem_tr = $(
+                        "<tr><td>" +
+                            [
+                                data["stu_id"],
+                                data["name"],
+                                data["faculty"],
+                                data["activity_DATE"],
+                                data["duration"],
+                                data["activity_name"],
+                                data["activity_faculty"],
+                                data["duty_person"],
+                            ].join("</td><td>") +
+                            "</td></tr>"
+                    );
+                    if (data["queryNewly"]) {
+                        $(elem_tr).addClass("query-newly");
+                    }
+                    $("#data-table tbody").append(elem_tr);
+                }
+                $("#usr-name").text("Hi," + res.name);
+                $("#all-time").text("记录数" + res.dataSheet.length + "，总时长" + totalDuration + "h");
+                Toastify({
+                    text: "查询完毕",
+                    duration: 2000,
+                    gravity: "top",
+                    position: "right",
+                }).showToast();
+                if (res.num_sameID || res.num_sameName) {
+                    $(".alert__id2name").text(res.num_sameID);
+                    $(".alert__name2id").text(res.num_sameName);
+                    $(".alert_dataErr").show(200);
+                }
+                if (res.err_queryLost) {
+                    $(".alert_dataLost").show(200);
+                }
+            },
+            error: function (e) {
+                console.log(e);
+            },
+        });
+    }
+</script>
+{% endblock %}

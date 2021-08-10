@@ -9,11 +9,12 @@ ip = socket.gethostbyname(hostname)
 class Config():
     DEBUG = False if ip == '172.31.240.127' else True
     VERSION = os.popen('git rev-parse --short HEAD').read()
-    SERVER_NAME = '127.0.0.1:5000' if DEBUG else 'www.dutbit.com'
+    SERVER_NAME = 'sl.dutbit.com' if DEBUG else 'www.dutbit.com'
 
     # DB Config
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///dev.db' if DEBUG else os.environ['SQLALCHEMY_DATABASE_URI']
+    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://dutBit:12345678@192.168.0.103:3306/uni_studio?charset=utf8" if DEBUG else os.environ[
+        'SQLALCHEMY_DATABASE_URI']
     if (not DEBUG) and 'mysql+pymysql' not in SQLALCHEMY_DATABASE_URI:
         raise EnvironmentError("No db connection uri provided")
         exit(-1)
@@ -24,7 +25,7 @@ class Config():
     # JWT TOKEN Config
     TOKEN_EXPIRES_IN = 3600
     SECRET_KEY = 'Do not go gentle into that good night'
-    
+
     HOMEPAGE_URL = "https://wp.dutbit.com/wp20/"
 
     # Fileservice Config

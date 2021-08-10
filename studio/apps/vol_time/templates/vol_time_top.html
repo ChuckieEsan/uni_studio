@@ -1,34 +1,31 @@
 {% extends 'common_base.html'%}
+<br />
+
 {% block content %}
 <div class="container">
-    <div class="row">
-        <span class="title">
-            leaderboard
-        </span>
+    <div>
+        <span class="title">排行榜</span>
     </div>
-    <hr>
-    <table class="table" style="font-size:14px">
+    <hr />
+    <table class="table" style="font-size: 14px">
         <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">姓名</td>
-                <th scope="col">学院</td>
-                <th scope="col">学号</td>
-                <th scope="col">时长</td>
+                <th scope="col">姓名</th>
+                <th scope="col">学号</th>
+                <th scope="col">时长</th>
             </tr>
         </thead>
         <tbody>
             {% for k in data %}
             <tr>
                 <th scope="row">{{loop.index}}</th>
-                <td>{{k.name}}</td>
-                <td>{{k.faculty}}</td>
-                <td>{{k.stu_id}}</td>
-                <td>{{k.STIME}}</td> 
+                <td>{{k.one_name}}</td>
+                <td>{{k.one_id}}</td>
+                <td>{{k.dur_sum}}</td>
             </tr>
- 
             {% endfor %}
         </tbody>
-    </table> 
+    </table>
 </div>
 {% endblock %}
