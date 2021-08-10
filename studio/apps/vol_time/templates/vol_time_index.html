@@ -17,6 +17,16 @@
             min-width: 57em;
         }
     }
+    @media only screen and (max-width: 360px) {
+        .toastify-left,
+        .toastify-right {
+            margin-left: auto;
+            margin-right: auto;
+            left: 0;
+            right: 0;
+            max-width: max-content;
+        }
+    }
     #data-table td,
     #data-table th {
         font-size: 14px;
@@ -225,7 +235,7 @@
                     gravity: "top",
                     position: "right",
                 }).showToast();
-                if (res.num_sameID || res.num_sameName) {
+                if (res.num_sameID > 1 || res.num_sameName > 1) {
                     $(".alert__id2name").text(res.num_sameID);
                     $(".alert__name2id").text(res.num_sameName);
                     $(".alert_dataErr").show(200);
