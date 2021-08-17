@@ -32,3 +32,14 @@ class VolTime(db.Model):
     activity_DATE = db.Column(db.DATE, nullable=False)
     duty_person = db.Column(db.String(20), nullable=False)
     remark = db.Column(db.Text, nullable=False)
+
+
+class VolTime_edit(TimestampMixin, db.Model):
+    __tablename__ = "vol_time_edit"
+    id = db.Column(db.Integer, primary_key=True, nullable=False)
+    vol_time_id = db.Column(db.Integer, nullable=False)
+    name_ori = db.Column(db.String(20), nullable=False)
+    stu_id_ori = db.Column(db.BigInteger, nullable=False)
+    name_new = db.Column(db.String(20), nullable=False)
+    stu_id_new = db.Column(db.BigInteger, nullable=False)
+    edit_by = db.Column(db.Integer, nullable=False)

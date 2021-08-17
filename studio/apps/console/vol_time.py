@@ -1,12 +1,83 @@
-from flask import flash, render_template, redirect, request, g, url_for, current_app, session
+from flask import flash, render_template, redirect, request, g, url_for, current_app, session, jsonify
 from studio.apps.console import console
-from studio.models import db, VolTime_old, VolTime
+from studio.models import db, VolTime_old, VolTime, VolTime_edit
 import os
 import time
 import re
 import pandas as pd
 import codecs
 import chardet
+
+
+@console.route('/vol_time/show')
+def vol_time_show():
+    return render_template(
+        'vol_time_manage.html',
+        bootstrap_table=True,
+        title='vol_time_manage'
+    )
+
+
+@console.route('/vol_time/data')
+def vol_time_data():
+    pageNumber = int(request.values.get('pageNumber'))
+    pageSize = 30 if request.values.get(
+        'pageSize') is None else int(request.values.get('pageSize'))
+
+    searchText: str = request.values.get('searchText')
+    sameList = []
+    if searchText == '':
+        volTimeQuery = VolTime.query
+    elif searchText.isdigit():
+        volTimeQuery = VolTime.query.filter(VolTime.stu_id == searchText)
+        sameList = db.session.query(VolTime.name).filter(
+            VolTime.stu_id == searchText).group_by(VolTime.name).all()
+    else:
+        volTimeQuery = VolTime.query.filter(VolTime.name == searchText)
+        sameList = db.session.query(VolTime.stu_id).filter(
+            VolTime.name == searchText).group_by(VolTime.stu_id).all()
+
+    volTimes: list[VolTime] = volTimeQuery.order_by(VolTime.id.desc())\
+        .paginate(pageNumber, per_page=pageSize, error_out=False).items
+    volTimeList = []
+    for volTime in volTimes:
+        volTime = volTime.__dict__
+        volTime.pop('_sa_instance_state')
+        volTime['activity_DATE'] = volTime['activity_DATE'].strftime(
+            '%Y-%m-%d')
+        volTimeList.append(volTime)
+    return jsonify({"total": volTimeQuery.count(), "rows": volTimeList, "sameList": [item[0] for item in sameList]})
+
+
+@console.route('/vol_time/edit', methods=['POST'])
+def vol_time_edit():
+    try:
+        req_id = request.values.get('id')
+        req_name = request.values.get('name')
+        req_stu_id = request.values.get('stu_id')
+
+        volTime_ori = VolTime.query.filter(VolTime.id == req_id).first()
+        volTime_edit = VolTime_edit(
+            id=0,
+            vol_time_id=volTime_ori.id,
+            name_ori=volTime_ori.name,
+            stu_id_ori=volTime_ori.stu_id,
+            name_new=req_name if req_name != str(volTime_ori.name) else '',
+            stu_id_new=req_stu_id if req_stu_id != str(
+                volTime_ori.stu_id) else 0,
+            edit_by=g.user.id)
+        db.session.add(volTime_edit)
+        db.session.commit()
+
+        db.session.query(VolTime).filter(VolTime.id == req_id).update(
+            {'stu_id': req_stu_id, 'name': req_name})
+        db.session.commit()
+        return jsonify({"status": 200, "msg": '操作成功'})
+
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(e)
+        return jsonify({"status": 499, "msg": '操作失败'})
 
 
 @console.route('/vol_time/update_by_array', methods=['POST'])
@@ -47,6 +118,7 @@ def update_by_array():
         new_rows = get_rows()
         return('操作成功，插入'+(str(new_rows-old_rows))+"条新数据")
     except Exception as e:
+        db.session.rollback()
         current_app.logger.error(e)
         return("操作失败，原有"+str(old_rows)+"条，现有"+str(get_rows())+"条")
 

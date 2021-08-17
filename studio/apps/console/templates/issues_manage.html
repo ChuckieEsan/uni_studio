@@ -1,38 +1,38 @@
 {% extends 'common_base.html'%}
+<inr />
+
+{% block stylesheet %}
+<link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.css" />
+{% endblock %}
+<inr />
+
 {% block content %}
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title" id="myModalLabel">反馈类别编辑</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
             </div>
             <form action="{{url_for('console.issues_types_handler')}}" method="POST" name="newVoteForm">
                 <div class="modal-body">
                     <div id="issuetypes">
-                        {% if not issuetypes %}
-                        NO ISSUE TYPES
-                        {% endif %}
+                        {% if not issuetypes %} NO ISSUE TYPES {% endif %}
+                        <inr />
                         {% for t in issuetypes %}
                         <label>类别名称</label>
-                        <span>
-                            {{t.typename}}
-                        </span>
+                        <span> {{t.typename}} </span>
                         <label>类别值</label>
-                        <span>
-                            {{t.typevalue}}
-                        </span>
+                        <span> {{t.typevalue}} </span>
                         <label>优先级</label>
-                        <span>
-                            {{t.priority}}
-                        </span>
-                        <br>
+                        <span> {{t.priority}} </span>
+                        <br />
                         {% endfor %}
                     </div>
 
-                    <input type="text" placeholder="类别名称" required name="name">
-                    <input type="text" placeholder="类别值" required name="value">
-                    <input type="text" placeholder="优先级" required name="priority" value="1">
+                    <input type="text" placeholder="类别名称" required name="name" />
+                    <input type="text" placeholder="类别值" required name="value" />
+                    <input type="text" placeholder="优先级" required name="priority" value="1" />
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -42,53 +42,66 @@
         </div>
     </div>
 </div>
-<div style="margin-top: 10px;">
-    <span style="font-size:30px;margin-left: 10px;">反馈记录</span>
-    
-    <span style="float:right;margin-top:10px;margin-right: 10px;">
-        <a href="{{url_for('console.console_root')}}">
-            返回控制台
-        </a>
+<div style="margin-top: 10px">
+    <span style="font-size: 30px; margin-left: 10px">反馈记录</span>
+
+    <span style="float: right; margin-top: 10px; margin-right: 10px">
+        <a href="{{url_for('console.console_root')}}"> 返回控制台 </a>
     </span>
-    <span style="float:right;margin-top:10px;margin-right: 10px;">
-        <a href="{{url_for('issues.root')}}">
-            上报页面
-        </a>
+    <span style="float: right; margin-top: 10px; margin-right: 10px">
+        <a href="{{url_for('issues.root')}}"> 上报页面 </a>
     </span>
-    {% for r in g.role %}
-    <span class="badge badge-dark"style="float:right;margin-top:13px;margin-right: 10px;">{{r}}</span>
-    {% endfor %}
 </div>
-<hr>
+<hr />
 <div id="toolbar">
-    <button class="btn btn-info" data-toggle="modal" data-target="#myModal">反馈类别编辑
+    <button class="btn btn-info" data-toggle="modal" data-target="#myModal">
+        反馈类别编辑
         <img src="{{url_for('common.static',filename='img/edit.png')}}" width="15px" height="15x" />
     </button>
 </div>
-<table id="table" data-locale="zh-CN" data-toolbar="#toolbar" data-toggle="table"
-    data-url="{{url_for('console.get_issues',page_id=1)}}" data-search="true" data-show-columns="true"
-    data-show-export="true" data-show-pagination-switch="true" data-pagination="true" data-show-pagination-switch="true"
-    data-page-list="[15, 25, 50, 100, all]">
+<table
+    id="table"
+    data-locale="zh-CN"
+    data-toolbar="#toolbar"
+    data-toggle="table"
+    data-url="{{url_for('console.get_issues')}}"
+    data-search="true"
+    data-show-search-button="true"
+    data-show-columns="true"
+    data-show-export="true"
+    data-side-pagination="server"
+    data-pagination="true"
+    data-page-list="[15, 25, 50]"
+    data-query-params-type="undefined"
+>
     <thead>
         <tr>
-            <th data-field="url">来源页面</th>
+            <th data-field="created_at">提交时间</th>
+            <th data-field="url" data-visible="false">来源页面</th>
             <th data-field="type">类型</th>
             <th data-field="contact">联系方式</th>
-            <th data-field="created_at">提交时间</th>
+            <th data-field="name" data-cell-style="cellStyle">姓名</th>
+            <th data-field="stu_id">学号</th>
             <th data-field="content">内容</th>
-            <th data-field="user_id">id</th>
+            <th data-field="status">状态</th>
+            <th data-field="user_id">user_id</th>
         </tr>
     </thead>
 </table>
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
-<script src="https://unpkg.com/bootstrap-table@1.15.3/dist/bootstrap-table.min.js"></script>
 
 <script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
 <script src="https://unpkg.com/bootstrap-table@1.18.0/dist/bootstrap-table.min.js"></script>
 <script src="https://unpkg.com/bootstrap-table@1.18.0/dist/bootstrap-table-locale-all.min.js"></script>
 <script src="https://unpkg.com/bootstrap-table@1.18.0/dist/extensions/export/bootstrap-table-export.min.js"></script>
 <script>
-
+    function cellStyle(value, row, index) {
+        return {
+            css: {
+                "white-space": "nowrap",
+            },
+        };
+    }
 </script>
 {% endblock %}

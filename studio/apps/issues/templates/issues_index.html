@@ -1,67 +1,91 @@
 {% extends 'common_base.html'%}
+<inr />
+
 {% block content %}
 <div class="container">
     <div class="row">
         <span class="title">反馈</span>
     </div>
-    <hr>
-    <form enctype="multipart/form-data" action="{{url_for('issues.root')}}" method="POST" name="discForm" id="discForm"
-        onsubmit="return check()">
-        <div class="form-group">
-            <span style="display: none;">
-                来源页面：
-                <input type="text" disabled value="{{referer}}" id="source" style="width:50%" name="url" />
-            </span>
+    <hr />
+    <form
+        enctype="multipart/form-data"
+        action="{{url_for('issues.root')}}"
+        method="POST"
+        name="discForm"
+        id="discForm"
+        onsubmit="return check()"
+    >
+        <div class="form-group row" style="display: none">
+            <label for="url" class="col-2 col-form-label text-nowrap">来源页面：</label>
+            <div class="col-10">
+                <input type="text" class="form-control" disabled value="{{referer}}" id="url" name="url" />
+            </div>
         </div>
-        <div class="form-group">
-            <span>
-                联系方式：
-                <input type="text" id="contact" style="width:50%" name="contact" placeholder="邮件/电话/qq号等" />
-            </span>
-        </div>
-        <div class="form-group">
-            <span>
-                反馈类型：
-                <select name="type">
+        <div class="form-group row">
+            <label for="type" class="col-sm-2 col-form-label text-nowrap">反馈类型：</label>
+            <div class="col-sm-10">
+                <select id="type" class="form-control" name="type">
                     {% for t in issuetypes %}
-                    <option value="{{t.typevalue}}" {% if default %}selected{% endif %}>
-                        {{t.typename}}
-                    </option>
+                    <option value="{{t.typevalue}}" {% if default %}selected{% endif %}>{{t.typename}}</option>
                     {% endfor %}
                 </select>
-            </span>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="contact" class="col-sm-2 col-form-label text-nowrap">联系方式：</label>
+            <div class="col-sm-10">
+                <input
+                    type="text"
+                    class="form-control"
+                    id="contact"
+                    name="contact"
+                    placeholder="邮箱（推荐）/电话/qq号等"
+                />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="name" class="col-2 col-form-label text-nowrap">姓名：</label>
+            <div class="col-10">
+                <input type="text" class="form-control" id="name" name="name" placeholder="信息更正时必填" />
+            </div>
+        </div>
+        <div class="form-group row">
+            <label for="stu_id" class="col-2 col-form-label text-nowrap">学号：</label>
+            <div class="col-10">
+                <input type="text" class="form-control" id="stu_id" name="stu_id" placeholder="信息更正时必填" />
+            </div>
         </div>
         {% if not g.user %}
-        <div class="form-group" style="color:orangered;font-weight: 1000;">
-            
-                New：
-                <a href="{{url_for('users.users_entrypoint')}}?target={{url_for('issues.root')}}" class="btn btn-sm btn-warning">
-                    登录
-                </a>
-                以获得可能的
-                <a href="{{url_for('chat.chat_index')}}">
-                    站内信
-                </a>
-                或邮件回复
-            
+        <div class="form-group" style="color: orangered; font-weight: 1000">
+            New：
+            <a
+                href="{{url_for('users.users_entrypoint')}}?target={{url_for('issues.root')}}"
+                class="btn btn-sm btn-warning"
+            >
+                登录
+            </a>
+            以获得可能的
+            <a href="{{url_for('chat.chat_index')}}">站内信</a>
+            或邮件回复
         </div>
         {% endif %}
         <div class="form-group">
-            <textarea class="form-control" rows="5" placeholder="遇到的问题或您的建议;  信息更正类请提供同时姓名和学号以便我们核对信息" id="content"
-                name="content"></textarea>
+            <textarea
+                class="form-control"
+                rows="5"
+                placeholder="遇到的问题或您的建议"
+                id="content"
+                name="content"
+            ></textarea>
         </div>
         <div class="form-group">
             {{hcaptcha}}
             <span>
                 <button type="submit" form="discForm" value="Submit" id="submit" class="btn btn-primary">提交</button>
             </span>
-            <span style="font-size:20px;color:#B7472A">
+            <span style="font-size: 20px; color: #b7472a">
                 <strong id="messages">
-                    {% for m in get_flashed_messages() %}
-                    {{m}}
-                    &nbsp;&nbsp;
-                    {% endfor %}
-                    &nbsp;&nbsp;
+                    {% for m in get_flashed_messages() %} {{m}} &nbsp;&nbsp; {% endfor %} &nbsp;&nbsp;
                 </strong>
             </span>
         </div>
@@ -70,6 +94,7 @@
 
 <script src="{{url_for('issues.static',filename='js/issues.js')}}"></script>
 {% if timeout %}
-<script>hangon()</script>
-{% endif %}
-{% endblock %}
+<script>
+    hangon();
+</script>
+{% endif %} {% endblock %}
