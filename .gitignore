@@ -133,3 +133,7 @@ dmypy.json
 .idea/$CACHE_FILE$
 .idea/encodings.xml
 .DS_STORE
+
+
+
+migrations/versions/*
