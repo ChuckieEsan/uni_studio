@@ -9,7 +9,10 @@ vol_time = Blueprint("vol_time", __name__, template_folder="templates")
 
 @vol_time.route('/', methods=["GET"])
 def vol_time_home():
-    return render_template("vol_time_index.html", title="志愿时长查询")
+    lastDate = db.session.query(VolTime.activity_DATE)\
+        .order_by(VolTime.activity_DATE.desc()).first()[0]
+    lastDate = lastDate.strftime('%Y-%m-%d')
+    return render_template("vol_time_index.html", title="志愿时长查询", lastDate=lastDate)
 
 
 @vol_time.route('/', methods=['POST'])
