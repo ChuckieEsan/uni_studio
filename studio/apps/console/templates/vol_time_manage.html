@@ -118,6 +118,8 @@
         onLoadSuccess: function (data) {
             if (data.sameList.length > 0) {
                 $(".info-box__load-info").html("去重结果：" + data.sameList);
+            } else {
+                $(".info-box__load-info").html("");
             }
             console.log(data);
         },

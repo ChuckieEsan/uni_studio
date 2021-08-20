@@ -71,31 +71,32 @@
     data-show-export="true"
     data-side-pagination="server"
     data-pagination="true"
-    data-page-list="[15, 25, 50]"
+    data-page-size="10"
+    data-page-list="[10, 20, 50]"
     data-query-params-type="undefined"
->
-    <thead>
-        <tr>
-            <th data-field="created_at">提交时间</th>
-            <th data-field="url" data-visible="false">来源页面</th>
-            <th data-field="type">类型</th>
-            <th data-field="contact">联系方式</th>
-            <th data-field="name" data-cell-style="cellStyle">姓名</th>
-            <th data-field="stu_id">学号</th>
-            <th data-field="content">内容</th>
-            <th data-field="status">状态</th>
-            <th data-field="user_id">user_id</th>
-        </tr>
-    </thead>
-</table>
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"></script>
+    data-editable-emptytext="Default empty text."
+    data-editable-mode="inline"
+></table>
+{% endblock %}
+<inr />
 
-<script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script>
-<script src="https://unpkg.com/bootstrap-table@1.18.0/dist/bootstrap-table.min.js"></script>
-<script src="https://unpkg.com/bootstrap-table@1.18.0/dist/bootstrap-table-locale-all.min.js"></script>
-<script src="https://unpkg.com/bootstrap-table@1.18.0/dist/extensions/export/bootstrap-table-export.min.js"></script>
+{% block script %}
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/x-editable/1.5.1/bootstrap3-editable/js/bootstrap-editable.js"></script>
+<!-- <script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script> -->
+<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.18.3/bootstrap-table.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.18.3/bootstrap-table-locale-all.min.js"></script>
+
+<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.18.3/extensions/export/bootstrap-table-export.min.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.18.3/extensions/editable/bootstrap-table-editable.js"></script>
 <script>
+    $.fn.editableform.buttons =
+        '<button type="submit" class="btn btn-primary btn-sm editable-submit">' +
+        '<i class="fa fa-fw fa-check"></i>' +
+        "</button>" +
+        '<button type="button" class="btn btn-outline-dark btn-sm editable-cancel">' +
+        '<i class="fa fa-fw fa-times"></i>' +
+        "</button>";
     function cellStyle(value, row, index) {
         return {
             css: {
@@ -103,5 +104,91 @@
             },
         };
     }
+    $("#table").bootstrapTable({
+        columns: [
+            {
+                field: "created_at",
+                title: "提交时间",
+            },
+            {
+                field: "url",
+                visible: false,
+                title: "来源页面",
+            },
+            {
+                field: "type",
+                title: "类型",
+                cellStyle: cellStyle,
+            },
+            {
+                field: "name",
+                title: "姓名",
+                cellStyle: cellStyle,
+            },
+            {
+                field: "stu_id",
+                title: "学号",
+            },
+            {
+                field: "contact",
+                title: "联系方式",
+            },
+            {
+                field: "content",
+                title: "内容",
+            },
+            {
+                field: "status",
+                title: "状态",
+                width: "8",
+                widthUnit: "em",
+                editable: {
+                    type: "select",
+                    value: 2,
+                    source: [
+                        { value: 1, text: "Pending" },
+                        { value: 2, text: "Star" },
+                        { value: 3, text: "Done" },
+                        { value: 4, text: "Invalid" },
+                    ],
+                },
+            },
+            {
+                field: "user_id",
+                title: "user_id",
+            },
+        ],
+        onEditableSave: function (field, row, oldValue, $el) {
+            $.ajax({
+                type: "post",
+                url: "{{url_for('console.issues_edit')}}",
+                data: row,
+                success: function (data, status) {
+                    console.log(data, status);
+                    if (data.status == 200) {
+                        Toastify({
+                            text: data.msg,
+                            duration: 3000,
+                            position: "left",
+                        }).showToast();
+                    } else {
+                        msgFail(data + status);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr, status, error);
+                    alert("编辑失败");
+                },
+            });
+        },
+        onLoadSuccess: function (data) {
+            if (data.sameList.length > 0) {
+                $(".info-box__load-info").html("去重结果：" + data.sameList);
+            } else {
+                $(".info-box__load-info").html("");
+            }
+            console.log(data);
+        },
+    });
 </script>
 {% endblock %}

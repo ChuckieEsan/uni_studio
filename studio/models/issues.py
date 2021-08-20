@@ -13,7 +13,7 @@ class IssuesIssues(TimestampMixin, db.Model):
     stu_id = db.Column(db.BigInteger, nullable=True)
     content = db.Column(db.Text, nullable=True)
     user_id = db.Column(db.String(255), nullable=True)
-    status = db.Column(db.String(255), default='pending', nullable=True)
+    status = db.Column(db.SmallInteger, default=1, nullable=True)
 
     def __init__(self, *args, **kwargs):
         super(IssuesIssues, self).__init__(**kwargs)
