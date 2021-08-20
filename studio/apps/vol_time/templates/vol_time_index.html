@@ -67,16 +67,24 @@
     .alert.hidden {
         display: none;
     }
+    .lastDate-info {
+        color: #0246b3;
+        font-size: 20px;
+    }
 </style>
 {% endblock %}
 <br />
 
 {% block content %}
 <div class="container">
-    <div>
-        <span class="title">志愿时长查询</span>
-        <a href="{{url_for('vol_time.get_top')}}" style="font-size: 20px; margin: 0 1em">排行榜</a>
+    <div class="row">
+        <div class="col-md-6">
+            <span class="title">志愿时长查询</span>
+            <a href="{{url_for('vol_time.get_top')}}" style="font-size: 20px; margin: 0 1em">排行榜</a>
+        </div>
+        <div class="col-md-6 d-flex flex-row-reverse align-items-end"><span class="lastDate-info">更新至：{{lastDate}}</span></div>
     </div>
+
     <hr />
     <form id="myform" class="form-horizontal">
         <div class="form-row">
@@ -135,6 +143,7 @@
                     <th>任务名称</th>
                     <th>组织学院</th>
                     <th>组织人</th>
+                    <th>备注</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -219,6 +228,7 @@
                                 data["activity_name"],
                                 data["activity_faculty"],
                                 data["duty_person"],
+                                data["remark"],
                             ].join("</td><td>") +
                             "</td></tr>"
                     );
