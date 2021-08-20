@@ -19,15 +19,22 @@ def get_issues():
     pageNumber = int(request.values.get('pageNumber'))
     pageSize = 15 if request.values.get(
         'pageSize') is None else int(request.values.get('pageSize'))
-    issues: list[IssuesIssues] = db.session.query(IssuesIssues).order_by(
-        IssuesIssues.created_at.desc()).paginate(pageNumber, per_page=pageSize, error_out=False).items
+    searchText: str = request.values.get('searchText')
+
+    if searchText.isdigit():
+        issuesQuery = db.session.query(IssuesIssues).filter(
+            IssuesIssues.status == searchText)
+    else:
+        issuesQuery = db.session.query(IssuesIssues)
+    issues: list[IssuesIssues] = issuesQuery.order_by(IssuesIssues.created_at.desc())\
+        .paginate(pageNumber, per_page=pageSize, error_out=False).items
     issueList = []
     for issue in issues:
         issue = issue.__dict__
         issue.pop('_sa_instance_state')
         issue['created_at'] = issue['created_at'].strftime('%Y-%m-%d %H:%M:%S')
         issueList.append(issue)
-    return jsonify({"total": db.session.query(IssuesIssues).count(), "rows": issueList})
+    return jsonify({"total": issuesQuery.count(), "rows": issueList})
 
 
 @console.route('/issues/edit', methods=['POST'])

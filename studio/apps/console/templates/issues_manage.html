@@ -3,62 +3,28 @@
 
 {% block stylesheet %}
 <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.css" />
+<!-- <link href="https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.18.3/bootstrap-table.min.css" rel="stylesheet" />
+<link
+    href="https://cdn.bootcdn.net/ajax/libs/x-editable/1.5.1/bootstrap3-editable/css/bootstrap-editable.css"
+    rel="stylesheet"
+/> -->
 {% endblock %}
 <inr />
 
 {% block content %}
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title" id="myModalLabel">反馈类别编辑</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            </div>
-            <form action="{{url_for('console.issues_types_handler')}}" method="POST" name="newVoteForm">
-                <div class="modal-body">
-                    <div id="issuetypes">
-                        {% if not issuetypes %} NO ISSUE TYPES {% endif %}
-                        <inr />
-                        {% for t in issuetypes %}
-                        <label>类别名称</label>
-                        <span> {{t.typename}} </span>
-                        <label>类别值</label>
-                        <span> {{t.typevalue}} </span>
-                        <label>优先级</label>
-                        <span> {{t.priority}} </span>
-                        <br />
-                        {% endfor %}
-                    </div>
-
-                    <input type="text" placeholder="类别名称" required name="name" />
-                    <input type="text" placeholder="类别值" required name="value" />
-                    <input type="text" placeholder="优先级" required name="priority" value="1" />
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <input type="submit" value="Submit" class="btn btn-primary" />
-                </div>
-            </form>
-        </div>
+<div class="container">
+    <div class="title">
+        <span style="font-size: 28px">反馈记录</span>
+        <span style="float: right">
+            <a href="{{url_for('issues.root')}}">反馈页面</a>
+        </span>
+        <span style="float: right">/</span>
+        <span style="float: right">
+            <a href="{{url_for('console.console_root')}}">返回控制台</a>
+        </span>
     </div>
 </div>
-<div style="margin-top: 10px">
-    <span style="font-size: 30px; margin-left: 10px">反馈记录</span>
-
-    <span style="float: right; margin-top: 10px; margin-right: 10px">
-        <a href="{{url_for('console.console_root')}}"> 返回控制台 </a>
-    </span>
-    <span style="float: right; margin-top: 10px; margin-right: 10px">
-        <a href="{{url_for('issues.root')}}"> 上报页面 </a>
-    </span>
-</div>
 <hr />
-<div id="toolbar">
-    <button class="btn btn-info" data-toggle="modal" data-target="#myModal">
-        反馈类别编辑
-        <img src="{{url_for('common.static',filename='img/edit.png')}}" width="15px" height="15x" />
-    </button>
-</div>
 <table
     id="table"
     data-locale="zh-CN"
