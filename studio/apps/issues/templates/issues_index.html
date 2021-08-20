@@ -18,7 +18,7 @@
         <div class="form-group row" style="display: none">
             <label for="url" class="col-2 col-form-label text-nowrap">来源页面：</label>
             <div class="col-10">
-                <input type="text" class="form-control" disabled value="{{referer}}" id="url" name="url" />
+                <input type="text" class="form-control" value="{{referer}}" id="url" name="url" />
             </div>
         </div>
         <div class="form-group row">
@@ -91,10 +91,33 @@
         </div>
     </form>
 </div>
+{% endblock %}
+<inr />
 
-<script src="{{url_for('issues.static',filename='js/issues.js')}}"></script>
+{% block script %}
+<script>
+    function check() {
+        if ($("#content").val() == "") {
+            $("#messages").text("不可为空！");
+            hangon();
+            return false;
+        }
+        return true;
+    }
+    function hangon() {
+        $("#submit").attr("disabled", "disabled");
+        $("#submit").text("请等待");
+        setTimeout(() => {
+            $("#submit").removeAttr("disabled");
+            $("#submit").text("提交");
+        }, 1500);
+    }
+</script>
 {% if timeout %}
 <script>
     hangon();
 </script>
-{% endif %} {% endblock %}
+{% endif %}
+<inr />
+
+{% endblock %}
