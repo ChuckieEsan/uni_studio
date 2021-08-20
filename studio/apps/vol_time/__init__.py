@@ -28,7 +28,8 @@ def vol_time_search():
     set_idsOld = set([result[0] for result in results])
 
     volTimes = db.session.query(VolTime)\
-        .filter(VolTime.stu_id == req_stu_id, VolTime.name == req_name).all()
+        .filter(VolTime.stu_id == req_stu_id, VolTime.name == req_name)\
+        .order_by(VolTime.activity_DATE.desc()).all()
     volTimeList = []
     for volTime in volTimes:
         volTime = volTime.__dict__

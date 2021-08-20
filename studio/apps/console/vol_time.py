@@ -37,7 +37,7 @@ def vol_time_data():
         sameList = db.session.query(VolTime.stu_id).filter(
             VolTime.name == searchText).group_by(VolTime.stu_id).all()
 
-    volTimes: list[VolTime] = volTimeQuery.order_by(VolTime.id.desc())\
+    volTimes: list[VolTime] = volTimeQuery.order_by(VolTime.activity_DATE.desc())\
         .paginate(pageNumber, per_page=pageSize, error_out=False).items
     volTimeList = []
     for volTime in volTimes:
