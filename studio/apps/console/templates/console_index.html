@@ -1,32 +1,47 @@
 {% extends 'common_base.html'%}
+<inr />
+
+{% block stylesheet %}
+<style>
+    .title {
+        margin: 0px 0.5em;
+        font-size: 30px;
+    }
+    .header .badge {
+        margin: 0px 0.5em;
+        font-size: 16px;
+    }
+</style>
+{% endblock %}
+<inr />
+
 {% block content %}
 <div class="container">
-    <div class="row">
-        <span style="font-size:30px;margin-left: 10px;">Console</span>
-        <span class="badge badge-dark" style="float:right;margin-top:13px;margin-right: 10px;">
-            {{g.user.email}}
-        </span>
+    <div class="header d-flex align-items-center">
+        <span class="title">控制台</span>
+        <span class="badge badge-info mr-auto">{{g.user.email}}</span>
         {% for r in roles %}
-        <span class="badge badge-dark" style="float:right;margin-top:13px;margin-right: 10px;">
-            {{r.role_text}}
-        </span>
+        <span class="badge badge-success">{{r.role_text}}</span>
         {% endfor %}
     </div>
-    <hr>
-    {% for r in routes %}
-    <p>
-        <a href="{{r.startswith}}">{{r.description}}</a>
-    </p>
-    {% endfor %}
-    <p>
-        <a href="{{url_for('users.users_password_step1')}}">修改密码</a>
-    </p>
-    <hr>
-    <div id="root"></div>
-    <hr>
-    <div id="rules">
-        <!--interceptor rules-->
- 
+    <hr />
+    <div class="card border-info mb-4">
+        <div class="card-body">
+            <h5 class="card-title">用户</h5>
+            <a href="{{url_for('users.users_password_step1')}}">修改密码</a>
+        </div>
     </div>
+    {% for routeGroup in routeSheet.values() %}
+    <div class="card border-success mb-4">
+        <div class="card-body">
+            <h5 class="card-title">{{routeGroup.description}}</h5>
+            <div class="d-flex flex-wrap row-cols-6">
+                {% for route in routeGroup.routes %}
+                <a href="{{route.startswith}}">{{route.description}}</a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
 </div>
 {% endblock %}
