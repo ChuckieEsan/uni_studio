@@ -1,68 +1,22 @@
-{% extends 'common_base.html'%}
+{% extends 'common_table.html'%}
 <inr />
 
-{% block stylesheet %}
-<link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.css" />
-<!-- <link href="https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.18.3/bootstrap-table.min.css" rel="stylesheet" />
-<link
-    href="https://cdn.bootcdn.net/ajax/libs/x-editable/1.5.1/bootstrap3-editable/css/bootstrap-editable.css"
-    rel="stylesheet"
-/> -->
-{% endblock %}
-<inr />
-
-{% block content %}
-<div class="container">
-    <div class="title">
-        <span style="font-size: 28px">反馈记录</span>
-        <span style="float: right">
-            <a href="{{url_for('issues.root')}}">反馈页面</a>
-        </span>
-        <span style="float: right">/</span>
-        <span style="float: right">
-            <a href="{{url_for('console.console_root')}}">返回控制台</a>
-        </span>
-    </div>
+{% block head %}
+<div class="container" style="font-size: 28px">
+    <span class="title">反馈记录</span>
+    <span style="float: right">
+        <a href="{{url_for('issues.root')}}">反馈页面</a>
+    </span>
+    <span style="float: right">/</span>
+    <span style="float: right">
+        <a href="{{url_for('console.console_root')}}">返回控制台</a>
+    </span>
 </div>
-<hr />
-<table
-    id="table"
-    data-locale="zh-CN"
-    data-toolbar="#toolbar"
-    data-toggle="table"
-    data-url="{{url_for('console.get_issues')}}"
-    data-search="true"
-    data-show-search-button="true"
-    data-show-columns="true"
-    data-show-export="true"
-    data-side-pagination="server"
-    data-pagination="true"
-    data-page-size="10"
-    data-page-list="[10, 20, 50]"
-    data-query-params-type="undefined"
-    data-editable-emptytext="Default empty text."
-    data-editable-mode="inline"
-></table>
 {% endblock %}
 <inr />
 
 {% block script %}
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js"></script>
-<script src="https://cdn.bootcdn.net/ajax/libs/x-editable/1.5.1/bootstrap3-editable/js/bootstrap-editable.js"></script>
-<!-- <script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script> -->
-<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.18.3/bootstrap-table.min.js"></script>
-<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.18.3/bootstrap-table-locale-all.min.js"></script>
-
-<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.18.3/extensions/export/bootstrap-table-export.min.js"></script>
-<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.18.3/extensions/editable/bootstrap-table-editable.js"></script>
 <script>
-    $.fn.editableform.buttons =
-        '<button type="submit" class="btn btn-primary btn-sm editable-submit">' +
-        '<i class="fa fa-fw fa-check"></i>' +
-        "</button>" +
-        '<button type="button" class="btn btn-outline-dark btn-sm editable-cancel">' +
-        '<i class="fa fa-fw fa-times"></i>' +
-        "</button>";
     function cellStyle(value, row, index) {
         return {
             css: {
@@ -71,6 +25,9 @@
         };
     }
     $("#table").bootstrapTable({
+        url: "{{url_for('console.get_issues')}}",
+        pageSize: 10,
+        pageList: [10, 20, 50],
         columns: [
             {
                 field: "id",
@@ -79,6 +36,8 @@
             {
                 field: "created_at",
                 title: "提交时间",
+                width: "7",
+                widthUnit: "em",
             },
             {
                 field: "url",
@@ -150,14 +109,6 @@
                     alert("编辑失败");
                 },
             });
-        },
-        onLoadSuccess: function (data) {
-            if (data.sameList.length > 0) {
-                $(".info-box__load-info").html("去重结果：" + data.sameList);
-            } else {
-                $(".info-box__load-info").html("");
-            }
-            console.log(data);
         },
     });
 </script>
