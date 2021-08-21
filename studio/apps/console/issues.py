@@ -1,4 +1,4 @@
-from studio.apps.console import console
+from .init import console
 from flask import url_for, redirect, render_template, request, jsonify, session, g, current_app
 from studio.models import db, IssuesIssues, IssueTypes
 

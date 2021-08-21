@@ -1,6 +1,6 @@
 from flask.helpers import send_file
 from flask import make_response
-from studio.apps.console import console as vote
+from .init import console as vote
 from studio.utils.time_helper import timestamp_to_datetime
 from studio.utils.hash_helper import md5
 from studio.apps.vote import get_candidate_all_info, get_vote_info
@@ -85,15 +85,15 @@ def vote_export(vote_id):
         })
     df = pd.DataFrame(result_list, columns=['id', str(
         vote_info.title_label), str(vote_info.subtitle_label), '票数'])
-    
+
     out = BytesIO()
-    writer = pd.ExcelWriter(out,engine='xlsxwriter')
-    df.to_excel(excel_writer=writer,index=False)
+    writer = pd.ExcelWriter(out, engine='xlsxwriter')
+    df.to_excel(excel_writer=writer, index=False)
     writer.save()
     writer.close()
     resp = make_response(out.getvalue())
     resp.headers["Content-Disposition"] = "attachment; filename={}-{}.xlsx"\
-        .format(slugify(vote_info.title),str(time.time()))
+        .format(slugify(vote_info.title), str(time.time()))
     resp.headers["Content-Type"] = "text/csv"
     return resp
 
@@ -131,7 +131,7 @@ def do_vote_batch_import(vote_id):
         if row.isna().values.any():
             continue
         c = VoteCandidates(
-            title=row[0],# if row[0] != pd.Nan,
+            title=row[0],  # if row[0] != pd.Nan,
             subtitle=row[1],
             description=row[2],
             action_at=row[3],

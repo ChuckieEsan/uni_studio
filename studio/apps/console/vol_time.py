@@ -1,5 +1,5 @@
 from flask import flash, render_template, redirect, request, g, url_for, current_app, session, jsonify
-from studio.apps.console import console
+from .init import console
 from studio.models import db, VolTime_old, VolTime, VolTime_edit
 import os
 import time
