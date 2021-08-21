@@ -1,50 +1,68 @@
-html{height:100%}
-body{min-height:100%}
+* {
+    margin: 0px;
+    padding: 0px;
+}
 
-#footer{
+html {
+    height: 100%
+}
+
+body {
+    display: flow-root;
+    min-height: 100%;
+}
+
+#footer {
     text-align: center;
-    color:#eee;
+    color: #eee;
     font-size: .8em;
 }
-#footer a{
-    color:#eee;
+
+#footer a {
+    padding: 0px 0.5em;
+    color: #eee;
 }
+
 .navbar-custom {
     background-color: #ff5500;
 }
+
 .bg-dark {
     background-color: #286090 !important;
 }
+
 .container {
-    margin-top:10px;
+    margin-top: 10px;
 }
+
 .title {
-    font-size:30px;margin-left: 20px;
+    font-size: 30px;
+    margin-left: 20px;
 }
 
-
-
-.scrollTo{
-    width:100px; 
-    height:130px;
-    text-align:center; 
+.scrollTo {
+    width: 100px;
+    height: 130px;
+    text-align: center;
     /* background: whiteSmoke; */
     font-weight: bold;
     font-size: xx-large;
     color: #444;
     text-decoration: none;
-    position:fixed;
-    display:none;
+    position: fixed;
+    display: none;
 }
-.scrollTo:hover{
+
+.scrollTo:hover {
     text-decoration: none;
 }
 
-.toTop{
-    bottom:85px;
-    right:0px;
+.toTop {
+    bottom: 85px;
+    right: 0px;
 }
-.toBottom{
-    bottom:35px;
-    right:0px;
+
+.toBottom {
+    bottom: 35px;
+    right: 0px;
 }
