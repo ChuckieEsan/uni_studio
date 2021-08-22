@@ -46,7 +46,7 @@ class VolTime_edit(TimestampMixin, db.Model):
 
 
 class VolTime_dupName(TimestampMixin, db.Model):
-    __tablename__ = "volTime_dupName"
+    __tablename__ = "voltime_dupname"
     id = db.Column(db.Integer, primary_key=True, nullable=False)
     name = db.Column(db.String(20), nullable=False)
     dupNum = db.Column(db.SmallInteger, nullable=False)
