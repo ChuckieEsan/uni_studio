@@ -46,9 +46,12 @@ def vol_time_search():
         .filter(VolTime.stu_id == req_stu_id).group_by(VolTime.name).count()
     num_sameName = db.session.query(VolTime.stu_id)\
         .filter(VolTime.name == req_name).group_by(VolTime.stu_id).count()
-
+    dupName = db.session.query(VolTime_dupName)\
+        .filter(VolTime_dupName.name == req_name).first()
+    num_dupName = 1 if dupName is None else dupName.dupNum
     return jsonify({"name": req_name, "dataSheet": volTimeList,
-                    "num_sameID": num_sameID, "num_sameName": num_sameName, "err_queryLost": err_queryLost})
+                    "num_sameID": num_sameID, "num_sameName": num_sameName,
+                    "num_dupName": num_dupName, "err_queryLost": err_queryLost})
 
 
 @vol_time.route('/top')

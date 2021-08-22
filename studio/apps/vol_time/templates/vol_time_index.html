@@ -251,7 +251,7 @@
                     gravity: "top",
                     position: "right",
                 }).showToast();
-                if (res.num_sameID > 1 || res.num_sameName > 1) {
+                if (res.num_sameID > 1 || res.num_sameName > res.num_dupName) {
                     $(".alert__id2name").text(res.num_sameID);
                     $(".alert__name2id").text(res.num_sameName);
                     $(".alert_dataErr").show(200);
