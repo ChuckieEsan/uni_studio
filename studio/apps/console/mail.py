@@ -1,6 +1,6 @@
 from flask.helpers import url_for
 from flask.templating import render_template
-from studio.apps.console import console
+from .init import console
 from flask import redirect, request, flash
 from studio.utils.send_mail import send_mail
 

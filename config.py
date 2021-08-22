@@ -1,6 +1,7 @@
 from studio.utils.dir_helper import join_upload_dir
 import os
 import socket
+from datetime import timedelta
 
 hostname = socket.gethostname()
 ip = socket.gethostbyname(hostname)
@@ -39,3 +40,6 @@ class Config():
     HCAPTCHA_SITE_KEY = os.environ.get('HCAPTCHA_SITE_KEY')
     HCAPTCHA_SECRET_KEY = os.environ.get('HCAPTCHA_SECRET_KEY')
     HCAPTCHA_ENABLED = not DEBUG
+
+    if DEBUG:
+        SEND_FILE_MAX_AGE_DEFAULT = timedelta(seconds=5)

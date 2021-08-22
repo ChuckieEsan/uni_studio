@@ -1,13 +1,7 @@
-{% extends 'common_base.html'%}
+{% extends 'common_table.html'%}
 <inr />
 
 {% block stylesheet %}
-<link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.css" />
-<link href="https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.18.3/bootstrap-table.min.css" rel="stylesheet" />
-<link
-    href="https://cdn.bootcdn.net/ajax/libs/x-editable/1.5.1/bootstrap3-editable/css/bootstrap-editable.css"
-    rel="stylesheet"
-/>
 <style>
     .info-box__load-info {
         margin: 0px 2em;
@@ -18,73 +12,25 @@
 {% endblock %}
 <inr />
 
-{% block content %}
-<div class="container">
-    <div class="title">
-        <span style="font-size: 28px">志愿时长记录</span>
-        <span style="float: right">
-            <a href="/vol_time">查询页面</a>
-        </span>
-        <span style="float: right">/</span>
-        <span style="float: right">
-            <a href="{{url_for('console.show_vol_time_update')}}">数据更新</a>
-        </span>
-    </div>
+{% block head %}
+<div class="container" style="font-size: 28px">
+    <span class="title">志愿时长记录</span>
+    <span style="float: right">
+        <a href="/vol_time">查询页面</a>
+    </span>
+    <span style="float: right">/</span>
+    <span style="float: right">
+        <a href="{{url_for('console.show_vol_time_update')}}">数据更新</a>
+    </span>
 </div>
-<hr />
-<div class="info-box__load-info" id="toolbar"></div>
-<table
-    id="table"
-    data-locale="zh-CN"
-    data-toolbar="#toolbar"
-    data-toggle="table"
-    data-url="{{url_for('console.vol_time_data')}}"
-    data-search="true"
-    data-show-search-button="true"
-    data-show-columns="true"
-    data-show-export="true"
-    data-side-pagination="server"
-    data-pagination="true"
-    data-page-size="20"
-    data-page-list="[20, 50, 80]"
-    data-query-params-type="undefined"
-    data-editable-emptytext="Default empty text."
-    data-editable-mode="inline"
->
-    <thead>
-        <tr>
-            <th data-field="id">id</th>
-            <th data-field="stu_id" data-editable="true" data-editable-type="text">学号</th>
-            <th data-field="name" data-editable="true" data-cell-style="cellStyle">姓名</th>
-            <th data-field="faculty">学院</th>
-            <th data-field="activity_DATE">时间</th>
-            <th data-field="duration">时长</th>
-            <th data-field="activity_name">任务名称</th>
-            <th data-field="activity_faculty">组织学院</th>
-            <th data-field="duty_person">组织人</th>
-        </tr>
-    </thead>
-</table>
+<div class="btn-group" id="toolbar">
+    <span class="info-box__load-info"></span>
+</div>
 {% endblock %}
 <inr />
 
 {% block script %}
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js"></script>
-<script src="https://cdn.bootcdn.net/ajax/libs/x-editable/1.5.1/bootstrap3-editable/js/bootstrap-editable.js"></script>
-<!-- <script src="https://unpkg.com/tableexport.jquery.plugin/tableExport.min.js"></script> -->
-<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.18.3/bootstrap-table.min.js"></script>
-<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.18.3/bootstrap-table-locale-all.min.js"></script>
-
-<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.18.3/extensions/export/bootstrap-table-export.min.js"></script>
-<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.18.3/extensions/editable/bootstrap-table-editable.js"></script>
 <script>
-    $.fn.editableform.buttons =
-        '<button type="submit" class="btn btn-primary btn-sm editable-submit">' +
-        '<i class="fa fa-fw fa-check"></i>' +
-        "</button>" +
-        '<button type="button" class="btn btn-outline-dark btn-sm editable-cancel">' +
-        '<i class="fa fa-fw fa-times"></i>' +
-        "</button>";
     function cellStyle(value, row, index) {
         return {
             css: {
@@ -93,6 +39,54 @@
         };
     }
     $("#table").bootstrapTable({
+        url: "{{url_for('console.vol_time_data')}}",
+        pageSize: 20,
+        pageList: [20, 50, 80],
+        columns: [
+            {
+                field: "id",
+                title: "id",
+            },
+            {
+                field: "stu_id",
+                title: "学号",
+                editable: {
+                    type: "text",
+                },
+            },
+            {
+                field: "name",
+                title: "姓名",
+                cellStyle: cellStyle,
+                editable: {
+                    type: "text",
+                },
+            },
+            {
+                field: "faculty",
+                title: "学院",
+            },
+            {
+                field: "activity_DATE",
+                title: "时间",
+            },
+            {
+                field: "duration",
+                title: "时长",
+            },
+            {
+                field: "activity_name",
+                title: "任务名称",
+            },
+            {
+                field: "activity_faculty",
+                title: "组织学院",
+            },
+            {
+                field: "duty_person",
+                title: "组织人",
+            },
+        ],
         onEditableSave: function (field, row, oldValue, $el) {
             $.ajax({
                 type: "post",
@@ -115,6 +109,14 @@
                     alert("编辑失败");
                 },
             });
+        },
+        queryParams: function (params) {
+            $("#toolbar")
+                .find("input[name]")
+                .each(function () {
+                    params[$(this).attr("name")] = $(this).val();
+                });
+            return params;
         },
         onLoadSuccess: function (data) {
             if (data.sameList.length > 0) {

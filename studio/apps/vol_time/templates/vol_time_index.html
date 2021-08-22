@@ -82,7 +82,9 @@
             <span class="title">志愿时长查询</span>
             <a href="{{url_for('vol_time.get_top')}}" style="font-size: 20px; margin: 0 1em">排行榜</a>
         </div>
-        <div class="col-md-6 d-flex flex-row-reverse align-items-end"><span class="lastDate-info">更新至：{{lastDate}}</span></div>
+        <div class="col-md-6 d-flex flex-row-reverse align-items-end">
+            <span class="lastDate-info">更新至：{{lastDate}}</span>
+        </div>
     </div>
 
     <hr />
@@ -155,6 +157,10 @@
         <a href="{{url_for('issues.root')}}">联系我们</a>
     </span>
 </div>
+{% endblock %}
+<inr />
+
+{% block script %}
 <script src="https://static.runoob.com/assets/jquery-validation-1.14.0/lib/jquery.js"></script>
 <script src="https://static.runoob.com/assets/jquery-validation-1.14.0/dist/jquery.validate.min.js"></script>
 <script>
@@ -245,7 +251,7 @@
                     gravity: "top",
                     position: "right",
                 }).showToast();
-                if (res.num_sameID > 1 || res.num_sameName > 1) {
+                if (res.num_sameID > 1 || res.num_sameName > res.num_dupName) {
                     $(".alert__id2name").text(res.num_sameID);
                     $(".alert__name2id").text(res.num_sameName);
                     $(".alert_dataErr").show(200);

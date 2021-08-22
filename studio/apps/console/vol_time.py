@@ -1,6 +1,6 @@
 from flask import flash, render_template, redirect, request, g, url_for, current_app, session, jsonify
-from studio.apps.console import console
-from studio.models import db, VolTime_old, VolTime, VolTime_edit
+from .init import console
+from studio.models import db, VolTime_old, VolTime, VolTime_edit, VolTime_dupName
 import os
 import time
 import re
@@ -74,6 +74,76 @@ def vol_time_edit():
         db.session.commit()
         return jsonify({"status": 200, "msg": '操作成功'})
 
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(e)
+        return jsonify({"status": 499, "msg": '操作失败'})
+
+
+@console.route('/vol_time/dupName/show')
+def volTime_dupName_show():
+    return render_template(
+        'volTime_dupName.html',
+        bootstrap_table=True,
+        title='志愿时长重名管理'
+    )
+
+
+@console.route('/vol_time/dupName/data')
+def volTime_dupName_data():
+    pageNumber = int(request.values.get('pageNumber'))
+    pageSize = int(request.values.get('pageSize'))
+
+    dupNamesQuery = db.session.query(VolTime_dupName)
+    dupNames = dupNamesQuery.order_by(VolTime_dupName.id.desc())\
+        .paginate(pageNumber, per_page=pageSize, error_out=False).items
+    dupNameList = []
+
+    for dupName in dupNames:
+        dupName = dupName.__dict__
+        dupName.pop('_sa_instance_state')
+        dupNameList.append(dupName)
+    return jsonify({"total": dupNamesQuery.count(), "rows": dupNameList})
+
+
+@console.route('/vol_time/dupName/edit', methods=['POST'])
+def volTime_dupName_edit():
+    try:
+        db.session.query(VolTime_dupName)\
+            .filter(VolTime_dupName.id == request.values.get('id'))\
+            .update({'name': request.values.get('name'), 'dupNum': request.values.get('dupNum')})
+        db.session.commit()
+        return jsonify({"status": 200, "msg": '操作成功'})
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(e)
+        return jsonify({"status": 499, "msg": '操作失败'})
+
+
+@console.route('/vol_time/dupName/add', methods=['POST'])
+def volTime_dupName_add():
+    try:
+        dupName = VolTime_dupName(
+            id=0,
+            name=request.values.get('name'),
+            dupNum=request.values.get('dupNum'),
+            edit_by=g.user.id)
+        db.session.add(dupName)
+        db.session.commit()
+        return jsonify({"status": 200, "msg": '操作成功'})
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(e)
+        return jsonify({"status": 499, "msg": '操作失败'})
+
+
+@console.route('/vol_time/dupName/del', methods=['POST'])
+def volTime_dupName_del():
+    try:
+        db.session.query(VolTime_dupName)\
+            .filter(VolTime_dupName.id == request.values.get('id')).delete()
+        db.session.commit()
+        return jsonify({"status": 200, "msg": '操作成功'})
     except Exception as e:
         db.session.rollback()
         current_app.logger.error(e)
