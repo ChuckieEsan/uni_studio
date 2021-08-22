@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, jsonify, current_app, flash, g
-from studio.models import db, VolTime_old, VolTime
+from studio.models import db, VolTime_old, VolTime, VolTime_dupName
 from studio.cache import cache
 import os
 import heapq
@@ -35,8 +35,8 @@ def vol_time_search():
         volTime = volTime.__dict__
         volTime.pop('_sa_instance_state')
         volTime['activity_DATE'] = volTime['activity_DATE'].strftime(
-            '%Y-%m-%d')
-        volTime['queryNewly'] = 0 if volTime['id'] in set_idsOld else 1
+            '%Y-%m-%d') if volTime['activity_DATE'].year > 2005 else volTime['activity_date_str']
+        volTime['queryNewly'] = 0 if volTime['id'] in set_idsOld or volTime['id'] > 100000 else 1
         volTimeList.append(volTime)
 
     set_idsNow = set([volTime['id'] for volTime in volTimeList])
