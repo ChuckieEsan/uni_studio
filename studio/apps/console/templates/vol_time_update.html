@@ -78,113 +78,117 @@
         <p class="info-box__ajax-info"></p>
         <p class="info-box__csv-info"></p>
     </div>
-    <script>
-        let toggleHowTo = () => {
-            $("#howto").toggle();
-        };
-
-        /** @type {FileReader} */
-        let reader;
-        if (window.FileReader) {
-            reader = new FileReader();
-        } else {
-            console.log("你的浏览器不支持读取文件");
-        }
-        /** @type {File} */
-        let file;
-        /** @type {string} */
-        let csv_text;
-        let encoding = "";
-        let result;
-        $("#refreshFile").click((e) => {
-            $("#data-table tbody").empty();
-            $(".info-box__csv-info").remove();
-            file = $("#csvFile")[0].files[0];
-            if (!file.name.endsWith(".csv")) {
-                appendCSVInfo("ERROR: 文件格式不是CSV", "error");
-                return;
-            }
-            reader.readAsText(file);
-            reader.onload = function () {
-                csv_text = reader.result;
-                if (csv_text.indexOf("�") != -1 || csv_text.indexOf("?") != -1) {
-                    if (encoding == "") {
-                        appendCSVInfo("INFO: 编码不是UTF-8，尝试GBK", "error");
-                        encoding = "GBK";
-                        reader.readAsText(file, "GBK");
-                    } else {
-                        appendCSVInfo("ERROR: 编码不是UTF-8或GBK", "error");
-                    }
-                } else {
-                    encoding = "";
-                    result = csv2array(csv_text);
-                    console.log(result);
-                    Toastify({
-                        text: "数据已加载",
-                        duration: 2000,
-                        gravity: "top",
-                        position: "left",
-                    }).showToast();
-                }
-            };
-            reader.onerror = function () {
-                console.log("ERROR: " + reader.error);
-            };
-        });
-        $("#uploadFile").click((e) => {
-            $.ajax({
-                type: "post",
-                contentType: "application/json",
-                data: JSON.stringify(result),
-                dataType: "text",
-                url: "{{url_for('console.update_by_array')}}",
-                success: function (res) {
-                    $(".info-box__ajax-info").html(res);
-                },
-                error: function (e) {
-                    console.log(e);
-                },
-            });
-        });
-        $("#csvFile").change((e) => {
-            $("#refreshFile").click();
-        });
-        /** @param {string} csvStr */
-        function csv2array(csvStr) {
-            let lines = csvStr.split("\n");
-            let results = [];
-            for (let i = 1; i < lines.length; i++) {
-                if (lines[i]) {
-                    let splits = lines[i].replace(/\s*/g, "").split(",");
-                    if (
-                        splits.length == 11 &&
-                        /^\d+$/.test(splits[3]) &&
-                        /^(\d{1,3}|\d{1,3}\.\d+)$/.test(splits[4]) &&
-                        /^\d{4}\/\d{1,2}\/\d{1,2}$/.test(splits[8])
-                    ) {
-                        $("#data-table tbody").append("<tr><td>" + splits.join("</td><td>") + "</td></tr>");
-                        results.push(splits);
-                    } else {
-                        appendCSVInfo(
-                            "WARN: 以下数据格式错误（学号：" +
-                                /^\d+$/.test(splits[3]) +
-                                "，时长：" +
-                                /^(\d{1,3}|\d{1,3}\.\d+)$/.test(splits[4]) +
-                                "，时间：" +
-                                /^\d{4}\/\d{1,2}\/\d{1,2}$/.test(splits[8]) +
-                                "）",
-                            "warning"
-                        );
-                        appendCSVInfo(splits);
-                    }
-                }
-            }
-            appendCSVInfo("读取到" + results.length + "条有效数据");
-            return results;
-        }
-        function appendCSVInfo(info, type = "") {
-            $(".info-box").append('<p class="info-box__csv-info ' + type + '">' + info + "</p>");
-        }
-    </script>
 </div>
+{% endblock %}
+<inr />
+
+{% block script %}
+<script>
+    let toggleHowTo = () => {
+        $("#howto").toggle();
+    };
+
+    /** @type {FileReader} */
+    let reader;
+    if (window.FileReader) {
+        reader = new FileReader();
+    } else {
+        console.log("你的浏览器不支持读取文件");
+    }
+    /** @type {File} */
+    let file;
+    /** @type {string} */
+    let csv_text;
+    let encoding = "";
+    let result;
+    $("#refreshFile").click((e) => {
+        $("#data-table tbody").empty();
+        $(".info-box__csv-info").remove();
+        file = $("#csvFile")[0].files[0];
+        if (!file.name.endsWith(".csv")) {
+            appendCSVInfo("ERROR: 文件格式不是CSV", "error");
+            return;
+        }
+        reader.readAsText(file);
+        reader.onload = function () {
+            csv_text = reader.result;
+            if (csv_text.indexOf("�") != -1 || csv_text.indexOf("?") != -1) {
+                if (encoding == "") {
+                    appendCSVInfo("INFO: 编码不是UTF-8，尝试GBK", "error");
+                    encoding = "GBK";
+                    reader.readAsText(file, "GBK");
+                } else {
+                    appendCSVInfo("ERROR: 编码不是UTF-8或GBK", "error");
+                }
+            } else {
+                encoding = "";
+                result = csv2array(csv_text);
+                console.log(result);
+                Toastify({
+                    text: "数据已加载",
+                    duration: 2000,
+                    gravity: "top",
+                    position: "left",
+                }).showToast();
+            }
+        };
+        reader.onerror = function () {
+            console.log("ERROR: " + reader.error);
+        };
+    });
+    $("#uploadFile").click((e) => {
+        $.ajax({
+            type: "post",
+            contentType: "application/json",
+            data: JSON.stringify(result),
+            dataType: "text",
+            url: "{{url_for('console.update_by_array')}}",
+            success: function (res) {
+                $(".info-box__ajax-info").html(res);
+            },
+            error: function (e) {
+                console.log(e);
+            },
+        });
+    });
+    $("#csvFile").change((e) => {
+        $("#refreshFile").click();
+    });
+    /** @param {string} csvStr */
+    function csv2array(csvStr) {
+        let lines = csvStr.split("\n");
+        let results = [];
+        for (let i = 1; i < lines.length; i++) {
+            if (lines[i]) {
+                let splits = lines[i].replace(/\s*/g, "").split(",");
+                if (
+                    splits.length == 11 &&
+                    /^\d+$/.test(splits[3]) &&
+                    /^(\d{1,3}|\d{1,3}\.\d+)$/.test(splits[4]) &&
+                    /^\d{4}\/\d{1,2}\/\d{1,2}$/.test(splits[8])
+                ) {
+                    $("#data-table tbody").append("<tr><td>" + splits.join("</td><td>") + "</td></tr>");
+                    results.push(splits);
+                } else {
+                    appendCSVInfo(
+                        "WARN: 以下数据格式错误（学号：" +
+                            /^\d+$/.test(splits[3]) +
+                            "，时长：" +
+                            /^(\d{1,3}|\d{1,3}\.\d+)$/.test(splits[4]) +
+                            "，时间：" +
+                            /^\d{4}\/\d{1,2}\/\d{1,2}$/.test(splits[8]) +
+                            "）",
+                        "warning"
+                    );
+                    appendCSVInfo(splits);
+                }
+            }
+        }
+        appendCSVInfo("读取到" + results.length + "条有效数据");
+        return results;
+    }
+    function appendCSVInfo(info, type = "") {
+        $(".info-box").append('<p class="info-box__csv-info ' + type + '">' + info + "</p>");
+    }
+</script>
 {% endblock %}
