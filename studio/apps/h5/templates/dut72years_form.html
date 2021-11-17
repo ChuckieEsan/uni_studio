@@ -1,6 +1,9 @@
-{% extends 'common_base.html'%} {% block content %}
+{% extends 'common_base.html'%}
+<inr />
+
+{% block content %}
 <link href="{{url_for('h5.static',filename='css/72years.css')}}" rel="stylesheet" type="text/css" />
-<div class="main__bg"><img src="{{url_for('h5.static',filename='72years/form.jpg')}}" alt=""></div>
+<div class="main__bg"><img src="{{url_for('h5.static',filename='72years/form.jpg')}}" alt="" /></div>
 <div class="main__form-box container">
     <form
         action="{{url_for('h5.celeb_72_card')}}"
@@ -48,6 +51,10 @@
         </div>
     </form>
 </div>
+{% endblock %}
+<inr />
+
+{% block script %}
 <script>
     let handleChange = () => {
         let v = $("#wish").val();
