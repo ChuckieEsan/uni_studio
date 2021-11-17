@@ -1,4 +1,7 @@
-{% extends 'common_base.html'%} {% block content %}
+{% extends 'common_base.html'%}
+<inr />
+
+{% block content %}
 <link href="{{url_for('h5.static',filename='css/72years.css')}}" rel="stylesheet" type="text/css" />
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -10,7 +13,9 @@
                 </button>
             </div>
             <div class="modal-body">
-                <a href="https://www.dutbit.com{{url_for('h5.celeb_72_form')}}">https://www.dutbit.com{{url_for('h5.celeb_72_form')}}</a>
+                <a href="https://www.dutbit.com{{url_for('h5.celeb_72_form')}}"
+                    >https://www.dutbit.com{{url_for('h5.celeb_72_form')}}</a
+                >
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
@@ -28,7 +33,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <img src="" width="90%" height="90%" id="imgExport">
+                <img src="" width="90%" height="90%" id="imgExport" />
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
@@ -47,26 +52,30 @@
     </div>
 </div>
 <div class="main_svg-test" style="display: none"></div>
+{% endblock %}
+<inr />
+
+{% block script %}
 <script>
     function buildSvgImageUrl(svg) {
         b64 = window.btoa(unescape(encodeURIComponent(svg)));
         return "data:image/svg+xml;base64," + b64;
     }
     $("#reload").click(() => {
-        window.location.href = "{{url_for('h5.celeb_72_form')}}"
+        window.location.href = "{{url_for('h5.celeb_72_form')}}";
     });
     $("#save").click(() => {
-        let data = "123"
+        let data = "123";
         var MIME_TYPE = "image/png";
-        cvs = document.getElementById("main__cvs")
+        cvs = document.getElementById("main__cvs");
         data = cvs.toDataURL(MIME_TYPE);
         $("#imgExport").attr("src", data);
-        $("#exampleModal2").modal('show')
+        $("#exampleModal2").modal("show");
     });
 
     let cvs = document.getElementById("main__cvs");
     let img = new Image();
-    img.setAttribute('crossorigin', 'anonymous');
+    img.setAttribute("crossorigin", "anonymous");
     img.src = "{{url_for('h5.static',filename='72years/'+image[0])}}";
     img.onload = function () {
         let ctx = cvs.getContext("2d");
@@ -76,8 +85,7 @@
         console.log(cvs.height, cvs.width);
         ctx.drawImage(this, 0, 0, cvs.width, cvs.height);
 
-        let text =
-            `我是${"{{data.name}}"}，是一名${"{{data.identity}}"}。在您72岁生日到来之际，我在${"{{data.location}}"}祝大工${"{{data.wish}}"}`;
+        let text = `我是${"{{data.name}}"}，是一名${"{{data.identity}}"}。在您72岁生日到来之际，我在${"{{data.location}}"}祝大工${"{{data.wish}}"}`;
         console.log(text);
         text =
             `<svg xmlns='http://www.w3.org/2000/svg' width='${cvs.width * 0.6}' height='${cvs.height * 0.45}'>` +
@@ -92,22 +100,22 @@
             "</div>" +
             "</foreignObject>" +
             "</svg>";
-        let url = buildSvgImageUrl(text)
+        let url = buildSvgImageUrl(text);
         let imgText = new Image();
-        imgText.setAttribute('crossorigin', 'anonymous');
+        imgText.setAttribute("crossorigin", "anonymous");
         imgText.onload = function () {
             ctx.drawImage(this, 0.2 * cvs.width, 0.27 * cvs.height);
         };
 
         imgText.src = url;
 
-        let imgQR = new Image()
-        imgQR.setAttribute('crossorigin', 'anonymous');
+        let imgQR = new Image();
+        imgQR.setAttribute("crossorigin", "anonymous");
 
-        imgQR.src = "{{url_for('h5.static',filename='72years/qr.jpg')}}"
+        imgQR.src = "{{url_for('h5.static',filename='72years/qr.jpg')}}";
         imgQR.onload = function () {
-            ctx.drawImage(this, 0.2 * cvs.width, 0.62 * cvs.height, 0.17 * cvs.width, 0.17 * cvs.width)
-        }
+            ctx.drawImage(this, 0.2 * cvs.width, 0.62 * cvs.height, 0.17 * cvs.width, 0.17 * cvs.width);
+        };
 
         document.querySelector(".main_svg-test").innerHTML = text;
     };
