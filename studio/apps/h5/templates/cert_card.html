@@ -57,7 +57,7 @@
                 width: 50%;
             }
         </style>
-        <title>card</title>
+        <title>专属证书</title>
     </head>
     <body>
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -90,7 +90,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <img src="" style="width:100%" id="imgExport" />
+                        <img src="" style="width: 100%" id="imgExport" />
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
@@ -115,7 +115,7 @@
                     </button>
                 </div>
             </div>
-            <div class="main_svg-test" style="display: none;"></div>
+            <div class="main_svg-test" style="display: none"></div>
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
@@ -150,28 +150,27 @@
                 console.log(img.height, img.width);
                 console.log(cvs.height, cvs.width);
                 ctx.drawImage(this, 0, 0, cvs.width, cvs.height);
+                img = new Image();
 
                 let text =
                     `<svg xmlns='http://www.w3.org/2000/svg' width='${cvs.width}' height='${cvs.height}'>` +
-                    `<foreignObject width='${cvs.width}' height='${cvs.height}'>` +
-                    `<div xmlns='http://www.w3.org/1999/xhtml' 
-                    style="margin:350px;padding-top:500px;font-size:70px;
-                    font-family:STKaiti, KaiTi, KaiTi_GB2312, DFKai-SB, serif;">` +
-                    `<p style='font-size:200px;text-align:center;'>${"{{data.name}}"}</p>` +
-                    `<p style='margin-top:-150px;text-align:center;'>来自${"{{data.department}}"}的${"{{data.name}}"}同学</p>` +
-                    `<p style='margin-top:-20px;text-align:center;'>鉴于你在校园安全宣传月各项活动中的积极表现，授予称号</p>` +
-                    `<p style='margin:370px 0 0 600px'>${"{{data.stu_num}}"}</p>` +
-                    "</div>" +
-                    "</foreignObject>" +
+                    `<text x="${
+                        cvs.width / 2
+                    }" y="1230" font-family="KaiTi" font-size="200" text-anchor="middle">${"{{data.name}}"}</text>` +
+                    `<text x="${
+                        cvs.width / 2
+                    }" y="1420" font-family="KaiTi" font-size="70" text-anchor="middle">来自${"{{data.department}}"}的${"{{data.name}}"}同学</text>` +
+                    `<text x="${
+                        cvs.width / 2
+                    }" y="1540" font-family="KaiTi" font-size="70" text-anchor="middle">鉴于你在校园安全宣传月各项活动中的积极表现，授予称号</text>` +
+                    `<text x="1150" y="1972" font-family="KaiTi" font-size="70" text-anchor="middle">${"{{data.stu_num}}"}</text>` +
                     "</svg>";
-                let url = buildSvgImageUrl(text);
-                let imgText = new Image();
+                let imgText = document.createElement("img");
                 imgText.setAttribute("crossorigin", "anonymous");
                 imgText.onload = function () {
                     ctx.drawImage(this, 0, 0);
                 };
-                imgText.src = url;
-                console.log(url);
+                imgText.src = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(text)));
 
                 document.querySelector(".main_svg-test").innerHTML = text;
             };

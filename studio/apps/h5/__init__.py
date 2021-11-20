@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, make_response, current_app
+from studio.models import IssuesIssues, db
 import random
 h5 = Blueprint("h5", __name__, template_folder="templates",
                static_folder="static")
@@ -36,6 +37,18 @@ def cert_form():
 @h5.route('/cert/card', methods=['GET', 'POST'])
 def cert_card():
     data = request.values.to_dict()
+    issue = IssuesIssues(
+        ip=request.remote_addr,
+        url='www.dutbit.com/h5/cert',
+        type='专属证书',
+        contact='00',
+        name=data['name'],
+        stu_id=data['stu_num'],
+        content=data['department'],
+        user_id=None
+    )
+    db.session.add(issue)
+    db.session.commit()
 
     res = make_response(render_template('cert_card.html', data=data))
     res.headers['Access-Control-Allow-Origin'] = '*'
