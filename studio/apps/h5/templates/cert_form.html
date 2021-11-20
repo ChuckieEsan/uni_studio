@@ -37,7 +37,7 @@
                 top: 0;
                 left: 0;
                 width: 100%;
-                margin-top: 350px;
+                margin-top: 80%;
                 text-align: center;
             }
             .main__card-box {
@@ -57,11 +57,11 @@
                 width: 50%;
             }
         </style>
-        <title>form</title>
+        <title>专属证书</title>
     </head>
     <body>
         <div>
-            <div class="main__bg"><img src="{{url_for('h5.static',filename='72years/cert_form.jpg')}}" alt="" /></div>
+            <div class="main__bg"><img src="{{url_for('h5.static',filename='72years/cert_form3.jpg')}}" alt="" /></div>
             <div class="main__form-box">
                 <form action="{{url_for('h5.cert_card')}}" method="POST" id="cardform">
                     <button type="submit" style="display: none" id="submit"></button>
@@ -73,27 +73,31 @@
                     </div>
                     <div class="form-group">
                         <select name="department" form="cardform" id="department" class="form-control" required>
-                            <option value="" disabled selected>学院</option>
+                            <option value="" disabled selected>学部或学院</option>
+                            <option value="化工与环境生命学部">化工与环境生命学部</option>
+                            <option value="机械工程与材料能源学部">机械工程与材料能源学部</option>
                             <option value="电子信息与电气工程学部">电子信息与电气工程学部</option>
                             <option value="建设工程学部">建设工程学部</option>
-                            <option value="人文与社会科学学部">人文与社会科学学部</option>
                             <option value="运载工程与力学学部">运载工程与力学学部</option>
-                            <option value="材料科学与工程学院">材料科学与工程学院</option>
-                            <option value="光电工程与仪器科学学院">光电工程与仪器科学学院</option>
-                            <option value="化工学院">化工学院</option>
-                            <option value="环境学院">环境学院</option>
-                            <option value="机械工程学院">机械工程学院</option>
-                            <option value="建筑与艺术学院">建筑与艺术学院</option>
+                            <option value="人文与社会科学学部">人文与社会科学学部</option>
                             <option value="经济管理学院">经济管理学院</option>
-                            <option value="能源与动力学院">能源与动力学院</option>
-                            <option value="生物工程学院">生物工程学院</option>
-                            <option value="数学科学学院">数学科学学院</option>
+                            <option value="建筑与艺术学院">建筑与艺术学院</option>
+                            <option value="马克思主义学院">马克思主义学院</option>
                             <option value="外国语学院">外国语学院</option>
                             <option value="物理学院">物理学院</option>
-                            <option value="张大煜学院">张大煜学院</option>
-                            <option value="大连理工大学白俄罗斯国立大学联合学院">
-                                大连理工大学白俄罗斯国立大学联合学院
-                            </option>
+                            <option value="数学科学学院">数学科学学院</option>
+                            <option value="光电工程与仪器科学学院">光电工程与仪器科学学院</option>
+                            <option value="张大煜（化学）学院">张大煜（化学）学院</option>
+                            <option value="体育与健康学院">体育与健康学院</option>
+                            <option value="国际教育学院（留学生办公室）">国际教育学院（留学生办公室）</option>
+                            <option value="创新创业学院">创新创业学院</option>
+                            <option value="大连理工大学白俄罗斯国立大学联合学院">大连理工大学白俄罗斯国立大学联合学院</option>
+                            <option value="国防教育学院">国防教育学院</option>
+                            <option value="远程与继续教育学院">远程与继续教育学院</option>
+                            <option value="城市学院">城市学院</option>
+                            <option value="宁波研究院">宁波研究院</option>
+                            <option value="高等教育研究院">高等教育研究院</option>
+                            <option value="能源研究院">能源研究院</option>
                         </select>
                     </div>
                     <div class="form-group">
