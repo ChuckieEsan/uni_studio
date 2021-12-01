@@ -27,6 +27,7 @@ from .apps.users import users as usersapp
 from .apps.enroll import enroll as enrollapp
 from .apps.h5 import h5 as h5app
 from .apps.chat import chat as chatapp
+from .api.apivue import apivue
 
 from itsdangerous import TimedJSONWebSignatureSerializer as TJWSS
 
@@ -84,6 +85,7 @@ def create_app():
         app.register_blueprint(enrollapp, url_prefix="/enroll")
         app.register_blueprint(h5app, url_prefix="/h5")
         app.register_blueprint(chatapp, url_prefix='/chat')
+        app.register_blueprint(apivue, url_prefix='/apivue')
 
         app.tjwss = TJWSS(app.config['SECRET_KEY'],
                           expires_in=app.config['TOKEN_EXPIRES_IN'])
