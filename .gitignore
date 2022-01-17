@@ -135,5 +135,3 @@ dmypy.json
 .DS_STORE
 
 
-
-migrations/versions/*

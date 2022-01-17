@@ -14,8 +14,7 @@ class Config():
 
     # DB Config
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://dutBit:12345678@10.35.54.95:3306/uni_studio?charset=utf8" if DEBUG else os.environ[
-        'SQLALCHEMY_DATABASE_URI']
+    SQLALCHEMY_DATABASE_URI = os.environ['SQLALCHEMY_DATABASE_URI']
     if (not DEBUG) and 'mysql+pymysql' not in SQLALCHEMY_DATABASE_URI:
         raise EnvironmentError("No db connection uri provided")
         exit(-1)

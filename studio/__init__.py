@@ -76,7 +76,8 @@ def create_app():
         app.register_blueprint(fileserviceapp, url_prefix='/fileservice')
         app.register_blueprint(staticfileapp, url_prefix='/staticfile')
         app.register_blueprint(voteapp, url_prefix='/vote')
-        app.register_blueprint(postcardapp, url_prefix='/postcard')
+
+        # app.register_blueprint(postcardapp, url_prefix='/postcard')
         app.register_blueprint(issuesapp, url_prefix="/issues")
         app.register_blueprint(commonfileapp, url_prefix="/common")
         app.register_blueprint(consoleapp, url_prefix="/console")
