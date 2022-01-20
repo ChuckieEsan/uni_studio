@@ -3,8 +3,7 @@ from flask.helpers import make_response, url_for, flash
 from studio.models import db, UserUsers
 from studio.utils.send_mail import send_mail
 from studio.utils.captcha_helper import getcaptcha
-users = Blueprint("users", __name__,
-                  template_folder="templates", static_folder="static")
+users = Blueprint("users", __name__, template_folder="templates", static_folder="static")
 
 
 @users.route('/')
@@ -30,8 +29,12 @@ def users_login():
         info = {'id': user.id}
         resp: Response = jsonify({"success": True})
         token = current_app.tjwss.dumps(info).decode()
-        resp.set_cookie('token', token, max_age=current_app.config['TOKEN_EXPIRES_IN'],
-                        domain=current_app.config['SERVER_NAME'], secure=True, httponly=True)
+        resp.set_cookie('token',
+                        token,
+                        max_age=current_app.config['TOKEN_EXPIRES_IN'],
+                        domain=current_app.config['SERVER_NAME'],
+                        secure=True,
+                        httponly=True)
         return resp
     return jsonify({"success": False, "details": "用户名或密码错误"})
 
@@ -74,8 +77,7 @@ def users_password_set():
     data = current_app.tjwss.loads(token)
     uid = data['id']
     new_password = request.values.get('password')
-    UserUsers.query.filter(UserUsers.id == uid).update(
-        {UserUsers.password: new_password})
+    UserUsers.query.filter(UserUsers.id == uid).update({UserUsers.password: new_password})
     db.session.commit()
     return redirect(url_for('users.users_entrypoint'))
 
@@ -83,32 +85,27 @@ def users_password_set():
 @users.route('/confirm')
 def users_confirm_index():
     if not g.user:
-        return redirect(url_for('users.users_entrypoint')+'?target={}'.format(request.path))
+        return redirect(url_for('users.users_entrypoint') + '?target={}'.format(request.path))
     if g.user.confirmed:
         return redirect(url_for('console.console_root'))
     return render_template('users_confirm.html')
 
 
-
 @users.route('/confirm', methods=['POST'])
 def users_confirm_post():
     if not g.user:
-        return redirect(url_for('users.users_entrypoint')+'?target={}'.format(request.path))
+        return redirect(url_for('users.users_entrypoint') + '?target={}'.format(request.path))
     if request.values['code'] != g.user.validation_code:
         flash('验证码无效')
         return redirect(url_for('users.users_confirm_index'))
-    UserUsers.query.filter(UserUsers.id == g.user.id).update({
-        UserUsers.confirmed: True,
-        UserUsers.validation_code: ''
-    })
+    UserUsers.query.filter(UserUsers.id == g.user.id).update({UserUsers.confirmed: True, UserUsers.validation_code: ''})
     db.session.commit()
     flash('验证完成，3秒后跳转')
-    return render_template('users_confirm.html',confirmed=True)
+    return render_template('users_confirm.html', confirmed=True)
 
 
 @users.route('/logout')
 def users_logout():
     response = make_response(redirect(url_for('users.users_entrypoint')))
-    response.set_cookie('token', '', max_age=1,
-                        domain=current_app.config['SERVER_NAME'], secure=True, httponly=True)
+    response.set_cookie('token', '', max_age=1, domain=current_app.config['SERVER_NAME'], secure=True, httponly=True)
     return response

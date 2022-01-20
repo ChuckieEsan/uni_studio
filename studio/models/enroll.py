@@ -12,6 +12,7 @@ class EnrollCandidates(db.Model, TimestampMixin, DeleteMixin):
     details = db.Column(db.Text)
     status = db.Column(db.Integer, default=0)
     form_id = db.Column(db.Integer)
+
     def __init__(self, *args, **kwargs):
         super(EnrollCandidates, self).__init__(**kwargs)
 
@@ -27,6 +28,7 @@ class EnrollForms(db.Model, TimestampMixin, DeleteMixin):
     description = db.Column(db.Text)
     details = db.Column(db.Text)
     image = db.Column(db.Text)
+
     def __init__(self, *args, **kwargs):
         super(EnrollForms, self).__init__(**kwargs)
 

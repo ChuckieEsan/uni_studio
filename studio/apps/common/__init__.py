@@ -4,8 +4,7 @@ from studio.models import GlobalNotifications
 import datetime
 import json
 # static folder and template folder are set here to avoid ambiguity
-common = Blueprint("common", __name__,
-                   template_folder='templates', static_folder='static')
+common = Blueprint("common", __name__, template_folder='templates', static_folder='static')
 
 
 @common.route('/notification/global')

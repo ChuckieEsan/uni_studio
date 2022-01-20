@@ -1,5 +1,5 @@
 import os
-from studio.cos import cos_put, url_for_cos
+from studio.utils.cos import cos_put, url_for_cos
 from studio.utils.hash_helper import md5
 from .init import console
 from flask import render_template, redirect, request, abort, g, url_for, current_app
@@ -35,8 +35,7 @@ def crud_get(table):
     current_app.logger.info(target_class)
     _id = request.values.get('id')
     if _id:
-        all = target_class.query.filter(
-            getattr(target_class, 'id') == _id).all()
+        all = target_class.query.filter(getattr(target_class, 'id') == _id).all()
     else:
         all = target_class.query.all()
 
@@ -52,10 +51,12 @@ def crud_get(table):
             constraints[c['name']] = 'bool'
         elif _type == "datetime":
             constraints[c['name']] = 'datetime'
-    return render_template('common_crud.html', data=all,
+    return render_template('common_crud.html',
+                           data=all,
                            _class=target_class,
                            constraints=constraints,
-                           getattr=getattr, title="crud")
+                           getattr=getattr,
+                           title="crud")
 
 
 @console.route(URL_PATTERN_RU, methods=['POST'])
@@ -89,8 +90,7 @@ def crud_put(table):
     _id = request.values['id']
     if key is None or value is None:
         abort(500)
-    data = target_class.query.filter(
-        getattr(target_class, 'id') == _id).first()
+    data = target_class.query.filter(getattr(target_class, 'id') == _id).first()
     if data:
         setattr(data, key, value)
         models.db.session.commit()
@@ -104,8 +104,7 @@ def crud_put(table):
 def crud_delete(table):
     _id = request.values.get('id')
     target_class = get_class(table)
-    item = target_class.query.filter(
-        getattr(target_class, 'id') == _id).first()
+    item = target_class.query.filter(getattr(target_class, 'id') == _id).first()
     models.db.session.delete(item)
     models.db.session.commit()
     return redirect(url_for('console.crud_get', table=table))

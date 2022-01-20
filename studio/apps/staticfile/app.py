@@ -6,23 +6,24 @@
 # This work based on jQuery-File-Upload which can be found at https://github.com/blueimp/jQuery-File-Upload/
 
 import os
-import re,PIL
+import re, PIL
 from PIL import Image
 import simplejson
 import traceback
 
-from flask import Flask, request, render_template, redirect, url_for, send_from_directory,g,current_app,Blueprint
+from flask import Flask, request, render_template, redirect, url_for, send_from_directory, g, current_app, Blueprint
 from flask_bootstrap import Bootstrap
 from werkzeug.utils import secure_filename
 from studio.apps.fileservice.libs.upload_file import uploadfile
 
-
-app = Blueprint("staticfile",__name__,template_folder='templates',static_folder='static')
+app = Blueprint("staticfile", __name__, template_folder='templates', static_folder='static')
 
 ALLOWED_EXTENSIONS = set(['txt', 'gif', 'png', 'jpg', 'jpeg', 'bmp', 'rar', 'zip', '7zip', 'doc', 'docx'])
 IGNORED_FILES = set(['.gitignore'])
 UPLOAD_FOLDER = '/usr/share/nginx/html/static'
 THUMBNAIL_FOLDER = '/usr/share/nginx/html/static/img/thumbnails'
+
+
 #bootstrap = Bootstrap(app)
 @app.before_request
 def befreq():
@@ -68,7 +69,8 @@ def create_thumbnail(image):
 @app.route("/upload", methods=['GET', 'POST'])
 def upload():
     def filename_filter(s):
-        return re.sub('[\/:*?"<>|]','-',s)
+        return re.sub('[\/:*?"<>|]', '-', s)
+
     if request.method == 'POST':
         files = request.files['file']
 
@@ -85,17 +87,17 @@ def upload():
                 # save file to disk
                 uploaded_file_path = os.path.join(UPLOAD_FOLDER, filename)
                 files.save(uploaded_file_path)
-                os.chmod(uploaded_file_path,0o666)
+                os.chmod(uploaded_file_path, 0o666)
                 # create thumbnail after saving
                 if mime_type.startswith('image'):
                     create_thumbnail(filename)
-                
+
                 # get file size after saving
                 size = os.path.getsize(uploaded_file_path)
 
                 # return json for js call back
                 result = uploadfile(name=filename, type=mime_type, size=size)
-            
+
             return simplejson.dumps({"files": [result.get_file()]})
 
     if request.method == 'GET':
@@ -103,7 +105,7 @@ def upload():
         files = [f for f in os.listdir(UPLOAD_FOLDER)\
              if os.path.isfile(os.path.join(UPLOAD_FOLDER,f))\
                   and f not in IGNORED_FILES ]
-        
+
         file_display = []
 
         for f in files:
@@ -127,7 +129,7 @@ def delete(filename):
 
             if os.path.exists(file_thumb_path):
                 os.remove(file_thumb_path)
-            
+
             return simplejson.dumps({filename: 'True'})
         except:
             return simplejson.dumps({filename: 'False'})
@@ -142,6 +144,7 @@ def get_thumbnail(filename):
 @app.route("/data/<string:filename>", methods=['GET'])
 def get_file(filename):
     return send_from_directory(UPLOAD_FOLDER, filename=filename)
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():

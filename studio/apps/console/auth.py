@@ -34,8 +34,7 @@ def auth_add():
 
 @console.route('/auth_update', methods=['POST'])
 def auth_update():
-    rule = RouteInterceptors.query.filter(
-        RouteInterceptors.id == request.values['id']).first()
+    rule = RouteInterceptors.query.filter(RouteInterceptors.id == request.values['id']).first()
     rule.role_bits = 0
     roles = request.values.getlist('roles')
     for _r in roles:

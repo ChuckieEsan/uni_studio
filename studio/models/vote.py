@@ -31,7 +31,7 @@ class VoteCandidates(TimestampMixin, db.Model):
         super(VoteCandidates, self).__init__(**kwargs)
 
     def __str__(self):
-        return str(self.todict())#"<Candidate NO {}>".format(self.id)
+        return str(self.todict())  # "<Candidate NO {}>".format(self.id)
 
 
 class VoteInfo(TimestampMixin, db.Model):
@@ -42,19 +42,19 @@ class VoteInfo(TimestampMixin, db.Model):
     description = db.Column(db.Text, default='', nullable=True)
     image = db.Column(db.Text, nullable=True)
     disabled = db.Column(db.Boolean, default=False, nullable=False)
-    start_at = db.Column(db.DateTime(
-        True), default=db.func.now(), nullable=True)
+    start_at = db.Column(db.DateTime(True), default=db.func.now(), nullable=True)
     end_at = db.Column(db.DateTime(True), default=db.func.now(), nullable=True)
     vote_min = db.Column(db.Integer, default=0, nullable=False)
     vote_max = db.Column(db.Integer, default=999, nullable=False)
     admin = db.Column(db.Text, nullable=False)
     shuffle = db.Column(db.Boolean, default=False, nullable=False)
     is_poll = db.Column(db.Boolean, default=False, nullable=False)
-    show_stats = db.Column(db.Boolean,default=False)
-    show_raw_vote_on_expire = db.Column(db.Boolean,default=False)
-    show_raw_vote_on_voted = db.Column(db.Boolean,default=False)
-    title_label = db.Column(db.String(255))#每一个选项的大标题的label
-    subtitle_label = db.Column(db.Text)#每一个选项的副标题的label
+    show_stats = db.Column(db.Boolean, default=False)
+    show_raw_vote_on_expire = db.Column(db.Boolean, default=False)
+    show_raw_vote_on_voted = db.Column(db.Boolean, default=False)
+    title_label = db.Column(db.String(255))  # 每一个选项的大标题的label
+    subtitle_label = db.Column(db.Text)  # 每一个选项的副标题的label
+
     def __init__(self, *args, **kwargs):
         super(VoteInfo, self).__init__(**kwargs)
 

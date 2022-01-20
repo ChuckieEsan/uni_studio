@@ -18,30 +18,24 @@ f = Faker(locale='zh_CN')
 @vote.route('/vote', methods=["GET"])  # 投票管理大厅，能看所有投票
 def admin_votes_show():
     voteinfo_all = VoteInfo.query.filter().all()
-    return render_template(
-        'vote_admin_index.html',
-        info_list=voteinfo_all,
-        title="Vote Admin"
-    )
+    return render_template('vote_admin_index.html', info_list=voteinfo_all, title="Vote Admin")
 
 
 @vote.route('/vote', methods=["POST"])  # 新建投票接口
 def admin_votes_add():
     #new_vote = request.get_json()
     new_vote = request.form
-    v = VoteInfo(
-        title=new_vote.get("title"),
-        subtitle=new_vote.get("subtitle"),
-        description=new_vote.get("description"),
-        image=new_vote.get("image"),
-        start_at=timestamp_to_datetime(new_vote.get("start_at")),
-        end_at=timestamp_to_datetime(new_vote.get("end_at")),
-        vote_min=new_vote.get("vote_min"),
-        vote_max=new_vote.get("vote_max"),
-        title_label=new_vote.get('title_label'),
-        subtitle_label=new_vote.get('subtitle_label'),
-        admin=g.user.id
-    )
+    v = VoteInfo(title=new_vote.get("title"),
+                 subtitle=new_vote.get("subtitle"),
+                 description=new_vote.get("description"),
+                 image=new_vote.get("image"),
+                 start_at=timestamp_to_datetime(new_vote.get("start_at")),
+                 end_at=timestamp_to_datetime(new_vote.get("end_at")),
+                 vote_min=new_vote.get("vote_min"),
+                 vote_max=new_vote.get("vote_max"),
+                 title_label=new_vote.get('title_label'),
+                 subtitle_label=new_vote.get('subtitle_label'),
+                 admin=g.user.id)
     db.session.add(v)
     db.session.commit()
     return redirect(url_for('console.admin_votes_show'))
@@ -49,42 +43,34 @@ def admin_votes_add():
 
 @vote.route('/vote/<int:vote_id>', methods=["GET"])
 def admin_vote_page(vote_id):
-    candidate_all = VoteCandidates.query.filter(
-        VoteCandidates.vote_id == vote_id).all()
+    candidate_all = VoteCandidates.query.filter(VoteCandidates.vote_id == vote_id).all()
     vote_info = VoteInfo.query.filter(VoteInfo.id == vote_id).first_or_404()
     for c in candidate_all:
         c.description = Markup(c.description)
-    return render_template(
-        'vote_admin_vote_page.html',
-        candidate_all=candidate_all,
-        vote_info=vote_info,
-        title=vote_info.title
-    )
+    return render_template('vote_admin_vote_page.html',
+                           candidate_all=candidate_all,
+                           vote_info=vote_info,
+                           title=vote_info.title)
 
 
 @vote.route('/vote/stats/<int:vote_id>')
 def show_vote_stats(vote_id):
     vote_info = get_vote_info(vote_id=vote_id)
-    candidates_all = sorted(get_candidate_all_info(
-        vote_id=vote_id), key=lambda x: x.votes, reverse=True)
+    candidates_all = sorted(get_candidate_all_info(vote_id=vote_id), key=lambda x: x.votes, reverse=True)
     return render_template('vote_stats.html', vote_info=vote_info, candidates_all=candidates_all)
 
 
 @vote.route('/vote/export/<int:vote_id>')
 def vote_export(vote_id):
     vote_info = get_vote_info(vote_id=vote_id)
-    candidates_all = sorted(get_candidate_all_info(
-        vote_id=vote_id), key=lambda x: x.votes, reverse=True)
+    candidates_all = sorted(get_candidate_all_info(vote_id=vote_id), key=lambda x: x.votes, reverse=True)
     result_list = []
     for c in candidates_all:
-        result_list.append({
-            'id': c.id,
-            str(vote_info.title_label): c.title,
-            str(vote_info.subtitle_label): c.subtitle,
-            '票数': c.votes
-        })
-    df = pd.DataFrame(result_list, columns=['id', str(
-        vote_info.title_label), str(vote_info.subtitle_label), '票数'])
+        result_list.append(
+            {'id': c.id,
+             str(vote_info.title_label): c.title,
+             str(vote_info.subtitle_label): c.subtitle, '票数': c.votes})
+    df = pd.DataFrame(result_list, columns=['id', str(vote_info.title_label), str(vote_info.subtitle_label), '票数'])
 
     out = BytesIO()
     writer = pd.ExcelWriter(out, engine='xlsxwriter')
@@ -118,12 +104,13 @@ def candidate_add(vote_id):
 def do_vote_batch_import(vote_id):
     fname = request.values.get('fileIndex')
     coverall = request.values.get('coverall') != None
-    files = [f for f in os.listdir(os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'], str(g.user.id)))
-             if os.path.isfile(os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'], str(g.user.id), f))]
+    files = [
+        f for f in os.listdir(os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'], str(g.user.id)))
+        if os.path.isfile(os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'], str(g.user.id), f))
+    ]
     if fname not in files:
         abort(400)
-    fpath = os.path.join(
-        current_app.config['FILESERVICE_UPLOAD_FOLDER'], str(g.user.id), fname)
+    fpath = os.path.join(current_app.config['FILESERVICE_UPLOAD_FOLDER'], str(g.user.id), fname)
     df = pd.read_excel(fpath, engine='openpyxl', header=None)
     candidates = []
     for i in range(1, df.shape[0]):
@@ -135,12 +122,10 @@ def do_vote_batch_import(vote_id):
             subtitle=row[1],
             description=row[2],
             action_at=row[3],
-            vote_id=vote_id
-        )
+            vote_id=vote_id)
         candidates.append(c)
     if coverall:
-        old_candidates = VoteCandidates.query.filter(
-            VoteCandidates.vote_id == vote_id).all()
+        old_candidates = VoteCandidates.query.filter(VoteCandidates.vote_id == vote_id).all()
         for o in old_candidates:
             db.session.delete(o)
     db.session.add_all(candidates)
