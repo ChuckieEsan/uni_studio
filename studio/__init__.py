@@ -14,7 +14,6 @@ from flask_bootstrap import Bootstrap  # for flask-file-uploader | fileservice
 from flask_migrate import Migrate
 from flask_hcaptcha import hCaptcha
 
-from .test import tests
 from .apps.fileservice.app import app as fileserviceapp
 from .apps.staticfile.app import app as staticfileapp
 from .apps.vote import vote as voteapp
@@ -72,7 +71,6 @@ def create_app():
 
         app.add_url_rule(
             '/', view_func=lambda: redirect(app.config["HOMEPAGE_URL"]))
-        app.register_blueprint(tests)
         app.register_blueprint(fileserviceapp, url_prefix='/fileservice')
         app.register_blueprint(staticfileapp, url_prefix='/staticfile')
         app.register_blueprint(voteapp, url_prefix='/vote')
