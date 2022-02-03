@@ -82,7 +82,7 @@ def create_app():
         app.register_blueprint(h5app, url_prefix="/h5")
         app.register_blueprint(chatapp, url_prefix='/chat')
         # app.register_blueprint(postcardapp, url_prefix='/postcard')
-        app.register_blueprint(apivue, url_prefix='/apivue')
+        app.register_blueprint(apivue)
 
         app.tjwss = TJWSS(app.config['SECRET_KEY'], expires_in=app.config['TOKEN_EXPIRES_IN'])
         return app
