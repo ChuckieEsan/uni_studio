@@ -8,8 +8,7 @@ from studio.models.enroll import db, EnrollCandidates, EnrollForms
 
 @console.route('/enroll')
 def enroll_console():
-    info_list = EnrollForms.query.filter(
-        EnrollForms.created_by == g.user.id).all()
+    info_list = EnrollForms.query.filter(EnrollForms.created_by == g.user.id).all()
     return render_template('enroll_admin_index.html', info_list=info_list)
 
 

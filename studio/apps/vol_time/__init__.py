@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify, current_app, flash, g
 from studio.models import db, VolTime_old, VolTime, VolTime_dupName
-from studio.cache import cache
+from studio.utils.cache import cache
 import os
 import heapq
 from sqlalchemy import func
@@ -42,16 +42,14 @@ def vol_time_search():
     set_idsNow = set([volTime['id'] for volTime in volTimeList])
     err_queryLost = 1 if len(set_idsOld.difference(set_idsNow)) > 0 else 0
 
-    num_sameID = db.session.query(VolTime.name)\
-        .filter(VolTime.stu_id == req_stu_id).group_by(VolTime.name).count()
-    num_sameName = db.session.query(VolTime.stu_id)\
-        .filter(VolTime.name == req_name).group_by(VolTime.stu_id).count()
-    dupName = db.session.query(VolTime_dupName)\
-        .filter(VolTime_dupName.name == req_name).first()
+    num_sameID = db.session.query(VolTime.name).filter(VolTime.stu_id == req_stu_id).group_by(VolTime.name).count()
+    num_sameName = db.session.query(VolTime.stu_id).filter(VolTime.name == req_name).group_by(VolTime.stu_id).count()
+    dupName = db.session.query(VolTime_dupName).filter(VolTime_dupName.name == req_name).first()
     num_dupName = 1 if dupName is None else dupName.dupNum
-    return jsonify({"name": req_name, "dataSheet": volTimeList,
-                    "num_sameID": num_sameID, "num_sameName": num_sameName,
-                    "num_dupName": num_dupName, "err_queryLost": err_queryLost})
+    return jsonify({
+        "name": req_name, "dataSheet": volTimeList, "num_sameID": num_sameID, "num_sameName": num_sameName,
+        "num_dupName": num_dupName, "err_queryLost": err_queryLost
+    })
 
 
 @vol_time.route('/top')
@@ -59,6 +57,7 @@ def vol_time_search():
 def get_top():
     sql_str = "SELECT CONCAT(LEFT(stu_id,6),'***') AS one_id, MAX(`name`) AS one_name,\
 SUM(duration) AS dur_sum FROM `vol_time` GROUP BY `stu_id` ORDER BY dur_sum DESC LIMIT 1,50"
+
     cursor = db.session.execute(sql_str)
     res = cursor.fetchall()
     data = [dict(zip(result.keys(), result)) for result in res]

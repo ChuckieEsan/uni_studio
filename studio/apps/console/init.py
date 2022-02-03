@@ -1,28 +1,24 @@
 from flask import Blueprint, current_app, render_template, redirect, request, g, flash
 import docker
 import re
-from studio.cos import cos_put
+from studio.utils.cos import cos_put
 from flask.helpers import url_for
 from studio.models import db, UserRoles, RouteInterceptors
 # static folder and template folder are set here to avoid ambiguity
-console = Blueprint("console", __name__,
-                    template_folder='templates', static_folder='static')
+console = Blueprint("console", __name__, template_folder='templates', static_folder='static')
 
 
 @console.route('/')
 def console_root():
     roles = UserRoles.query.filter(UserRoles.delete == False).all()
-    routes = RouteInterceptors.query.filter(
-        RouteInterceptors.delete == False).all()
+    routes = RouteInterceptors.query.filter(RouteInterceptors.delete == False).all()
     user_role = g.user.role_bits or 2
 
     valid_roles = [r for r in roles if user_role & r.role_bit]
-    valid_routes = [r for r in routes if user_role &
-                    r.role_bits or user_role & 1]
+    valid_routes = [r for r in routes if user_role & r.role_bits or user_role & 1]
     routeSheet = {}
     for r in roles:
-        routeSheet[r.role_bit] = {
-            "role_text": r.role_text, "description": r.description, "routes": []}
+        routeSheet[r.role_bit] = {"role_text": r.role_text, "description": r.description, "routes": []}
 
     for r in valid_routes:
         bits = r.role_bits
@@ -30,8 +26,7 @@ def console_root():
             lowbit = bits & -bits
             routeSheet[lowbit]["routes"].append(r)
             bits = bits & ~lowbit
-    return render_template('console_index.html',
-                           title='控制台', roles=valid_roles, routeSheet=routeSheet)
+    return render_template('console_index.html', title='控制台', roles=valid_roles, routeSheet=routeSheet)
 
 
 @console.route('/tskey', methods=['GET'])
