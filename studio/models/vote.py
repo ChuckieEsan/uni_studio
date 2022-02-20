@@ -1,9 +1,7 @@
-from .base import db
-from .mixins import TimestampMixin
+from .base import db, MixinBase
 
 
-class VoteVotes(TimestampMixin, db.Model):
-    __tablename__ = "vote_voters"
+class VoteVotes(db.Model, MixinBase):
     id = db.Column(db.Integer, primary_key=True)
     ip = db.Column(db.String(100), nullable=False)
     candidate = db.Column(db.Integer, nullable=False)  # candidates id
@@ -16,8 +14,7 @@ class VoteVotes(TimestampMixin, db.Model):
         return "<Vote NO {}>".format(self.id)
 
 
-class VoteCandidates(TimestampMixin, db.Model):
-    __tablename__ = "vote_candidates"
+class VoteCandidates(db.Model, MixinBase):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
     subtitle = db.Column(db.Text, nullable=True)
@@ -34,8 +31,7 @@ class VoteCandidates(TimestampMixin, db.Model):
         return str(self.todict())  # "<Candidate NO {}>".format(self.id)
 
 
-class VoteInfo(TimestampMixin, db.Model):
-    __tablename__ = "vote_info"
+class VoteInfo(db.Model, MixinBase):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
     subtitle = db.Column(db.Text, default='', nullable=True)

@@ -1,6 +1,6 @@
 from .init import console
 from flask import url_for, redirect, render_template, request, jsonify, session, g, current_app
-from studio.models import db, IssuesIssues, IssueTypes
+from studio.models import db, IssueIssues, IssueTypes
 
 
 @console.route('/issues')
@@ -16,10 +16,10 @@ def get_issues():
     searchText: str = request.values.get('searchText')
 
     if searchText.isdigit():
-        issuesQuery = db.session.query(IssuesIssues).filter(IssuesIssues.status == searchText)
+        issuesQuery = db.session.query(IssueIssues).filter(IssueIssues.status == searchText)
     else:
-        issuesQuery = db.session.query(IssuesIssues)
-    issues: list[IssuesIssues] = issuesQuery.order_by(IssuesIssues.created_at.desc())\
+        issuesQuery = db.session.query(IssueIssues)
+    issues: list[IssueIssues] = issuesQuery.order_by(IssueIssues.created_at.desc())\
         .paginate(pageNumber, per_page=pageSize, error_out=False).items
     issueList = []
     for issue in issues:
@@ -36,7 +36,7 @@ def issues_edit():
         req_id = request.values.get('id')
         req_status = request.values.get('status')
         print(req_id, req_status)
-        db.session.query(IssuesIssues).filter(IssuesIssues.id == req_id).update({'status': req_status})
+        db.session.query(IssueIssues).filter(IssueIssues.id == req_id).update({'status': req_status})
         db.session.commit()
         return jsonify({"status": 200, "msg": '操作成功'})
     except Exception as e:

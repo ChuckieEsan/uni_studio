@@ -1,6 +1,6 @@
 from flask import flash, render_template, redirect, request, g, url_for, current_app, session, jsonify
 from .init import console
-from studio.models import db, VolTime_old, VolTime, VolTime_edit, VolTime_dupName
+from studio.models import db, Voltime, VoltimeDupname
 import os
 import time
 import re
@@ -22,23 +22,23 @@ def vol_time_data():
     searchText: str = request.values.get('searchText')
     sameList = []
     if searchText == '':
-        volTimeQuery = VolTime.query
+        voltimeQuery = Voltime.query
     elif searchText.isdigit():
-        volTimeQuery = VolTime.query.filter(VolTime.stu_id == searchText)
-        sameList = db.session.query(VolTime.name).filter(VolTime.stu_id == searchText).group_by(VolTime.name).all()
+        voltimeQuery = Voltime.query.filter(Voltime.stu_id == searchText)
+        sameList = db.session.query(Voltime.name).filter(Voltime.stu_id == searchText).group_by(Voltime.name).all()
     else:
-        volTimeQuery = VolTime.query.filter(VolTime.name == searchText)
-        sameList = db.session.query(VolTime.stu_id).filter(VolTime.name == searchText).group_by(VolTime.stu_id).all()
+        voltimeQuery = Voltime.query.filter(Voltime.name == searchText)
+        sameList = db.session.query(Voltime.stu_id).filter(Voltime.name == searchText).group_by(Voltime.stu_id).all()
 
-    volTimes: list[VolTime] = volTimeQuery.order_by(VolTime.activity_DATE.desc())\
+    voltimes: list[Voltime] = voltimeQuery.order_by(Voltime.activity_DATE.desc())\
         .paginate(pageNumber, per_page=pageSize, error_out=False).items
-    volTimeList = []
-    for volTime in volTimes:
-        volTime = volTime.__dict__
-        volTime.pop('_sa_instance_state')
-        volTime['activity_DATE'] = volTime['activity_DATE'].strftime('%Y-%m-%d')
-        volTimeList.append(volTime)
-    return jsonify({"total": volTimeQuery.count(), "rows": volTimeList, "sameList": [item[0] for item in sameList]})
+    voltimeList = []
+    for voltime in voltimes:
+        voltime = voltime.__dict__
+        voltime.pop('_sa_instance_state')
+        voltime['activity_DATE'] = voltime['activity_DATE'].strftime('%Y-%m-%d')
+        voltimeList.append(voltime)
+    return jsonify({"total": voltimeQuery.count(), "rows": voltimeList, "sameList": [item[0] for item in sameList]})
 
 
 @console.route('/vol_time/edit', methods=['POST'])
@@ -48,18 +48,12 @@ def vol_time_edit():
         req_name = request.values.get('name')
         req_stu_id = request.values.get('stu_id')
 
-        volTime_ori = VolTime.query.filter(VolTime.id == req_id).first()
-        volTime_edit = VolTime_edit(id=0,
-                                    vol_time_id=volTime_ori.id,
-                                    name_ori=volTime_ori.name,
-                                    stu_id_ori=volTime_ori.stu_id,
-                                    name_new=req_name if req_name != str(volTime_ori.name) else '',
-                                    stu_id_new=req_stu_id if req_stu_id != str(volTime_ori.stu_id) else 0,
-                                    edit_by=g.user.id)
-        db.session.add(volTime_edit)
-        db.session.commit()
+        to_update = Voltime.query.filter(Voltime.id == req_id).one()
+        to_update.stu_id = int(req_stu_id)
+        to_update.name = req_name
+        db.session.add(to_update)
+        # db.session.query(Voltime).filter(Voltime.id == req_id).update({'stu_id': req_stu_id, 'name': req_name})
 
-        db.session.query(VolTime).filter(VolTime.id == req_id).update({'stu_id': req_stu_id, 'name': req_name})
         db.session.commit()
         return jsonify({"status": 200, "msg": '操作成功'})
 
@@ -70,17 +64,17 @@ def vol_time_edit():
 
 
 @console.route('/vol_time/dupName/show')
-def volTime_dupName_show():
-    return render_template('volTime_dupName.html', bootstrap_table=True, title='志愿时长重名管理')
+def VoltimeDupname_show():
+    return render_template('VoltimeDupname.html', bootstrap_table=True, title='志愿时长重名管理')
 
 
 @console.route('/vol_time/dupName/data')
-def volTime_dupName_data():
+def VoltimeDupname_data():
     pageNumber = int(request.values.get('pageNumber'))
     pageSize = int(request.values.get('pageSize'))
 
-    dupNamesQuery = db.session.query(VolTime_dupName)
-    dupNames = dupNamesQuery.order_by(VolTime_dupName.id.desc())\
+    dupNamesQuery = db.session.query(VoltimeDupname)
+    dupNames = dupNamesQuery.order_by(VoltimeDupname.id.desc())\
         .paginate(pageNumber, per_page=pageSize, error_out=False).items
     dupNameList = []
 
@@ -92,10 +86,10 @@ def volTime_dupName_data():
 
 
 @console.route('/vol_time/dupName/edit', methods=['POST'])
-def volTime_dupName_edit():
+def VoltimeDupname_edit():
     try:
-        db.session.query(VolTime_dupName)\
-            .filter(VolTime_dupName.id == request.values.get('id'))\
+        db.session.query(VoltimeDupname)\
+            .filter(VoltimeDupname.id == request.values.get('id'))\
             .update({'name': request.values.get('name'), 'dupNum': request.values.get('dupNum')})
         db.session.commit()
         return jsonify({"status": 200, "msg": '操作成功'})
@@ -106,12 +100,12 @@ def volTime_dupName_edit():
 
 
 @console.route('/vol_time/dupName/add', methods=['POST'])
-def volTime_dupName_add():
+def VoltimeDupname_add():
     try:
-        dupName = VolTime_dupName(id=0,
-                                  name=request.values.get('name'),
-                                  dupNum=request.values.get('dupNum'),
-                                  edit_by=g.user.id)
+        dupName = VoltimeDupname(id=0,
+                                 name=request.values.get('name'),
+                                 dupNum=request.values.get('dupNum'),
+                                 edit_by=g.user.id)
         db.session.add(dupName)
         db.session.commit()
         return jsonify({"status": 200, "msg": '操作成功'})
@@ -122,10 +116,10 @@ def volTime_dupName_add():
 
 
 @console.route('/vol_time/dupName/del', methods=['POST'])
-def volTime_dupName_del():
+def VoltimeDupname_del():
     try:
-        db.session.query(VolTime_dupName)\
-            .filter(VolTime_dupName.id == request.values.get('id')).delete()
+        db.session.query(VoltimeDupname)\
+            .filter(VoltimeDupname.id == request.values.get('id')).delete()
         db.session.commit()
         return jsonify({"status": 200, "msg": '操作成功'})
     except Exception as e:
@@ -152,7 +146,7 @@ def update_by_array():
     try:
         for i in range(len(dataSheet)):
             dataArray = dataSheet[i]
-            line_volTime = VolTime(id=0,
+            line_voltime = Voltime(id=0,
                                    name=dataArray[0],
                                    sex=dataArray[1],
                                    faculty=dataArray[2],
@@ -165,7 +159,7 @@ def update_by_array():
                                    activity_DATE=dataArray[8],
                                    duty_person=dataArray[9],
                                    remark=dataArray[10])
-            db.session.add(line_volTime)
+            db.session.add(line_voltime)
             db.session.commit()
         current_app.logger.info("load data ok")
         new_rows = get_rows()
@@ -231,7 +225,7 @@ def do_vol_time_update():
 
 
 def get_rows():
-    cursor = db.session.execute("select count(*) from vol_time")
+    cursor = db.session.execute("select count(*) from voltime")
     res = cursor.fetchall()
     count = res[0][0]
     return count

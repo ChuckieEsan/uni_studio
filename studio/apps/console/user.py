@@ -8,10 +8,10 @@ import struct
 
 @console.route('/user')
 def user_show():
-    roles = UserRoles.query.filter(UserRoles.delete == False).all()
+    roles = UserRoles.query.all()
     for role in roles:
         role.role_bit_bin = bin(role.role_bit)[2:]
-    users = UserUsers.query.filter(UserUsers.delete == False).all()
+    users = UserUsers.query.all()
     r2 = db.session.query(UserRoles.role_bit, UserRoles.role_text, UserRoles.description,
                           UserUsers.username).outerjoin(UserUsers, UserRoles.created_by == UserUsers.id).all()
     return render_template("user_manage.html", and_op=and_op, roles=roles, users=users, title="用户管理", r2=r2, bin_op=bin)

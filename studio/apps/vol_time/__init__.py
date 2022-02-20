@@ -1,16 +1,29 @@
 from flask import Blueprint, render_template, request, jsonify, current_app, flash, g
-from studio.models import db, VolTime_old, VolTime, VolTime_dupName
+from studio.models import db, VoltimeOld, Voltime, VoltimeDupname
 from studio.utils.cache import cache
 import os
 import heapq
 from sqlalchemy import func
 vol_time = Blueprint("vol_time", __name__, template_folder="templates")
 
+import time
+from werkzeug.security import check_password_hash, generate_password_hash
+import hashlib
+
+
+@vol_time.route('/test/<tet>')
+def vol_time_test(tet: str):
+    time_start = time.time()
+    hash1 = hashlib.sha512(tet.encode("utf-8")).hexdigest()
+    hash2 = generate_password_hash(hash1)
+    timea1 = time.time() - time_start
+    return hash2 + '\n' + str(timea1) + "\n" + hash1 + "fff" if check_password_hash(hash2,hash1) else "no"
+
 
 @vol_time.route('/', methods=["GET"])
 def vol_time_home():
-    lastDate = db.session.query(VolTime.activity_DATE)\
-        .order_by(VolTime.activity_DATE.desc()).first()[0]
+    lastDate = db.session.query(Voltime.activity_DATE)\
+        .order_by(Voltime.activity_DATE.desc()).first()[0]
     lastDate = lastDate.strftime('%Y-%m-%d')
     return render_template("vol_time_index.html", title="志愿时长查询", lastDate=lastDate)
 
@@ -23,31 +36,31 @@ def vol_time_search():
     # cursor = db.session.execute("select * from vol_time_old where name = :name and stu_id = :stu_id", {'name': name, 'stu_id': stu_id})
     # "C:\Users\Administrator\Anaconda3\Lib\site-packages\sqlalchemy\engine\result.py"
     # res = cursor.fetchall()
-    results = db.session.query(VolTime_old.id)\
-        .filter(VolTime_old.stu_id == req_stu_id, VolTime_old.name == req_name).all()
+    results = db.session.query(VoltimeOld.id)\
+        .filter(VoltimeOld.stu_id == req_stu_id, VoltimeOld.name == req_name).all()
     set_idsOld = set([result[0] for result in results])
 
-    volTimes = db.session.query(VolTime)\
-        .filter(VolTime.stu_id == req_stu_id, VolTime.name == req_name)\
-        .order_by(VolTime.activity_DATE.desc()).all()
-    volTimeList = []
-    for volTime in volTimes:
-        volTime = volTime.__dict__
-        volTime.pop('_sa_instance_state')
-        volTime['activity_DATE'] = volTime['activity_DATE'].strftime(
-            '%Y-%m-%d') if volTime['activity_DATE'].year > 2005 else volTime['activity_date_str']
-        volTime['queryNewly'] = 0 if volTime['id'] in set_idsOld or volTime['id'] > 100000 else 1
-        volTimeList.append(volTime)
+    voltimes = db.session.query(Voltime)\
+        .filter(Voltime.stu_id == req_stu_id, Voltime.name == req_name)\
+        .order_by(Voltime.activity_DATE.desc()).all()
+    voltimeList = []
+    for voltime in voltimes:
+        voltime = voltime.__dict__
+        voltime.pop('_sa_instance_state')
+        voltime['activity_DATE'] = voltime['activity_DATE'].strftime(
+            '%Y-%m-%d') if voltime['activity_DATE'].year > 2005 else voltime['activity_date_str']
+        voltime['queryNewly'] = 0 if voltime['id'] in set_idsOld or voltime['id'] > 100000 else 1
+        voltimeList.append(voltime)
 
-    set_idsNow = set([volTime['id'] for volTime in volTimeList])
+    set_idsNow = set([voltime['id'] for voltime in voltimeList])
     err_queryLost = 1 if len(set_idsOld.difference(set_idsNow)) > 0 else 0
 
-    num_sameID = db.session.query(VolTime.name).filter(VolTime.stu_id == req_stu_id).group_by(VolTime.name).count()
-    num_sameName = db.session.query(VolTime.stu_id).filter(VolTime.name == req_name).group_by(VolTime.stu_id).count()
-    dupName = db.session.query(VolTime_dupName).filter(VolTime_dupName.name == req_name).first()
+    num_sameID = db.session.query(Voltime.name).filter(Voltime.stu_id == req_stu_id).group_by(Voltime.name).count()
+    num_sameName = db.session.query(Voltime.stu_id).filter(Voltime.name == req_name).group_by(Voltime.stu_id).count()
+    dupName = db.session.query(VoltimeDupname).filter(VoltimeDupname.name == req_name).first()
     num_dupName = 1 if dupName is None else dupName.dupNum
     return jsonify({
-        "name": req_name, "dataSheet": volTimeList, "num_sameID": num_sameID, "num_sameName": num_sameName,
+        "name": req_name, "dataSheet": voltimeList, "num_sameID": num_sameID, "num_sameName": num_sameName,
         "num_dupName": num_dupName, "err_queryLost": err_queryLost
     })
 

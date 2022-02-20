@@ -1,9 +1,7 @@
-from .base import db
-from .mixins import TimestampMixin, DeleteMixin
+from .base import db, MixinBase
 
 
-class EnrollCandidates(db.Model, TimestampMixin, DeleteMixin):
-    __tablename__ = "enroll_candidates"
+class EnrollCandidates(db.Model, MixinBase):
     id = db.Column(db.Integer, primary_key=True)
     number = db.Column(db.String(100), nullable=False)
     gender = db.Column(db.String(5), nullable=False)
@@ -20,8 +18,7 @@ class EnrollCandidates(db.Model, TimestampMixin, DeleteMixin):
         return "<Enroll NO {}>".format(self.id)
 
 
-class EnrollForms(db.Model, TimestampMixin, DeleteMixin):
-    __tablename__ = "enroll_forms"
+class EnrollForms(db.Model, MixinBase):
     id = db.Column(db.Integer, primary_key=True)
     created_by = db.Column(db.Integer, nullable=False)
     title = db.Column(db.String(255))

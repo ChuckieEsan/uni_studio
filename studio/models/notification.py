@@ -1,9 +1,7 @@
-from .base import db
-from .mixins import TimestampMixin
+from .base import db, MixinBase
 
 
-class GlobalNotifications(db.Model, TimestampMixin):
-    __tablename__ = "notifications_global"
+class NotificationsGlobal(db.Model, MixinBase):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.Text)
     valid_until = db.Column(db.DateTime(True), default=db.func.now(), nullable=False)

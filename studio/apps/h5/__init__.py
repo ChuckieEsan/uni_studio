@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, make_response, current_app
-from studio.models import IssuesIssues, db
+from studio.models import IssueIssues, db
 import random
 h5 = Blueprint("h5", __name__, template_folder="templates", static_folder="static")
 
@@ -34,7 +34,7 @@ def cert_form():
 @h5.route('/cert/card', methods=['GET', 'POST'])
 def cert_card():
     data = request.values.to_dict()
-    issue = IssuesIssues(ip=request.remote_addr,
+    issue = IssueIssues(ip=request.remote_addr,
                          url='www.dutbit.com/h5/cert',
                          type='专属证书',
                          contact='00',

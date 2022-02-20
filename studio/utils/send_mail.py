@@ -11,8 +11,11 @@ mail_user = sender
 
 
 def send_mail(to='', content='', subject='', type='html'):
-    threading.Thread(target=send_mail_thread,
-                     args=(current_app._get_current_object(), to, content, subject, type)).start()
+    try:
+        threading.Thread(target=send_mail_thread,
+                         args=(current_app._get_current_object(), to, content, subject, type)).start()
+    except Exception as e:
+        current_app.logger.error(e)
 
 
 def send_mail_thread(current_app, to='', content='', subject='', type='html'):

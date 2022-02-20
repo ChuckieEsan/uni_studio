@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 from flask.json import jsonify
-from studio.models import GlobalNotifications
+from studio.models import NotificationsGlobal
 import datetime
 import json
 # static folder and template folder are set here to avoid ambiguity
@@ -16,10 +16,10 @@ def get_global_notification():
             lim.append(int(v))
     except:
         pass
-    noti = GlobalNotifications.query.filter(
-        GlobalNotifications.valid_until > datetime.datetime.now())\
-        .filter(GlobalNotifications.id.notin_(lim))\
-        .order_by(GlobalNotifications.valid_until.desc()).all()
+    noti = NotificationsGlobal.query.filter(
+        NotificationsGlobal.valid_until > datetime.datetime.now())\
+        .filter(NotificationsGlobal.id.notin_(lim))\
+        .order_by(NotificationsGlobal.valid_until.desc()).all()
     result = []
     path = str(request.values.get('path'))
     for n in noti:

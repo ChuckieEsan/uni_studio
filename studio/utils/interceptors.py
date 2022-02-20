@@ -14,8 +14,7 @@ MUST_LOGIN_PATH = ['/console', '/chat']
 
 @cache.memoize(30)
 def get_all_rules() -> List[RouteInterceptors]:
-    return RouteInterceptors.query.filter(RouteInterceptors.delete == False)\
-        .order_by(RouteInterceptors.startswith.desc()).all()
+    return RouteInterceptors.query.order_by(RouteInterceptors.startswith.desc()).all()
 
 
 @cache.memoize(3)
@@ -24,6 +23,8 @@ def get_user(_id):
 
 
 def global_interceptor():
+    if request.path.startswith('/apivue'):
+        return
     try:
         token = request.cookies['token']
         data = current_app.tjwss.loads(token)
@@ -57,7 +58,7 @@ def global_interceptor():
             rules_hit = True
             break
 
-    if rules_hit and not g.user.confirmed:
+    if rules_hit and not g.user.validated:
         if not g.user.validation_code:
             code = getcaptcha(4)
             UserUsers.query.filter(UserUsers.id == g.user.id).update({'validation_code': code})

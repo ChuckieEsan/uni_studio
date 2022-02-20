@@ -80,7 +80,7 @@
 </div>
 <!-- Optional JavaScript -->
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-<script src="https://static.dutbit.com/md5.js"></script>
+<script src="https://static.dutbit.com/crypto-js.js"></script>
 <script src="https://cdn.staticfile.org/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 <script>
     $(document).ready(() => {
@@ -126,9 +126,6 @@
         var r = window.location.search.substr(1).match(reg);  //匹配目标参数
         if (r != null) return unescape(r[2]); return null; //返回参数值
     }
-    let md5enc = (str) => {
-        return hex_md5('dutbit' + hex_md5(str) + '稍有常识的人')
-    }
     let handleRegSubmit = () => {
         let email = $("#emailInput").val()
         let password = $("#passwordInput").val()
@@ -147,7 +144,7 @@
         }
         let result = {
             "username": username,
-            "password": md5enc(password),
+            "password": CryptoJS.SHA512(password).toString(),
             "email": email
         }
         fetch("{{url_for('users.users_register')}}", {
@@ -184,7 +181,7 @@
         $("#loginSpinner").addClass("spinner-grow spinner-grow-md")
         let result = {
             "email": email,
-            "password": md5enc(password)
+            "password": CryptoJS.SHA512(password).toString()
         }
 
         fetch("{{url_for('users.users_login')}}", {

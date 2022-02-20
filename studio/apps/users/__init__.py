@@ -23,9 +23,8 @@ def users_register():
 @users.route('/login', methods=['POST'])
 def users_login():
     data = request.get_json()
-    user = UserUsers.query.filter(UserUsers.email == str(data.get('email')).strip())\
-        .filter(UserUsers.password == str(data.get('password')).strip()).first()
-    if user:
+    user: UserUsers = UserUsers.query.filter(UserUsers.email == str(data.get('email')).strip()).one()
+    if user.check_password(str(data.get('password'))):
         info = {'id': user.id}
         resp: Response = jsonify({"success": True})
         token = current_app.tjwss.dumps(info).decode()

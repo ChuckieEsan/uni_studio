@@ -1,14 +1,11 @@
-from .base import db
-from .mixins import TimestampMixin, DeleteMixin
-from sqlalchemy import text
+from .base import db, MixinBase
 
 
-class Points(db.Model):
-    __tablename__ = "points"
+class Points(db.Model, MixinBase):
     id = db.Column(db.Integer, primary_key=True, nullable=False)
-    name = db.Column(db.String(20), nullable=False, server_default='')
-    sex = db.Column(db.String(5), nullable=False, server_default='')
-    faculty = db.Column(db.String(20), nullable=False, server_default='')
-    stu_id = db.Column(db.BigInteger, nullable=False, server_default=text('0'))
-    points = db.Column(db.Integer, nullable=False, server_default=text('0'))
-    remark = db.Column(db.Text, nullable=False)
+    name = db.Column(db.String(20), nullable=False)
+    sex = db.Column(db.String(5), nullable=False, default='')
+    faculty = db.Column(db.String(20), nullable=False, default='')
+    stu_id = db.Column(db.BigInteger, nullable=False)
+    points = db.Column(db.Integer, nullable=False, default=0)
+    remark = db.Column(db.Text, nullable=False, default='')

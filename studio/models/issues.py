@@ -1,9 +1,7 @@
-from .base import db
-from .mixins import TimestampMixin
+from .base import db, MixinBase
 
 
-class IssuesIssues(TimestampMixin, db.Model):
-    __tablename__ = 'issues_issues'
+class IssueIssues(db.Model, MixinBase):
     id = db.Column(db.Integer, primary_key=True)
     ip = db.Column(db.String(100), nullable=False)
     url = db.Column(db.Text, nullable=True)
@@ -16,14 +14,13 @@ class IssuesIssues(TimestampMixin, db.Model):
     status = db.Column(db.SmallInteger, default=1, nullable=True)
 
     def __init__(self, *args, **kwargs):
-        super(IssuesIssues, self).__init__(**kwargs)
+        super(IssueIssues, self).__init__(**kwargs)
 
     def __str__(self):
         return f"<IssueIssue NO {self.id}>\n类型：{self.type}\n联系方式：{self.contact}\n姓名：{self.name}\n学号：{self.stu_id}\n反馈内容：\n{self.content}"
 
 
-class IssueTypes(TimestampMixin, db.Model):
-    __tablename__ = 'issues_types'
+class IssueTypes(db.Model, MixinBase):
     id = db.Column(db.Integer, primary_key=True)
     default = db.Column(db.Boolean, default=False, nullable=False)
     typename = db.Column(db.String(255), nullable=False)
